@@ -1,0 +1,258 @@
+/* página */
+.page {
+    min-height: 100vh;
+    background: #f0f0f0;
+    color: #222;
+}
+
+/* HERO (mesmo estilo dos Projetos) */
+.hero {
+    position: relative;
+    height: 36vh;
+    min-height: 220px;
+    background-image: url("/images/hero-projects.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.heroContent {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 0 16px;
+}
+
+.heroTitle {
+    color: #fff;
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.heroSubtitle {
+    color: #e6f7ef;
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 1rem;
+}
+
+/* container */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 28px auto 80px;
+}
+
+/* controls */
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #006a4e;
+    font-weight: 600;
+    transition: all .18s ease;
+}
+
+.filterBtn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.filterBtn.active {
+    background: #006a4e;
+    color: #fff;
+    border-color: #006a4e;
+}
+
+.searchWrap {
+    width: 280px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+/* grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+/* card */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(12, 12, 12, 0.06);
+    display: flex;
+    flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(12, 12, 12, 0.09);
+}
+
+.cardImgWrap {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.cardImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: center;
+    transition: transform .35s ease;
+}
+
+.card:hover .cardImg {
+    transform: scale(1.05);
+}
+
+.cardBody {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.category {
+    background: rgba(0, 106, 78, 0.08);
+    color: #006a4e;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.year {
+    color: #666;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-left: auto;
+}
+
+.cardTitle {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111;
+    margin-top: 4px;
+}
+
+.cardExcerpt {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.cardActions {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btnPrimary {
+    background: #006a4e;
+    color: #fff;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnPrimary:hover {
+    background: #00996e;
+    transform: translateY(-2px);
+}
+
+.btnSecondary {
+    background: transparent;
+    border: 1px solid #ddd;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* responsividade */
+@media (max-width: 1100px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .searchWrap {
+        width: 100%;
+        order: 3;
+    }
+
+    .buttons {
+        order: 2;
+    }
+
+    .controls {
+        align-items: flex-start;
+    }
+
+    .hero {
+        height: 32vh;
+        padding-top: 100px;
+    }
+
+    .heroTitle {
+        font-size: 1.6rem;
+    }
+}
