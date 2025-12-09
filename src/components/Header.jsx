@@ -85,9 +85,9 @@ export default function Header() {
           ${styles.fadeIn}
         `}
       >
-        <button className="text-3xl mb-6" onClick={() => setOpen(false)}>✕</button>
+        <button className="text-3xl mb-5" onClick={() => setOpen(false)}>✕</button>
 
-        <ul className="flex flex-col gap-4 text-lg text-gray-800">
+        <ul className=" flex flex-col gap-5 text-lg text-gray-800">
           <li><Link to="/" onClick={() => setOpen(false)}>Início</Link></li>
           <li><Link to="/pesquisas" onClick={() => setOpen(false)}>Pesquisas</Link></li>
           <li><Link to="/projetos" onClick={() => setOpen(false)}>Projetos</Link></li>
@@ -98,7 +98,7 @@ export default function Header() {
         <Link
           to="/publicacoes"
           onClick={() => setOpen(false)}
-          className={`block mt-8 bg-[#006A4E] text-center text-white py-2 rounded-md hover:bg-[#00996E] transition ${styles.ctaSmooth}`}
+          className={`block  bg-[#006A4E] text-center text-white py-2 rounded-md hover:bg-[#00996E] transition ${styles.ctaSmooth}`}
         >
           Acessar Publicações
         </Link>
