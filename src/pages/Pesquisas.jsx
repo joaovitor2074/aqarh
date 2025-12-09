@@ -8,7 +8,7 @@ export default function Pesquisas() {
             <header className={styles.hero}>
                 <div className={styles.heroOverlay} />
                 <div className={styles.heroContent}>
-                    <h1 className={styles.heroTitle}>Pesquisas do Centro AQARH – IFMA</h1>
+                    <h1 className={styles.heroTitle}>Pesquisas do Centro GIEPI – IFMA</h1>
                     <p className={styles.heroSubtitle}>
                         Nesta seção você encontrará os projetos de pesquisa desenvolvidos pelo grupo,
                         abordando temas em alimentos, química, agronomia e recursos hídricos.

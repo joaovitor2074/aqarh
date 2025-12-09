@@ -106,22 +106,41 @@ body {
 .hero {
     width: 100%;
     height: 75vh;
-
-    background: url("../images/hero.jpg") center/cover no-repeat;
     position: relative;
-
     display: flex;
     align-items: center;
     justify-content: flex-start;
     padding-left: 60px;
+    overflow: hidden;
 }
 
-/* overlay */
-.hero .overlay {
+/* vídeo ocupando o fundo inteiro */
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* overlay para escurecer ou dar cor */
+.overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0, 0, 0, 0.35); /* ajuste se quiser mais escuro */
+    z-index: 1;
 }
+
+/* conteúdo por cima do vídeo */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    max-width: 600px;
+}
+
 
 /* texto */
 .hero-content {
@@ -132,7 +151,7 @@ body {
 }
 
 .hero-content h1 {
-    color: #49a4ff;
+    color: #a4d1ff;
     font-size: 2.8rem;
     font-weight: 800;
 }

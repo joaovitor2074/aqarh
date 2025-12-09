@@ -10,7 +10,7 @@ export default function Footer() {
                 <div className="footer-col">
                     <h3>Sobre o Grupo</h3>
                     <p>IFMA – Campus Codó</p>
-                    <p>AQARH – Alimentos, Química, Agronomia e Recursos Hídricos</p>
+                    <p>Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI</p>
                 </div>
 
 
@@ -35,7 +35,7 @@ export default function Footer() {
 
 
             <div className="footer-bottom">
-                <p>© 2025 AQARH – IFMA – Campus Codó</p>
+                <p>© 2025 GIEPI – IFMA – Campus Codó</p>
                 <p>Desenvolvido por JV – Iniciação Científica 2025/26</p>
             </div>
         </footer>

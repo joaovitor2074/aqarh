@@ -1,28 +1,28 @@
 import React from 'react'
 
-export default function Home(){
+export default function Home() {
   return (
     <>
       <section id="main-hero" className="hero">
-        <div className="overlay" />
+        <video autoPlay loop muted playsInline className="hero-video">
+          <source src="/img/videohero.mp4" type="video/mp4" />
+        </video>
+
+        <div className="overlay"></div>
 
         <div className="hero-content">
           <h1>Seja bem-vindo ao nosso Grupo de Pesquisa</h1>
-
-          <p>
-            Trabalhamos com inovação, ciência e impacto social nas áreas de Alimentos, Química,
-            Agronomia e Recursos Hídricos no IFMA – Campus Codó.
-          </p>
-
+          <p>Trabalhamos com inovação e ciência…</p>
           <button className="btn hero-btn">Conheça nossos projetos</button>
         </div>
       </section>
 
+
       <section id="card-sobre" className="section">
-        <h2 className="section-title">Sobre o AQARH</h2>
+        <h2 className="section-title">Sobre o GIEPI</h2>
 
         <p className="section-text">
-          O Grupo AQARH desenvolve pesquisas em ciência e tecnologia buscando soluções inovadoras
+          O Grupo GIEPI desenvolve pesquisas em ciência e tecnologia buscando soluções inovadoras
           para melhorar a qualidade de vida e fomentar o conhecimento científico no IFMA.
         </p>
 
@@ -51,6 +51,8 @@ export default function Home(){
         <p className="section-text">
           Trabalhamos com rigor científico para entregar resultados consistentes e relevantes.
         </p>
+
+        <button className="btn section-btn">Explorar Pesquisas</button>
       </section>
 
       <section className="section-team">

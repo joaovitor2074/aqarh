@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Projetos from './pages/Projetos'
 import Pesquisas from './pages/Pesquisas'
 import Publicacoes from './pages/Publicacoes'
+import Equipe from './pages/Equipe'
 
 
 
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/projetos" element={<Projetos />} />
           <Route path="/pesquisas" element={<Pesquisas />} />
           <Route path="/publicacoes" element={<Publicacoes />} />
+          <Route path="/equipe" element={<Equipe />} />
         </Routes>
       </main>
 

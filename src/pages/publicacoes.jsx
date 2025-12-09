@@ -30,7 +30,7 @@ export default function Publicacoes() {
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>Publicações Científicas</h1>
           <p className={styles.heroSubtitle}>
-            Artigos, relatórios e documentos produzidos pelo Grupo AQARH — IFMA Campus Codó.
+            Artigos, relatórios e documentos produzidos pelo Grupo GIEPI — IFMA Campus Codó.
           </p>
         </div>
       </header>
