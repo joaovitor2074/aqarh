@@ -28,11 +28,11 @@ export default function Header() {
   `}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <div className={`${styles.divlogo} flex items-center gap-3`}>
           
 
           <img
-            src="../public/img/header.png"
+            src="/img/header.png"
             alt="Logo GIEPI"
             className={`${styles.logoimg} w-9 h-9 md:w-11 md:h-11 object-contain`}
             
@@ -40,7 +40,7 @@ export default function Header() {
         </div>
 
         {/* Menu Desktop */}
-        <nav className="hidden md:flex">
+        <nav className={`${styles.navlink} hidden md:flex`}>
           <ul className="flex gap-8 text-lg text-white font-medium">
             <li className={styles.navItem}><Link to="/">Início</Link></li>
             <li className={styles.navItem}><Link to="/pesquisas">Pesquisas</Link></li>

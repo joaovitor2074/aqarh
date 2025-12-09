@@ -19,7 +19,11 @@
   border-radius: 10%;
   height: auto;
   width: 195px;
-  margin-left: 50%;
+  margin: 0 50px
+}
+
+.divlogo{
+  margin-right: 4rem;
 }
 
 /* Remove a margem no mobile */
@@ -38,6 +42,9 @@
   position: relative;
   padding-bottom: 4px;
   transition: color 0.25s ease;
+}
+.navlink {
+  margin: 0 auto;
 }
 
 .navItem a:hover {
