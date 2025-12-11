@@ -7,6 +7,7 @@ import Projetos from './pages/Projetos'
 import Pesquisas from './pages/Pesquisas'
 import Publicacoes from './pages/Publicacoes'
 import Equipe from './pages/Equipe'
+import Login from './pages/Login'
 
 
 
@@ -18,6 +19,7 @@ export default function App() {
 
       <main>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
           <Route path="/projetos" element={<Projetos />} />
           <Route path="/pesquisas" element={<Pesquisas />} />
