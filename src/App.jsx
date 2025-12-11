@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -9,17 +9,23 @@ import Publicacoes from './pages/Publicacoes'
 import Equipe from './pages/Equipe'
 import Login from './pages/Login'
 
+function AppContent() {
+  const location = useLocation()
 
+  // Esconde header e footer apenas na página de login
+  const hideLayout = location.pathname === "/login"
 
-export default function App() {
   return (
     <div className="app-root">
-      <Header />
-
+      {!hideLayout && <Header />}
 
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />
+
+          <Route path="/admin/adelton" element={<div>Admin Adelton Dashboard</div>} />
+          <Route path="/admin/pesquisador" element={<div>Pesquisador Dashboard</div>} />
+
           <Route path="/" element={<Home />} />
           <Route path="/projetos" element={<Projetos />} />
           <Route path="/pesquisas" element={<Pesquisas />} />
@@ -28,8 +34,11 @@ export default function App() {
         </Routes>
       </main>
 
-
-      <Footer />
+      {!hideLayout && <Footer />}
     </div>
   )
+}
+
+export default function App() {
+  return <AppContent />
 }
