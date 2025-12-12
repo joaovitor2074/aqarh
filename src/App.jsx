@@ -9,6 +9,9 @@ import Publicacoes from './pages/Publicacoes'
 import Equipe from './pages/Equipe'
 import Login from './pages/admin/Login'
 
+//admin
+import Dashboard from './pages/admin/Dashboard'
+
 import ProtectedRoute from './components/ProtectedRoute'
 
 function AppContent() {
@@ -32,7 +35,7 @@ function AppContent() {
             path="/admin/adelton"
             element={
               <ProtectedRoute>
-                <div>Admin Adelton Dashboard</div>
+                <Dashboard/>
               </ProtectedRoute>
             }
           />
