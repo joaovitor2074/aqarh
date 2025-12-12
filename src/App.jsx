@@ -7,13 +7,15 @@ import Projetos from './pages/Projetos'
 import Pesquisas from './pages/Pesquisas'
 import Publicacoes from './pages/Publicacoes'
 import Equipe from './pages/Equipe'
-import Login from './pages/Login'
+import Login from './pages/admin/Login'
+
+import ProtectedRoute from './components/ProtectedRoute'
 
 function AppContent() {
   const location = useLocation()
 
-  // Esconde header e footer apenas na página de login
-  const hideLayout = location.pathname === "/login"
+  // Esconde header e footer na página de login
+  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador"
 
   return (
     <div className="app-root">
@@ -21,16 +23,36 @@ function AppContent() {
 
       <main>
         <Routes>
+
+          {/* Login */}
           <Route path="/login" element={<Login />} />
 
-          <Route path="/admin/adelton" element={<div>Admin Adelton Dashboard</div>} />
-          <Route path="/admin/pesquisador" element={<div>Pesquisador Dashboard</div>} />
+          {/* Rotas protegidas */}
+          <Route
+            path="/admin/adelton"
+            element={
+              <ProtectedRoute>
+                <div>Admin Adelton Dashboard</div>
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/admin/pesquisador"
+            element={
+              <ProtectedRoute>
+                <div>Pesquisador Dashboard</div>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rotas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/projetos" element={<Projetos />} />
           <Route path="/pesquisas" element={<Pesquisas />} />
           <Route path="/publicacoes" element={<Publicacoes />} />
           <Route path="/equipe" element={<Equipe />} />
+
         </Routes>
       </main>
 
