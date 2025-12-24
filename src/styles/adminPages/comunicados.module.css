@@ -1,0 +1,109 @@
+/* ============================
+   TABELA DE COMUNICADOS
+============================ */
+
+
+.tituloCom {
+    margin-bottom: 20px;
+    color: #1f2937;
+    margin-left: 5rem;
+    margin-top:3rem;
+}
+
+.novoComBtn {
+   
+    color: white;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.1s;
+    margin-right: 10rem;
+    margin-top: 2rem;
+}
+.table-auto {
+    border-collapse: collapse;
+}
+
+/* Cabeçalho */
+.table-auto thead {
+    background-color: #f3f4f6;
+}
+
+.table-auto thead th {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Linhas */
+.table-auto tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s;
+}
+
+.table-auto tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Células */
+.table-auto tbody th {
+    font-weight: 500;
+    color: #111827;
+    padding: 14px 16px;
+}
+
+/* Colunas específicas */
+.titulo {
+    font-weight: 700;
+    text-align: left;
+}
+
+.descricao {
+    color: #4b5563;
+    text-align: left;
+}
+
+.data {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-align: left;
+}
+
+/* ============================
+   BOTÕES DE AÇÃO
+============================ */
+
+.editarBtn {
+    background-color: #2563eb;
+    color: white;
+    padding: 8px 8px;
+    border-radius: 6px;
+    margin-right: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.editarBtn:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.deleteBtn {
+    background-color: #dc2626;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.deleteBtn:hover {
+    background-color: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.editarBtn svg,
+.deleteBtn svg {
+    width: 14px;
+    height: 14px;
+}
+

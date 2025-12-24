@@ -12,6 +12,14 @@ import Login from './pages/admin/Login'
 //admin
 import Dashboard from './pages/admin/Dashboard'
 import Membros from './pages/admin/Membros'
+import Admprojetos from './pages/admin/Admprojetos'
+import Linhaspesquisas from './pages/admin/Linhaspesquisa'
+import Comunicados from './pages/admin/Comunicados'
+
+//extras
+import Config from './pages/admin/Config'
+
+
 
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -19,7 +27,7 @@ function AppContent() {
   const location = useLocation()
 
   // Esconde header e footer na página de login
-  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros"
+  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config"
 
   return (
     <div className="app-root">
@@ -57,6 +65,50 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/admin/projetos"
+            element={
+              <ProtectedRoute>
+                <Admprojetos/>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/admin/linhaspesquisas"
+            element={
+              <ProtectedRoute>
+                <Linhaspesquisas/>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route 
+            path="/admin/comunicados"
+            element={
+              <ProtectedRoute>
+                <Comunicados/>
+              </ProtectedRoute>
+            }
+          />
+
+
+
+
+
+          {/* rotas extras */}
+            <Route
+            path="/admin/config"
+            element={
+              <ProtectedRoute>
+                <Config/>
+              </ProtectedRoute>
+            }
+          />
+
+
+
 
           {/* Rotas públicas */}
           <Route path="/" element={<Home />} />

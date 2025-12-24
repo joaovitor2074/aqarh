@@ -11,7 +11,7 @@ export default function Sidebar() {
     { label: "Dashboard", path: "/admin/dashboard", icon: HomeIcon },
     { label: "Membros", path: "/admin/membros", icon: UsersIcon },
     { label: "Projetos", path: "/admin/projetos", icon: ProjectsIcon },
-    { label: "Linhas de Pesquisa", path: "/admin/linhas", icon: FlaskIcon },
+    { label: "Linhas de Pesquisa", path: "/admin/linhaspesquisas", icon: FlaskIcon },
     { label: "Comunicados", path: "/admin/comunicados", icon: MegaphoneIcon },
     { label: "Configurações", path: "/admin/config", icon: ConfigIcon },
   ];
