@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR"><head><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/theme.css.jsf?ln=primefaces-lattes" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/bootstrap.min.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/bootstrap-responsive.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/style-correct.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/printlattes.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" media="print" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/contrast.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/primefaces.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=primefaces" /><link type="text/css" rel="stylesheet" href="/dgp/javax.faces.resource/util.css.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=css" /><script type="text/javascript" src="/dgp/javax.faces.resource/jquery/jquery.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=primefaces"></script><script type="text/javascript" src="/dgp/javax.faces.resource/primefaces.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=primefaces"></script><script type="text/javascript" src="/dgp/javax.faces.resource/jquery/jquery-plugins.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=primefaces"></script>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <meta http-equiv="X-UA-Compatible" content="IE=8" /><script type="text/javascript" src="/dgp/javax.faces.resource/asmSelect.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/bootstrap.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/html5.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/tooltip.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/script.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/util.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script>
+	    <!-- Keycloak oAuth2 -->
+	    <script type="text/javascript" src="https://login.cnpq.br/auth/js/keycloak.js"></script><script type="text/javascript" src="/dgp/javax.faces.resource/keycloak-adapter.js.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=js"></script><script type="text/javascript">
+	    	var acessoPublico = true;
+	    	
+	    	if (!acessoPublico) {
+		    	keycloakAdapter.checkSso({
+	                      url: 'https://login.cnpq.br/auth',
+	                      realm: 'cnpq',
+	                      clientId: 'dgp'
+	                  });
+            }
+	    </script></head><body>
+	
+	    <div>
+    
+    <style type="text/css">
+    	
+	   	#idFrmOpcoesAcessibilidade .icon-question-sign {
+		  background-position: -96px -96px;
+		}
+		
+		#idFrmOpcoesAcessibilidade [class^="icon-"], [class*=" icon-"] {
+		  display: inline-block;
+		  width: 14px;
+		  height: 14px;
+		  margin-top: 1px;
+		  line-height: 14px;
+		  vertical-align: text-top;
+		  background-repeat: no-repeat;
+		}
+		
+		#idFrmOpcoesAcessibilidade i, cite, em, var, address, dfn {
+		  font-style: italic;
+		}
+		
+		#idFrmOpcoesAcessibilidade .btn-group > .btn, .btn-group > .dropdown-menu {
+		  font-size: 14px;
+		}
+		
+		#idFrmOpcoesAcessibilidade .btn {
+		  display: inline-block;
+		  padding: 4px 14px;
+		  margin-bottom: 0;
+		  color: #333333;
+		  text-align: center;
+		  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+		  vertical-align: middle;
+		  cursor: pointer;
+		  background-color: #f5f5f5;
+		  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+		  background-repeat: repeat-x;
+		  border: 1px solid #bbbbbb;
+		  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+		  border-bottom-color: #a2a2a2;
+		  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+		}
+		
+		#idFrmOpcoesAcessibilidade a:-webkit-any-link {
+		  text-decoration: underline;
+		}
+		
+		#idFrmOpcoesAcessibilidade .btn-group {
+		  position: relative;
+		  white-space: nowrap;
+		  vertical-align: middle;
+		}
+		
+		#idFrmOpcoesAcessibilidade body {
+		  padding-bottom: 20px;
+		  padding-top: 90px;
+		}
+		
+		#idFrmOpcoesAcessibilidade body {
+		  margin: 0;
+		  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		  background-color: #ffffff;
+		}
+		
+		#idFrmOpcoesAcessibilidade a:hover, a:active {
+		  outline: 0;
+		}
+		
+		#idFrmOpcoesAcessibilidade .btn:hover {
+		  color: #333333;
+		  text-decoration: none;
+		  background-color: #e6e6e6;
+		  background-position: 0 -15px;
+		  -webkit-transition: background-position 0.1s linear;
+		  -moz-transition: background-position 0.1s linear;
+		  -o-transition: background-position 0.1s linear;
+		  transition: background-position 0.1s linear;
+		}
+    
+    </style>
+    
+    <script type="text/javascript">
+	
+		var contrast = false;
+
+        function maisFonte(){
+        	var tam = parseInt($('body').css('font-size'));
+        	tam = tam + 2;
+            $('body, p, span,label').animate({'font-size' : tam + 'px'});
+	    };
+
+	    function menosFonte(){
+	    	var tam = parseInt($('body').css('font-size'));
+        	tam = tam - 2;
+            $('body, p, span,label').animate({'font-size' : tam + 'px'});
+	    };
+		
+		function contraste(){
+			if(contrast){
+				$("body").removeClass('contrast');
+				contrast = false;
+			}else{
+				$("body").addClass('contrast');
+				contrast = true;
+			}
+	    };
+
+	</script>
+	
+	<div class="container">
+<form id="idFrmOpcoesAcessibilidade" name="idFrmOpcoesAcessibilidade" method="post" action="/dgp/espelhorh/0050280708;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="idFrmOpcoesAcessibilidade" value="idFrmOpcoesAcessibilidade" />
+
+			<div class="logo-cnpq nav-collapse hidden-phone">
+				<a href="http://www.cnpq.br/" title="CNPq">
+					<h1>CNPq</h1>
+				</a>
+			</div>
+			<h2 class="nome-empresa hidden-phone">DI</h2>
+			<div class="acessibilidade btn-group pull-right">
+				<a class="btn" id="contrast" title="Contraste" rel="tooltip" data-placement="botton" onclick="contraste();">
+					<i class="icon-adjust"></i>
+				</a>
+				
+					<script>$('a[rel="tooltip"]').tooltip();</script> 
+					<a href="#" class="btn" title="Aumentar fonte" rel="tooltip" data-placement="bottom" onclick="maisFonte();">
+						<i class="icon-plus-sign"></i>
+					</a> 
+					<script>$('a[rel="tooltip"]').tooltip();</script> 
+					<a href="#" class="btn" title="Diminuir fonte" rel="tooltip" data-placement="bottom" onclick="menosFonte();">
+						<i class="icon-minus-sign"></i>
+					</a> 
+					<script>$('a[rel="tooltip"]').tooltip();</script> 
+					
+				<a href="http://lattes.cnpq.br/web/dgp/wiki/ " class="btn" rel="tooltip" target="_blank" title="Ajuda"><i class="icon-question-sign"></i> </a> 
+	
+			</div><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="1842160217953985945:8010200158742760026" autocomplete="off" />
+</form>
+	</div>
+	    </div>
+	
+	    <div>
+            <div class="navbar">
+            	<div class="navbar-inner">
+	                <div class="container">
+	                </div>
+                </div>
+            </div>
+	    </div>
+	
+	    <div class="container">
+	        <div class="row-fluid">
+	            <div class="span12">
+	
+	<!--MENU LATERAL-->	
+		<div class="container">
+			<div class="row-fluid">
+				<div class="span3 telaVisualizar" id="menuEspelhoRH">
+					<div class="menuPainel bs-docs-sidenav affix" data-spy="affix" data-offset-top="150">
+						<ul class="nav nav-list bs-docs-sidenav">
+								<li><span class="label_vazio"></span> <a href="#dadosGerais">Dados Gerais</a></li>
+								<li class="divisor menuItem"></li>
+								<li><span class="label_vazio"></span> <a href="#gruposPesquisa">Grupos de pesquisa</a></li>
+								<li class="divisor menuItem"></li>
+								<li><span class="label_vazio"></span> <a href="#linhasPesquisa">Linhas de pesquisa</a></li>
+								<li class="divisor menuItem"></li>
+								<li><span class="label_vazio"></span> <a href="#indicadoresProducao">Indicadores de produção</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- CONTEUDO DE VISUALIZACAO DO ESPELHO -->
+
+				<div id="divConteudo" class="span9">
+				<div class="row-fluid">
+				
+				<!-- T&Iacute;TULO DA P&Aacute;GINA PARA PESQUISADOR -->
+		
+				<!-- T&Iacute;TULO DA P&Aacute;GINA PARA ESTUDANTE -->
+		
+				<!-- T&Iacute;TULO DA P&Aacute;GINA PARA T&Eacute;CNICO -->
+				
+				<!-- T&Iacute;TULO DA P&Aacute;GINA PARA COLABORADOR ESTRANGEIRO --><div id="j_idt61"></div><script id="j_idt61_s" type="text/javascript">PrimeFaces.cw('AjaxStatus','widget_j_idt61',{id:'j_idt61'});widget_j_idt61.bindCallback('ajaxStart',function(){cnpqAjaxDialog.show();});widget_j_idt61.bindCallback('ajaxSuccess',function(){cnpqAjaxDialog.hide(); correcaoHintsPaginacaoDatatables();});</script><div id="j_idt62" class="ui-dialog ui-widget ui-widget-content ui-overlay-hidden ui-corner-all ui-shadow"><div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top"><span id="j_idt62_title" class="ui-dialog-title">Processando</span></div><div class="ui-dialog-content ui-widget-content">
+    <div class="layout-cell layout-cell-1"></div>
+    <div class="layout-cell layout-cell-3">
+        <center><img src="/dgp/javax.faces.resource/executando.gif.jsf;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0?ln=images" alt="Processando" /></center>
+    </div>
+    <div class="layout-cell layout-cell-14"><img id="j_idt66" height="10" alt="" src="/dgp/javax.faces.resource/spacer/dot_clear.gif.jsf?ln=primefaces" style="display: block;" />Sua solicitação está sendo executada. Aguarde.
+    </div>
+    <script type="text/javascript">
+    	
+	</script></div></div><script id="j_idt62_s" type="text/javascript">$(function(){PrimeFaces.cw('Dialog','cnpqAjaxDialog',{id:'j_idt62',draggable:false,resizable:false,modal:true,width:'350'});});</script><script id="j_idt69_s" type="text/javascript">$(function(){PrimeFaces.cw('Effect','widget_j_idt69',{id:'j_idt69',source:'mensagensEspelhoRH',event:'click',delay:0,fn:function(){$(PrimeFaces.escapeClientId('mensagensEspelhoRH')).effect('fade',{},1000);}});});</script><div id="mensagensEspelhoRH" class="ui-messages ui-widget" aria-live="polite"></div>
+				
+				<div style="text-align: center !important;">Endereço para acessar este espelho: 
+				</div>
+<form id="formVisualizarRH" name="formVisualizarRH" method="post" action="/dgp/espelhorh/0050280708;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0" class="form-horizontal box-form control-info" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="formVisualizarRH" value="formVisualizarRH" />
+
+					
+					<!-- AGRUPAMENTO DADOS GERAIS --><span class="">	
+
+	<div id="dadosGerais">
+	
+	<style>
+		.ui-datalist-content.ui-widget-content{
+			border:none!important;
+		}
+	</style>
+	
+		<legend>Dados Gerais</legend>
+	
+		<!-- NOME EM CITACOES BIBLIOGRAFICAS -->
+		<div class="control-group">
+			<label class="control-label">Nome em citações bibliográficas:</label>
+			<div class="controls">
+			</div>
+		</div>	
+		
+		
+		<!-- TITULACAO: RENDERIZADO SOMENTE PARA PESQUISADOR/ESTUDANTE/COL. ESTRANGEIRO -->		
+		
+		<!-- TITULACAO: RENDERIZADO SOMENTE ESTUDANTE -->
+		
+		
+		<!-- FORMACAO ACADEMICA: RENDERIZADO SOMENTE PARA TECNICO -->
+		
+		<!-- AREAS DE ATUACAO: RENDERIZADO SOMENTE PARA PESQUISADOR/ESTUDANTE/COL. ESTRANGEIRO -->
+		
+		<!-- BOLSISTA CNPQ: RENDERIZADO SOMENTE PARA PESQUISADOR/ESTUDANTE/COL. ESTRANGEIRO -->
+		
+		<!-- ULTIMA ATUALIZACAO DO CURRICULO LATTES -->
+		<div class="control-group">
+			<label class="control-label">Última atualização do Currículo Lattes:</label>
+			<div class="controls">
+			</div>
+		</div>
+	
+		<!-- CONTATO -->
+		<div class="control-group no-print">
+			<label class="control-label">Contato:</label>
+			<div class="controls" style="margin-top: -5px;">
+			</div>
+		</div>
+	
+		<!-- HOMEPAGE -->	
+		<div class="control-group">
+			<label class="control-label">Homepage:	</label>
+			<div class="controls">
+			</div>
+		</div><div id="formVisualizarRH:idDlgNmesCitacoes" class="ui-dialog ui-widget ui-widget-content ui-overlay-hidden ui-corner-all ui-shadow modal"><div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top"><span id="formVisualizarRH:idDlgNmesCitacoes_title" class="ui-dialog-title">Citações bibliográficas</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all"><span class="ui-icon ui-icon-closethick"></span></a></div><div class="ui-dialog-content ui-widget-content">
+			<div class="modal-body"><div id="formVisualizarRH:j_idt116" class="ui-datalist ui-widget"><div id="formVisualizarRH:j_idt116_content" class="ui-datalist-content ui-widget-content"><ul id="formVisualizarRH:j_idt116_list" class="ui-datalist-data"></ul></div></div><script id="formVisualizarRH:j_idt116_s" type="text/javascript">PrimeFaces.cw('DataList','widget_formVisualizarRH_j_idt116',{id:'formVisualizarRH:j_idt116'});</script>
+			</div>
+			<div class="modal-footer"><button id="formVisualizarRH:j_idt119" name="formVisualizarRH:j_idt119" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only btn-primary ui-state-highlight" onclick="dlgNmesCitacoes.hide();;PrimeFaces.ab({source:'formVisualizarRH:j_idt119'});return false;" type="submit"><span class="ui-button-text ui-c">Fechar</span></button><script id="formVisualizarRH:j_idt119_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_formVisualizarRH_j_idt119',{id:'formVisualizarRH:j_idt119'});</script>
+			</div></div></div><script id="formVisualizarRH:idDlgNmesCitacoes_s" type="text/javascript">$(function(){PrimeFaces.cw('Dialog','dlgNmesCitacoes',{id:'formVisualizarRH:idDlgNmesCitacoes',resizable:false,modal:true,width:'700'});});</script>
+		
+		
+		<!-- JANELA PARA ENVIO DE EMAIL --><div id="formVisualizarRH:contatoDialogId" class="ui-dialog ui-widget ui-widget-content ui-overlay-hidden ui-corner-all ui-shadow modal"><div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top"><span id="formVisualizarRH:contatoDialogId_title" class="ui-dialog-title">Contato</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all"><span class="ui-icon ui-icon-closethick"></span></a></div><div class="ui-dialog-content ui-widget-content"><span id="formVisualizarRH:formularioContatoContainer" class="modal-body">
+			
+				<div class="control-group">
+					<label class="control-label">
+						<span title="Required" class="required">*</span>Email do remetente
+					</label>
+					<div class="controls"><input id="formVisualizarRH:emailRemetenteInpuText" name="formVisualizarRH:emailRemetenteInpuText" type="text" maxlength="255" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all span11" /><script id="formVisualizarRH:emailRemetenteInpuText_s" type="text/javascript">PrimeFaces.cw('InputText','widget_formVisualizarRH_emailRemetenteInpuText',{id:'formVisualizarRH:emailRemetenteInpuText'});</script><script id="formVisualizarRH:j_idt123_s" type="text/javascript">$(function(){PrimeFaces.cw('Effect','widget_formVisualizarRH_j_idt123',{id:'formVisualizarRH:j_idt123',source:'formVisualizarRH:emailRemetenteInpuTextMsg',event:'click',delay:0,fn:function(){$(PrimeFaces.escapeClientId('formVisualizarRH:emailRemetenteInpuTextMsg')).effect('fade',{},1000);}});});</script><div id="formVisualizarRH:emailRemetenteInpuTextMsg" aria-live="polite"></div>
+					</div>
+				</div>
+				
+				<div class="control-group">
+					<label class="control-label">
+						<span title="Required" class="required">*</span>Assunto
+					</label>
+					<div class="controls"><input id="formVisualizarRH:assuntoEmailInpuText" name="formVisualizarRH:assuntoEmailInpuText" type="text" maxlength="255" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all span11" /><script id="formVisualizarRH:assuntoEmailInpuText_s" type="text/javascript">PrimeFaces.cw('InputText','widget_formVisualizarRH_assuntoEmailInpuText',{id:'formVisualizarRH:assuntoEmailInpuText'});</script><script id="formVisualizarRH:j_idt125_s" type="text/javascript">$(function(){PrimeFaces.cw('Effect','widget_formVisualizarRH_j_idt125',{id:'formVisualizarRH:j_idt125',source:'formVisualizarRH:assuntoEmailInpuTextMsg',event:'click',delay:0,fn:function(){$(PrimeFaces.escapeClientId('formVisualizarRH:assuntoEmailInpuTextMsg')).effect('fade',{},1000);}});});</script><div id="formVisualizarRH:assuntoEmailInpuTextMsg" aria-live="polite"></div>
+					</div>
+				</div>
+				
+				<div class="control-group">
+					<label class="control-label">
+						<span title="Required" class="required">*</span>Descrição
+					</label>
+					<div class="controls"><textarea id="formVisualizarRH:corpoEmailInpuText" name="formVisualizarRH:corpoEmailInpuText" class="span11" rows="5"></textarea><script id="formVisualizarRH:j_idt127_s" type="text/javascript">$(function(){PrimeFaces.cw('Effect','widget_formVisualizarRH_j_idt127',{id:'formVisualizarRH:j_idt127',source:'formVisualizarRH:corpoEmailInpuTextMsg',event:'click',delay:0,fn:function(){$(PrimeFaces.escapeClientId('formVisualizarRH:corpoEmailInpuTextMsg')).effect('fade',{},1000);}});});</script><div id="formVisualizarRH:corpoEmailInpuTextMsg" aria-live="polite"></div>
+					</div>
+				</div></span>
+			
+			<div class="modal-footer"><button id="formVisualizarRH:j_idt130" name="formVisualizarRH:j_idt130" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only btn-primary ui-state-highlight" onclick="PrimeFaces.ab({source:'formVisualizarRH:j_idt130',process:'formVisualizarRH:formularioContatoContainer formVisualizarRH:j_idt130',update:'formVisualizarRH:formularioContatoContainer'});return false;" type="submit"><span class="ui-button-text ui-c">Enviar</span></button><script id="formVisualizarRH:j_idt130_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_formVisualizarRH_j_idt130',{id:'formVisualizarRH:j_idt130'});</script><button id="formVisualizarRH:j_idt131" name="formVisualizarRH:j_idt131" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="PrimeFaces.ab({source:'formVisualizarRH:j_idt131',update:'formVisualizarRH:formularioContatoContainer'});return false;" type="submit"><span class="ui-button-text ui-c">Limpar</span></button><script id="formVisualizarRH:j_idt131_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_formVisualizarRH_j_idt131',{id:'formVisualizarRH:j_idt131'});</script>
+			</div></div></div><script id="formVisualizarRH:contatoDialogId_s" type="text/javascript">$(function(){PrimeFaces.cw('Dialog','contatoDialog',{id:'formVisualizarRH:contatoDialogId',resizable:false,modal:true,width:'700'});});</script>
+		
+	</div></span>
+					
+					<!-- AGRUPAMENTO GRUPOS DE PESQUISA EM QUE ATUA &#8211; INSTITUI&Ccedil;&Atilde;O DO GRUPO - STATUS --><span class="no-print">
+
+	<div id="gruposPesquisa">
+
+	<legend>Grupos de pesquisa em que atua</legend><div id="formVisualizarRH:tblEspelhoRHGPAtuacao" class="ui-datatable ui-widget table"><div class="ui-datatable-tablewrapper"><table role="grid"><thead id="formVisualizarRH:tblEspelhoRHGPAtuacao_head"><tr role="row"><th id="formVisualizarRH:tblEspelhoRHGPAtuacao:j_idt139" class="ui-state-default" role="columnheader"><span>Nome do grupo</span></th><th id="formVisualizarRH:tblEspelhoRHGPAtuacao:j_idt142" class="ui-state-default center" role="columnheader"><span>Instituição</span></th><th id="formVisualizarRH:tblEspelhoRHGPAtuacao:j_idt145" class="ui-state-default" role="columnheader"><span>Perfil</span></th><th id="formVisualizarRH:tblEspelhoRHGPAtuacao:j_idt148" class="ui-state-default no-print center" role="columnheader"><span>Ações</span></th></tr></thead><tfoot></tfoot><tbody id="formVisualizarRH:tblEspelhoRHGPAtuacao_data" class="ui-datatable-data ui-widget-content"><tr class="ui-widget-content ui-datatable-empty-message"><td colspan="4">Nenhum registro adicionado</td></tr></tbody></table></div></div><script id="formVisualizarRH:tblEspelhoRHGPAtuacao_s" type="text/javascript">$(function(){PrimeFaces.cw('DataTable','widget_formVisualizarRH_tblEspelhoRHGPAtuacao',{id:'formVisualizarRH:tblEspelhoRHGPAtuacao'});});</script>
+	
+	</div></span>
+					
+					<!-- AGRUPAMENTO LINHA DE PESQUISA EM QUE ATUA --><span class="no-print">
+	
+	<style>
+		.ui-datatable-data tr td .ui-datalist .ui-datalist-content.ui-widget-content{
+			border:none!important;
+		}
+	</style>
+	
+	<div id="linhasPesquisa">
+
+	<legend>Linhas de pesquisa em que atua</legend><div id="formVisualizarRH:tblEspelhoRHLPAtuacao" class="ui-datatable ui-widget table"><div class="ui-datatable-tablewrapper"><table role="grid"><thead id="formVisualizarRH:tblEspelhoRHLPAtuacao_head"><tr role="row"><th id="formVisualizarRH:tblEspelhoRHLPAtuacao:j_idt157" class="ui-state-default" role="columnheader"><span>Linha de pesquisa</span></th><th id="formVisualizarRH:tblEspelhoRHLPAtuacao:j_idt160" class="ui-state-default" role="columnheader"><span>Nome do grupo</span></th><th id="formVisualizarRH:tblEspelhoRHLPAtuacao:j_idt163" class="ui-state-default center no-print" role="columnheader"><span>Ações</span></th></tr></thead><tfoot></tfoot><tbody id="formVisualizarRH:tblEspelhoRHLPAtuacao_data" class="ui-datatable-data ui-widget-content"><tr class="ui-widget-content ui-datatable-empty-message"><td colspan="3">Nenhum registro adicionado</td></tr></tbody></table></div></div><script id="formVisualizarRH:tblEspelhoRHLPAtuacao_s" type="text/javascript">$(function(){PrimeFaces.cw('DataTable','widget_formVisualizarRH_tblEspelhoRHLPAtuacao',{id:'formVisualizarRH:tblEspelhoRHLPAtuacao'});});</script>
+
+	</div></span>
+					
+					<!-- AGRUPAMENTO ESTUDANTES ORIENTADOS PELO(A) PESQUISADOR(A), PARTICIPANTES DE GRUPOS EM QUE O PESQUISADOR ATUA -->
+					
+					<!-- AGRUPAMENTO ORIENTADOR(A) PARTICIPANTE DE GRUPOS DE PESQUISA NA INSTITUI&Ccedil;&Atilde;O -->
+					
+					<!-- AGRUPAMENTO ATIVIDADES -->
+					
+					<!-- AGRUPAMENTO GRUPOS DE PESQUISA EM QUE &Eacute; EGRESSO -->
+					
+					<!-- AGRUPAMENTO INDICADORES DE PRODU&Ccedil;&Atilde;O --><span class="no-print">
+
+	<div id="indicadoresProducao">
+
+	<legend>Indicadores de produção</legend>
+
+	<!-- HOMEPAGE -->	
+		<div class="control-group">
+			<label class="control-label">Indicadores:</label>
+			<div class="controls"><a href="http://dgp.cnpq.br/dgp/espelhorh/;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0" style="color: #0000FF; text-decoration: underline" target="_blank">
+					Visualizar
+				</a>
+			</div>
+		</div>
+
+	<!-- &lt;p:dataTable emptyMessage=&quot;Nenhum registro adicionado&quot; styleClass=&quot;table&quot;&gt;
+
+		&lt;p:column&gt;
+			&lt;f:facet name=&quot;header&quot;&gt;
+				&lt;h:outputText value=&quot;Tipo de produ&ccedil;&atilde;o&quot; /&gt;
+			&lt;/f:facet&gt;
+		&lt;/p:column&gt;
+
+		&lt;p:column&gt;
+			&lt;f:facet name=&quot;header&quot;&gt;
+				&lt;h:outputText value=&quot;2009&quot; /&gt;
+			&lt;/f:facet&gt;
+		&lt;/p:column&gt;
+
+		&lt;p:column&gt;
+			&lt;f:facet name=&quot;header&quot;&gt;
+				&lt;h:outputText value=&quot;2010&quot; /&gt;
+			&lt;/f:facet&gt;
+		&lt;/p:column&gt;
+		
+		&lt;p:column&gt;
+			&lt;f:facet name=&quot;header&quot;&gt;
+				&lt;h:outputText value=&quot;2011&quot; /&gt;
+			&lt;/f:facet&gt;
+		&lt;/p:column&gt;
+		
+		&lt;p:column&gt;
+			&lt;f:facet name=&quot;header&quot;&gt;
+				&lt;h:outputText value=&quot;2012&quot; /&gt;
+			&lt;/f:facet&gt;
+		&lt;/p:column&gt;
+	&lt;/p:dataTable&gt;
+ -->
+	</div></span>
+		
+					<!-- BOTOES DE A&Ccedil;&Atilde;O -->
+					<div class="form-actions no-print"><button id="formVisualizarRH:btnImprimir" name="formVisualizarRH:btnImprimir" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left btn btn-primary ui-state-highlight" onclick="PrimeFaces.ab({source:'formVisualizarRH:btnImprimir',oncomplete:function(xhr,status,args){idModalImprimirEspelhoRHVar.show();;}});return false;" type="submit"><span class="ui-button-icon-left ui-icon ui-c ui-icon-print"></span><span class="ui-button-text ui-c">Imprimir</span></button><script id="formVisualizarRH:btnImprimir_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_formVisualizarRH_btnImprimir',{id:'formVisualizarRH:btnImprimir'});</script><button id="formVisualizarRH:btnFechar" name="formVisualizarRH:btnFechar" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left btn" onclick="window.close();;PrimeFaces.ab({source:'formVisualizarRH:btnFechar'});return false;" type="submit"><span class="ui-button-icon-left ui-icon ui-c ui-icon-circle-arrow-w"></span><span class="ui-button-text ui-c">Fechar</span></button><script id="formVisualizarRH:btnFechar_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_formVisualizarRH_btnFechar',{id:'formVisualizarRH:btnFechar'});</script>
+		    		</div><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="1842160217953985945:8010200158742760026" autocomplete="off" />
+</form>
+				</div>
+				</div>
+			</div>
+		</div>
+
+		<iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe><div id="idModalImprimirEspelhoRH" class="ui-dialog ui-widget ui-widget-content ui-overlay-hidden ui-corner-all ui-shadow"><div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top"><span id="idModalImprimirEspelhoRH_title" class="ui-dialog-title">Imprimir</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all"><span class="ui-icon ui-icon-closethick"></span></a></div><div class="ui-dialog-content ui-widget-content">
+<form id="idFormImprimirLinhaPesquisa" name="idFormImprimirLinhaPesquisa" method="post" action="/dgp/espelhorh/0050280708;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0" class="form-horizontal" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="idFormImprimirLinhaPesquisa" value="idFormImprimirLinhaPesquisa" />
+
+			<div class="modal-body"><div id="idFormImprimirLinhaPesquisa:j_idt257" class="ui-datatable ui-widget"><div class="ui-datatable-tablewrapper"><table role="grid"><thead id="idFormImprimirLinhaPesquisa:j_idt257_head"><tr role="row"><th id="idFormImprimirLinhaPesquisa:j_idt257:j_idt258" class="ui-state-default ui-selection-column" role="columnheader" style="width:18px"><span></span><div class="ui-chkbox ui-chkbox-all ui-widget"><div class="ui-helper-hidden-accessible"><input type="checkbox" name="idFormImprimirLinhaPesquisa:j_idt257_checkbox" /></div><div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default"><span class="ui-chkbox-icon ui-c"></span></div></div></th><th id="idFormImprimirLinhaPesquisa:j_idt257:j_idt259" class="ui-state-default" role="columnheader"><span>Itens</span></th></tr></thead><tfoot></tfoot><tbody id="idFormImprimirLinhaPesquisa:j_idt257_data" class="ui-datatable-data ui-widget-content"><tr data-ri="0" data-rk="dadosgerais" class="ui-widget-content ui-datatable-even ui-state-highlight" role="row" aria-selected="true"><td role="gridcell" style="width:18px" class="ui-selection-column"><div class="ui-chkbox ui-widget"><div class="ui-helper-hidden-accessible"><input type="checkbox" name="idFormImprimirLinhaPesquisa:j_idt257_checkbox" /></div><div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default ui-state-active"><span class="ui-chkbox-icon ui-c ui-chkbox-icon ui-icon ui-icon-check ui-c"></span></div></div></td><td role="gridcell">Dados gerais</td></tr></tbody></table></div><input type="hidden" id="idFormImprimirLinhaPesquisa:j_idt257_selection" name="idFormImprimirLinhaPesquisa:j_idt257_selection" autocomplete="off" value="dadosgerais" /></div><script id="idFormImprimirLinhaPesquisa:j_idt257_s" type="text/javascript">$(function(){PrimeFaces.cw('DataTable','widget_idFormImprimirLinhaPesquisa_j_idt257',{id:'idFormImprimirLinhaPesquisa:j_idt257',selectionMode:'checkbox'});});</script>
+				
+			</div>
+			
+			<div class="modal-footer"><button id="idFormImprimirLinhaPesquisa:j_idt263" name="idFormImprimirLinhaPesquisa:j_idt263" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left btn-primary ui-state-highlight" onclick="PrimeFaces.ab({source:'idFormImprimirLinhaPesquisa:j_idt263',update:'formVisualizarRH',global:false});return false;" type="submit"><span class="ui-button-icon-left ui-icon ui-c ui-icon-print"></span><span class="ui-button-text ui-c">Imprimir</span></button><script id="idFormImprimirLinhaPesquisa:j_idt263_s" type="text/javascript">PrimeFaces.cw('CommandButton','widget_idFormImprimirLinhaPesquisa_j_idt263',{id:'idFormImprimirLinhaPesquisa:j_idt263'});</script>
+            </div><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="1842160217953985945:8010200158742760026" autocomplete="off" />
+</form></div></div><script id="idModalImprimirEspelhoRH_s" type="text/javascript">$(function(){PrimeFaces.cw('Dialog','idModalImprimirEspelhoRHVar',{id:'idModalImprimirEspelhoRH',resizable:false,modal:true,width:'310'});});</script>
+	           </div>
+	       </div>
+	    </div>
+	
+	
+	    <div class="cnpq-layout-rodape layout-cell layout-cell-18"> 
+	    </div>
+<form id="j_idt268" name="j_idt268" method="post" action="/dgp/espelhorh/0050280708;jsessionid=A6A8E3C473B76EE45FB6BF9EC3B6E28D.dgp_0" enctype="application/x-www-form-urlencoded" style="display: none">
+<input type="hidden" name="j_idt268" value="j_idt268" />
+<script type="text/javascript">autorizacaoRequestJSF = function() {PrimeFaces.ab({source:'j_idt269',formId:'j_idt268',params:arguments[0]});}</script><input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="1842160217953985945:8010200158742760026" autocomplete="off" />
+</form></body>
+	
+	<script type="text/javascript">
+		function correcaoHintsPaginacaoDatatables(){
+			inseriHintPaginacaoDatatables("Primeira página",
+										  "Última página",
+										  "Página anterior",
+										  "Próxima página");
+		}
+
+		correcaoHintsPaginacaoDatatables();
+	</script>
+</html>

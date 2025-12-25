@@ -13,7 +13,7 @@ import Login from './pages/admin/Login'
 import Dashboard from './pages/admin/Dashboard'
 import Membros from './pages/admin/Membros'
 import Admprojetos from './pages/admin/Admprojetos'
-import Linhaspesquisas from './pages/admin/Linhaspesquisa'
+import Linhaspesquisas from './pages/admin/LinhasPesquisa'
 import Comunicados from './pages/admin/Comunicados'
 
 //extras
