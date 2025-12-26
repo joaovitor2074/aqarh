@@ -1,26 +1,17 @@
-// scrape_cnpq.js
-const fs = require("fs");
-const path = require("path");
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const fs = require("fs");
 
 puppeteer.use(StealthPlugin());
 
-const URL = "http://dgp.cnpq.br/dgp/espelhorh/0038452960";
+const URL = "http://dgp.cnpq.br/dgp/espelhogrupo/6038878475345897";
 const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
 (async () => {
-  console.log("Iniciando scraper...");
-
   const browser = await puppeteer.launch({
     headless: false,
     executablePath: CHROME_PATH,
-    defaultViewport: null,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-blink-features=AutomationControlled"
-    ]
+    defaultViewport: null
   });
 
   const page = await browser.newPage();
@@ -30,47 +21,81 @@ const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
     "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
   );
 
-  console.log("Abrindo página...");
-  await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 60000 });
+  console.log("Abrindo página do grupo...");
+  await page.goto(URL, { waitUntil: "networkidle2" });
 
-  // Espera manual (substitui waitForTimeout)
-  await new Promise(r => setTimeout(r, 5000));
+  // Aguarda tabela de pesquisadores
+  await page.waitForSelector(
+    "#idFormVisualizarGrupoPesquisa\\:j_idt271_data tr",
+    { timeout: 30000 }
+  );
 
-  console.log("Aguardando carregamento da tabela...");
+  // Pega somente a primeira linha
+  const primeiraLinha = await page.$(
+    "#idFormVisualizarGrupoPesquisa\\:j_idt271_data tr"
+  );
 
-  // Espera o PrimeFaces realmente renderizar
-  try {
-    await page.waitForFunction(() => {
-      const el = document.querySelector("#formVisualizarRH\\:tblEspelhoRHLPAtuacao_data");
-      return el && el.querySelectorAll("tr").length > 0;
-    }, { timeout: 20000 });
-  } catch {
-    console.log("Tabela não carregou automaticamente.");
+  if (!primeiraLinha) {
+    throw new Error("Nenhuma linha encontrada na tabela principal");
   }
 
+  // 🔹 AQUI ESTÁ A CORREÇÃO
+  const linkEspelho = await primeiraLinha.$(
+    "a[id*='idBtnVisualizarEspelhoPesquisador']"
+  );
+
+  if (!linkEspelho) {
+    throw new Error("Link do espelho não encontrado na linha");
+  }
+
+  console.log("Abrindo espelho do pesquisador...");
+
+  const [espelhoPage] = await Promise.all([
+    new Promise(resolve =>
+      browser.once("targetcreated", async target => {
+        const p = await target.page();
+        resolve(p);
+      })
+    ),
+    linkEspelho.click()
+  ]);
+
+  await espelhoPage.bringToFront();
+
+  // Espera o PrimeFaces carregar os dados reais (AJAX)
+  await espelhoPage.waitForFunction(() => {
+    const rows = document.querySelectorAll(
+      "tbody[id$='tblEspelhoRHLPAtuacao_data'] tr[data-ri]"
+    );
+    return rows.length > 0;
+  }, { timeout: 30000 });
+
   // Extrai os dados
-  const dados = await page.evaluate(() => {
-    const linhas = document.querySelectorAll(
-      "#formVisualizarRH\\:tblEspelhoRHLPAtuacao_data tr"
+  const dados = await espelhoPage.evaluate(() => {
+    const rows = document.querySelectorAll(
+      "tbody[id$='tblEspelhoRHLPAtuacao_data'] tr[data-ri]"
     );
 
-    return Array.from(linhas).map(tr => {
+    return Array.from(rows).map(tr => {
       const tds = tr.querySelectorAll("td");
       return {
-        linha: tds[0]?.innerText.trim() || "",
+        linha_pesquisa: tds[0]?.innerText.trim() || "",
         grupo: tds[1]?.innerText.trim() || ""
       };
     });
   });
 
-  console.log("RESULTADO:");
+  console.log("DADOS EXTRAÍDOS:");
   console.log(dados);
 
-  // Salva arquivos
-  fs.writeFileSync("dados.json", JSON.stringify(dados, null, 2), "utf8");
+  fs.writeFileSync(
+    "teste_linha1.json",
+    JSON.stringify(dados, null, 2),
+    "utf-8"
+  );
 
-  console.log("✔ Dados salvos em dados.json");
+  console.log("Arquivo teste_linha1.json salvo com sucesso");
 
-  // NÃO fecha o navegador automaticamente (pra debug)
+  // Não fechar o browser para debug
   // await browser.close();
 })();
