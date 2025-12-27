@@ -68,7 +68,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
       const popup = await Promise.race([
         popupPromise,
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("popup_timeout")), 30000)
+          setTimeout(() => reject(new Error("popup_timeout")), 70000)
         )
       ]);
 
@@ -76,7 +76,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
       // aguarda tabela aparecer
       const tbodySelector = "tbody[id$='tblEspelhoRHLPAtuacao_data']";
-      await popup.waitForSelector(tbodySelector, { timeout: 20000 });
+      await popup.waitForSelector(tbodySelector, { timeout: 30000 });
 
       // aguarda dados AJAX
       await popup.waitForFunction(() => {
@@ -84,7 +84,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
           "tbody[id$='tblEspelhoRHLPAtuacao_data'] tr"
         );
         return rows.length > 0;
-      }, { timeout: 20000 });
+      }, { timeout: 30000 });
 
       const linhas_pesquisa = await popup.evaluate(() => {
         return Array.from(
