@@ -6,45 +6,46 @@ import {
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { db } from "../config/db.js";
 
-
 const router = Router();
 
-// protegidas
 router.get("/", authMiddleware, listarMembros);
 router.post("/", authMiddleware, criarMembro);
-// DELETE /membros/:id
+
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    await db.query("DELETE FROM membros WHERE id = ?", [id]);
-    res.json({ message: "Membro excluído com sucesso" });
+    await db.query("DELETE FROM pesquisadores WHERE id = ?", [id]);
+    res.json({ message: "Pesquisador excluído com sucesso" });
   } catch (err) {
-    res.status(500).json({ message: "Erro ao excluir membro" });
+    res.status(500).json({ message: "Erro ao excluir pesquisador" });
   }
 });
-// PUT /membros/:id
+
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, email, funcao } = req.body;
+    const { nome, titulacao_maxima,data_inclusao, email } = req.body;
 
-    if (!nome || !funcao) {
-      return res.status(400).json({ message: "Nome e função são obrigatórios" });
+    if (!nome || !titulacao_maxima) {
+      return res.status(400).json({
+        message: "Nome e titulação máxima são obrigatórios"
+      });
     }
 
     await db.query(
-      "UPDATE membros SET nome = ?, email = ?, funcao = ? WHERE id = ?",
-      [nome, email, funcao, id]
+      `
+      UPDATE pesquisadores
+      SET nome = ?, titulacao_maxima = ?, email = ?
+      WHERE id = ?
+      `,
+      [nome, titulacao_maxima, email, data_inclusao, id]
     );
 
-    res.json({ message: "Membro atualizado com sucesso" });
+    res.json({ message: "Pesquisador atualizado com sucesso" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erro ao atualizar membro" });
+    res.status(500).json({ message: "Erro ao atualizar pesquisador" });
   }
 });
 
-
-
 export default router;
-

@@ -21,9 +21,11 @@ export default function Membros() {
 
     const [form, setForm] = useState({
         nome: "",
-        funcao: "",
+        titulacao_maxima: "",
+        data_inclusao: "",
         email: ""
     });
+
 
     function handleChange(e) {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,14 +34,19 @@ export default function Membros() {
     async function carregarMembros() {
         try {
             setLoading(true);
+
             const data = await apiRequest("/membros");
+
+
             setMembros(data);
         } catch (error) {
+            console.error("❌ Erro ao carregar membros:", error);
             alert(error.message);
         } finally {
             setLoading(false);
         }
     }
+
 
     async function handleAddMembro() {
         try {
@@ -96,7 +103,7 @@ export default function Membros() {
 
                 {/* Cabeçalho */}
                 <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800">Membros</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800">Pesquisadores</h2>
                     <Button onClick={() => setOpenModal(true)}>Adicionar membro</Button>
                 </div>
 
@@ -111,8 +118,9 @@ export default function Membros() {
                             <thead>
                                 <tr className="text-left text-gray-500 border-b">
                                     <th className="pb-3">Nome</th>
-                                    <th className="pb-3">Função</th>
                                     <th className="pb-3">Email</th>
+                                    <th className="pb-3">Titulação</th>
+                                    <th className="pb-3">Incluido</th>
                                     <th className="pb-3">Ações</th>
                                 </tr>
                             </thead>
@@ -120,8 +128,12 @@ export default function Membros() {
                                 {membros.map((membro) => (
                                     <tr key={membro.id} className="border-b last:border-0">
                                         <td className="py-3 font-medium">{membro.nome}</td>
-                                        <td className="py-3">{membro.funcao}</td>
                                         <td className="py-3">{membro.email}</td>
+                                        <td className="py-3">{membro.titulacao_maxima}</td>
+                                        <td className="py-3">
+                                            {new Date(membro.data_inclusao).toLocaleDateString("pt-BR")}
+                                        </td>
+
                                         <td className="py-3 flex gap-2">
                                             <button
                                                 onClick={() => setEditing(membro)}
@@ -150,9 +162,14 @@ export default function Membros() {
                             <Input name="nome" value={form.nome} onChange={handleChange} />
                         </FormGroup>
 
-                        <FormGroup label="Função">
-                            <Input name="funcao" value={form.funcao} onChange={handleChange} />
+                        <FormGroup label="Titulação Máxima">
+                            <Input
+                                name="titulacao_maxima"
+                                value={form.titulacao_maxima}
+                                onChange={handleChange}
+                            />
                         </FormGroup>
+
 
                         <FormGroup label="Email">
                             <Input name="email" value={form.email} onChange={handleChange} />
@@ -169,9 +186,23 @@ export default function Membros() {
                 <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Editar membro">
                     {editing && (
                         <div className="space-y-4">
-                            <Input value={editing.nome} onChange={e => setEditing({ ...editing, nome: e.target.value })} />
-                            <Input value={editing.funcao} onChange={e => setEditing({ ...editing, funcao: e.target.value })} />
-                            <Input value={editing.email} onChange={e => setEditing({ ...editing, email: e.target.value })} />
+                            <Input
+                                value={editing.nome}
+                                onChange={e => setEditing({ ...editing, nome: e.target.value })}
+                            />
+
+                            <Input
+                                value={editing.titulacao_maxima}
+                                onChange={e =>
+                                    setEditing({ ...editing, titulacao_maxima: e.target.value })
+                                }
+                            />
+
+                            <Input
+                                value={editing.email}
+                                onChange={e => setEditing({ ...editing, email: e.target.value })}
+                            />
+
 
                             <div className="flex justify-end gap-2">
                                 <Button variant="secondary" onClick={() => setEditing(null)}>Cancelar</Button>
