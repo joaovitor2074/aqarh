@@ -3,67 +3,57 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { db } from "../config/db.js";
 
-// corrigir __dirname (ESM)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// caminho correto do JSON
-const jsonPath = path.join(__dirname, "../../data/resultado_final.json");
+const JSON_PATH = path.join(
+  __dirname,
+  "../../data/resultado_final_estudantes.json"
+);
 
 async function importarLinhasPesquisa() {
-  try {
-    const rawData = fs.readFileSync(jsonPath, "utf-8");
-    const pesquisadores = JSON.parse(rawData);
+  console.log("📥 Importando linhas de pesquisa...");
 
-    console.log(`📥 Iniciando importação de linhas de pesquisa...`);
-    let totalInseridas = 0;
+  const raw = fs.readFileSync(JSON_PATH, "utf-8");
+  const pessoas = JSON.parse(raw);
 
-    for (const pesquisador of pesquisadores) {
-      if (!pesquisador.linhas_pesquisa) continue;
+  let inseridas = 0;
 
-      for (const lp of pesquisador.linhas_pesquisa) {
-        const nomeLinha = lp.linha_pesquisa?.trim();
-        const grupoLinha = lp.grupo?.trim() || null;
+  for (const pessoa of pessoas) {
+    if (!Array.isArray(pessoa.linhas_pesquisa)) continue;
 
-        if (!nomeLinha) {
-          console.log("⚠️ Linha ignorada (sem nome)");
-          continue;
-        }
+    for (const lp of pessoa.linhas_pesquisa) {
+      const nome = lp.linha_pesquisa?.trim();
+      const grupo = lp.grupo?.trim() || null;
 
-        // evita duplicação
-        const [existe] = await db.query(
-          `
-          SELECT id FROM linhas_pesquisa
-          WHERE nome = ? AND grupo <=> ?
-          LIMIT 1
-          `,
-          [nomeLinha, grupoLinha]
-        );
+      if (!nome) continue;
 
-        if (existe.length > 0) {
-          continue;
-        }
+      const [existe] = await db.query(
+        `
+        SELECT id FROM linhas_pesquisa
+        WHERE nome = ? AND grupo <=> ?
+        LIMIT 1
+        `,
+        [nome, grupo]
+      );
 
-        await db.query(
-          `
-          INSERT INTO linhas_pesquisa (nome, grupo, ativo)
-          VALUES (?, ?, 1)
-          `,
-          [nomeLinha, grupoLinha]
-        );
+      if (existe.length > 0) continue;
 
-        totalInseridas++;
-        console.log(`➕ Linha inserida: ${nomeLinha}`);
-      }
+      await db.query(
+        `
+        INSERT INTO linhas_pesquisa (nome, grupo, ativo)
+        VALUES (?, ?, 1)
+        `,
+        [nome, grupo]
+      );
+
+      inseridas++;
+      console.log(`➕ ${nome}`);
     }
-
-    console.log(`\n✅ Importação finalizada!`);
-    console.log(`📊 Total de linhas inseridas: ${totalInseridas}`);
-    process.exit();
-  } catch (error) {
-    console.error("❌ Erro ao importar linhas de pesquisa:", error);
-    process.exit(1);
   }
+
+  console.log(`✅ Linhas inseridas: ${inseridas}`);
+  process.exit();
 }
 
 importarLinhasPesquisa();
