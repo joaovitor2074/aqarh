@@ -1,29 +1,39 @@
 import { db } from "../config/db.js";
 
+
+
 export async function listarMembros(req, res) {
   try {
     const [rows] = await db.query(`
-  SELECT
-    id,
-    nome,
-    titulacao_maxima,
-    email,
-    data_inclusao
-  FROM pesquisadores
-  ORDER BY nome ASC
-`);
-
+      SELECT 
+  p.id,
+  p.nome,
+  p.email,
+  p.ativo,
+  p.titulacao_maxima,
+  p.data_inclusao,
+  p.tipo_vinculo,
+  GROUP_CONCAT(lp.nome SEPARATOR ', ') AS linhas_pesquisa
+FROM pesquisadores p
+LEFT JOIN pesquisador_linha_pesquisa plp
+  ON p.id = plp.pesquisador_id
+LEFT JOIN linhas_pesquisa lp
+  ON lp.id = plp.linha_pesquisa_id
+GROUP BY p.id;
+    `);
 
     res.json(rows);
-  } catch (error) {
-    console.error("Erro ao listar pesquisadores:", error);
-    res.status(500).json({ message: "Erro ao listar pesquisadores." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erro ao listar membros" });
   }
 }
 
+
+
 export async function criarMembro(req, res) {
   try {
-    const { nome, titulacao_maxima, data_inclusao, email } = req.body;
+    const { nome, titulacao_maxima, email } = req.body;
 
     if (!nome || !titulacao_maxima) {
       return res.status(400).json({
@@ -33,10 +43,16 @@ export async function criarMembro(req, res) {
 
     await db.query(
       `
-      INSERT INTO pesquisadores (nome, titulacao_maxima, email)
-      VALUES (?, ?, ?)
+      INSERT INTO pesquisadores (
+        nome,
+        titulacao_maxima,
+        email,
+        tipo_vinculo,
+        ativo
+      )
+      VALUES (?, ?, ?, 'pesquisador', 1)
       `,
-      [nome.trim(), titulacao_maxima.trim(), email, data_inclusao || null]
+      [nome.trim(), titulacao_maxima.trim(), email || null]
     );
 
     res.status(201).json({ message: "Pesquisador cadastrado com sucesso!" });
@@ -45,3 +61,4 @@ export async function criarMembro(req, res) {
     res.status(500).json({ message: "Erro ao criar pesquisador." });
   }
 }
+

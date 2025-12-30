@@ -7,8 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const JSON_PATH = path.join(
-  __dirname,
-  "../../data/resultado_final_estudantes.json"
+  __dirname, "../../data/resultado_linhas_estudantes_espelho.json"
 );
 
 async function importarLinhasPesquisa() {

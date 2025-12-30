@@ -8,12 +8,23 @@ export async function listarLinhasPesquisa(req, res) {
         lp.nome,
         lp.grupo,
         lp.ativo,
-        GROUP_CONCAT(p.nome SEPARATOR ', ') AS pesquisadores
+
+        -- lista apenas pesquisadores ATIVOS
+        GROUP_CONCAT(
+          CASE 
+            WHEN p.ativo = 1 THEN p.nome
+          END
+          SEPARATOR ', '
+        ) AS pesquisadores
+
       FROM linhas_pesquisa lp
-      JOIN pesquisador_linha_pesquisa plp 
+
+      LEFT JOIN pesquisador_linha_pesquisa plp
         ON plp.linha_pesquisa_id = lp.id
-      JOIN pesquisadores p 
+
+      LEFT JOIN pesquisadores p
         ON p.id = plp.pesquisador_id
+
       GROUP BY lp.id
       ORDER BY lp.nome ASC
     `);
@@ -24,3 +35,4 @@ export async function listarLinhasPesquisa(req, res) {
     res.status(500).json({ message: "Erro ao listar linhas de pesquisa." });
   }
 }
+

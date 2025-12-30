@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 // JSON
 const jsonPath = path.join(
   __dirname,
-  "../../data/resultado_final_estudantes.json"
+  "../../data/resultado_linhas_estudantes_espelho.json"
 );
 
 async function importarRelacionamentos() {
