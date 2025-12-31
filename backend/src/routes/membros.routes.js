@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
   listarMembros,
-  criarMembro
+  criarMembro,
+  quantMembros
 } from "../controllers/membros.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { db } from "../config/db.js";
@@ -9,6 +10,7 @@ import { db } from "../config/db.js";
 const router = Router();
 
 router.get("/", authMiddleware, listarMembros);
+router.get("/quantidade",  quantMembros)
 router.post("/", authMiddleware, criarMembro);
 
 router.delete("/:id", authMiddleware, async (req, res) => {

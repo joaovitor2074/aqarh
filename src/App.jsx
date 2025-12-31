@@ -27,7 +27,7 @@ function AppContent() {
   const location = useLocation()
 
   // Esconde header e footer na página de login
-  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config"
+  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config" || location.pathname === "/admin/dashboard"
 
   return (
     <div className="app-root">
@@ -48,6 +48,16 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard/>
+              </ProtectedRoute>
+            }/>
+
+          
 
           <Route
             path="/admin/pesquisador"

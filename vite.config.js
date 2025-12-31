@@ -10,4 +10,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
   },
+  server: {
+    proxy: {
+      "/adminjv": {
+        target: "http://localhost:3000",
+        changeOrigin: true
+      }
+    }
+  }
 })

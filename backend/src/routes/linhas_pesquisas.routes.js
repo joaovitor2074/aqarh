@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { listarLinhasPesquisa } from "../controllers/linhas_pesquisas.controller.js";
+import { listarLinhasPesquisa, quantLinhas } from "../controllers/linhas_pesquisas.controller.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 // GET /linhas-pesquisa
-router.get("/", listarLinhasPesquisa);
+router.get("/",authMiddleware, listarLinhasPesquisa);
+router.get("/quantidade",quantLinhas)
 
 export default router;

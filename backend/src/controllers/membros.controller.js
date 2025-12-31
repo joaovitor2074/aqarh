@@ -1,4 +1,14 @@
 import { db } from "../config/db.js";
+import { getQuantidadeMembros } from "../services/getquantidadeMembros.service.js";
+
+export async function quantMembros(req, res) {
+    try {
+        const total = await getQuantidadeMembros();
+        return res.json({ total });
+    } catch (err) {
+        return res.status(500).json({ message: "Erro interno" });
+    }
+}
 
 
 

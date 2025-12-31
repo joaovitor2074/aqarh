@@ -1,5 +1,14 @@
 import { db } from "../config/db.js";
+import { getQuantidadeLinhas } from "../services/getquantidadeLinhas.service.js";
 
+export async function quantLinhas(req, res) {
+  try {
+    const total = await getQuantidadeLinhas();
+    return res.json({ total });
+  } catch (err) {
+    return res.status(500).json({ message: "Erro interno" });
+  }
+}
 export async function listarLinhasPesquisa(req, res) {
   try {
     const [rows] = await db.query(`
