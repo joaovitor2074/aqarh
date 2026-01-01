@@ -65,16 +65,15 @@ const handleScrape = async () => {
   try {
     setLoading(true)
 
-    const response = await fetch("/adminjv/scrape/run", {
+    const response = await fetch("http://localhost:3000/adminjv/scrape/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      credentials: "include" // se usa auth por cookie
     })
 
     const data = await response.json()
-    // ex: { membros_verificados: 12, alteracoes_encontradas: 3 }
+        // ex: { membros_verificados: 12, alteracoes_encontradas: 3 }
 
   } catch (error) {
     console.error("Erro ao verificar atualizações", error)

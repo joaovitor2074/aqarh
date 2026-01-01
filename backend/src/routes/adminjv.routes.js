@@ -1,10 +1,10 @@
 import { Router } from "express"
-import { runScrape } from "../controllers/scrapeController.js"
+import { runScrape } from "../controllers/scrape.controller.js"
 
 const router = Router()
 
 router.post("/scrape/run", (req, res) => {
-  res.json({ ok: true })
+  return runScrape(req, res)
 })
 
 export default router

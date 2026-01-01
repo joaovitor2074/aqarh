@@ -1,6 +1,11 @@
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-const fs = require("fs");
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+puppeteer.use(StealthPlugin());
+
 
 puppeteer.use(StealthPlugin());
 
@@ -10,7 +15,22 @@ const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 // sleep compatível com puppeteer antigo
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function scrapePesquisadores(){
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const outputPath = path.join(
+  __dirname,
+  "../../data/resultado_final_pesquisadores.json"
+);
+
+
+
+
+
+
+async function scrapePesquisadores() {
   console.log("========================================");
   console.log("🚀 Iniciando scraping de pesquisadores");
   console.log("========================================");
@@ -105,10 +125,12 @@ async function scrapePesquisadores(){
   console.log("💾 Salvando arquivo JSON...");
 
   fs.writeFileSync(
-    "resultado_final_pesquisadores.json",
+    outputPath,
     JSON.stringify(resultados, null, 2),
     "utf-8"
   );
+  return resultados
+  
 
   console.log("✅ Arquivo salvo: resultado_final_pesquisadores.json");
   console.log("🏁 Scraping finalizado com sucesso");
