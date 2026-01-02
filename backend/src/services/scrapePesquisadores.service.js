@@ -54,12 +54,25 @@ async function scrapePesquisadores() {
   await page.goto(URL, { waitUntil: "networkidle2", timeout: 60000 });
   console.log("✅ Página carregada com sucesso");
 
-  const rowSelectorBase = "#idFormVisualizarGrupoPesquisa\\:j_idt271_data tr";
+const MAIN_TABLE_IDS = [
+  "idFormVisualizarGrupoPesquisa:j_idt277_data",
+  "idFormVisualizarGrupoPesquisa:j_idt272_data",
+];
   console.log("🔍 Aguardando tabela de pesquisadores...");
-  await page.waitForSelector(rowSelectorBase);
+async function getMainTbodyHandle() {
+      for (const id of MAIN_TABLE_IDS) {
+        const selector = normalizeIdForSelector(id);
+        const handle = await page.$(selector);
+        if (handle) return handle;
+      }
+      return null;
+    }
+  const tbodyHandle = await getMainTbodyHandle();
+
+  await page.waitForSelector(tbodyHandle);
   console.log("✅ Tabela encontrada");
 
-  const totalRows = await page.$$eval(rowSelectorBase, els => els.length);
+  const totalRows = await page.$$eval(tbodyHandle, els => els.length);
   console.log(`📊 Total de pesquisadores encontrados: ${totalRows}`);
 
   const resultados = [];
@@ -129,11 +142,11 @@ async function scrapePesquisadores() {
     JSON.stringify(resultados, null, 2),
     "utf-8"
   );
-  return resultados
   
-
+  
   console.log("✅ Arquivo salvo: resultado_final_pesquisadores.json");
   console.log("🏁 Scraping finalizado com sucesso");
+  return resultados
 };
 
 export default scrapePesquisadores;

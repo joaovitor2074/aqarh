@@ -10,7 +10,7 @@ const URL = "http://dgp.cnpq.br/dgp/espelhogrupo/6038878475345897";
 const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
 // Seletor da tabela de estudantes (escape dos ':')
-const TABLE_TBODY_SELECTOR = "#idFormVisualizarGrupoPesquisa\\:j_idt288_data";
+const TABLE_TBODY_SELECTOR = "#idFormVisualizarGrupoPesquisa\\:j_idt289_data";
 const ROW_SELECTOR = `${TABLE_TBODY_SELECTOR} > tr`;
 
 // seletor do link dentro da linha (id parcialmente conhecido)

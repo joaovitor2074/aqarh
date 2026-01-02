@@ -68,12 +68,17 @@ const handleScrape = async () => {
     const response = await fetch("http://localhost:3000/adminjv/scrape/run", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
     })
 
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`Erro HTTP ${response.status}: ${text}`)
+    }
+
     const data = await response.json()
-        // ex: { membros_verificados: 12, alteracoes_encontradas: 3 }
+    console.log("Resposta do scrape:", data)
 
   } catch (error) {
     console.error("Erro ao verificar atualizações", error)
@@ -87,11 +92,12 @@ const handleScrape = async () => {
 
 
 
+
+
   return (
     <AdminLayout>
       <div className="w-full space-y-6">
 
-        {/* Título da Página */}
         <h2 className="text-2xl font-semibold text-gray-800 flex">Visão Geral</h2>
 
         <Button onClick={handleScrape}>
@@ -129,3 +135,5 @@ const handleScrape = async () => {
     </AdminLayout>
   );
 }
+
+

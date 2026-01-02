@@ -1,10 +1,13 @@
 import scrapePesquisadores from "./scrapePesquisadores.service.js";
-import { normalizarPesquisadores } from "./normalizarPesquisadores.service.js";
+import scrapeEstudantes from "./scrapeestudantes.service.js";
+import { normalizarLinhasPesquisa,normalizarPesquisadores } from "./normalizarPesquisadores.service.js";
 import { detectarNovosPesquisadores } from "./compararpesquisadores.service.js";
 import { db } from "../config/db.js";
 
 
 import scrapeLinhas from "./scrapeLinhas.service.js";
+import scrapeLinhasEstudantes from "./scrapelinhasestudantes.service.js";
+
 
 export async function processarScrapePesquisador() {
   // 1️⃣ SCRAPE
@@ -32,12 +35,29 @@ export async function processarScrapePesquisador() {
 }
 
 
+export async function processarEstudantes(){
+  const brutos = await scrapeEstudantes();
+  console.log(brutos)
+
+}
+
+
 export async function processarScrapeLinhas(){
   // 1️⃣ SCRAPE
   const brutos = await scrapeLinhas();
+  
+  const normalizados = normalizarLinhasPesquisa(brutos)
+  console.log(brutos)
+  console.log(normalizados)
+  
 
-  return brutos;
 
 
+
+}
+
+export async function processarScrapelinhasEstudantes(){
+  const brutos = scrapeLinhasEstudantes()
+  console.log(brutos)
 }
 

@@ -7,3 +7,18 @@ export function normalizarPesquisadores(brutos) {
       data_inclusao: p.data_inclusao || null
     }));
 }
+
+export function normalizarLinhasPesquisa(brutos) {
+  return brutos
+    .filter(p => Array.isArray(p.linhas_pesquisa))
+    .flatMap(p =>
+      p.linhas_pesquisa
+        .filter(lp => lp.linha_pesquisa && lp.grupo)
+        .map(lp => ({
+          nome: lp.linha_pesquisa.trim(),
+          grupo: lp.grupo.trim(),
+          ativo: 1
+        }))
+    );
+}
+

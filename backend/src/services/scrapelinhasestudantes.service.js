@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 
 const outputPath = path.join(
   __dirname,
-  "../../data/resultado_linha_pesquisadores.json"
+  "../../data/resultado_linha_estudantes.json"
 );
 const outputDir = path.dirname(outputPath);
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
@@ -32,13 +32,12 @@ const CHROME_PATH =
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
 const HEADLESS =
-  process.env.HEADLESS === "1" || process.env.HEADLESS === "false";
+  process.env.HEADLESS === "1" || process.env.HEADLESS === "true";
 
 /* ===== TABELA DE PESQUISADORES (IDs FIXOS QUE ALTERNAM) ===== */
 // Nota: IDs são fornecidos sem escapes; normalizeIdForSelector fará o escape correto.
 const MAIN_TABLE_IDS = [
-  "idFormVisualizarGrupoPesquisa:j_idt277_data",
-  "idFormVisualizarGrupoPesquisa:j_idt272_data",
+  "idFormVisualizarGrupoPesquisa\\:j_idt289_data",
 ];
 
 /* ===== LINK DO ESPELHO (PESQUISADOR) ===== */
@@ -75,21 +74,26 @@ function safeWrite(data) {
 /* =========================
    SERVICE
 ========================= */
-export default async function scrapeLinhas() {
+export default async function scrapeLinhasEstudantes() {
   console.log("[scrapeLinhas] Iniciando scraping de pesquisadores...");
 
-  let browser;
   const resultados = []; // coletamos aqui e gravamos apenas no final
 
   try {
-    browser = await puppeteer.launch({
-      headless: HEADLESS,
+    const browser = await puppeteer.launch({
+      headless: false,
       executablePath: CHROME_PATH,
       defaultViewport: null,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const page = await browser.newPage();
+
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+      "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    );
+
     await page.setRequestInterception(true);
     page.on("request", (req) => {
       const type = req.resourceType();
@@ -100,17 +104,15 @@ export default async function scrapeLinhas() {
       }
     });
 
-
     page.setDefaultTimeout(SELECTOR_TIMEOUT);
     page.setDefaultNavigationTimeout(NAV_TIMEOUT);
 
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-      "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    );
-
     console.log("[scrapeLinhas] Abrindo página...");
-    await page.goto(URL, { waitUntil: "domcontentloaded" });
+    await page.goto(URL, {
+      waitUntil: "domcontentloaded",
+      timeout: NAV_TIMEOUT,
+    });
+
 
 
     /* ===== LOCALIZA A TABELA CORRETA ===== */
@@ -130,7 +132,6 @@ export default async function scrapeLinhas() {
 
     const rows = await tbodyHandle.$$("tr");
     console.log(`[scrapeLinhas] Total de pesquisadores: ${rows.length}`);
-
 
 
     /* ===== FUNÇÃO PARA ABRIR POPUP (VERSÃO ESTÁVEL) ===== */
@@ -195,6 +196,9 @@ export default async function scrapeLinhas() {
           await sleep(BETWEEN_ITERATION_DELAY);
           continue;
         }
+
+        console.log("Anchor encontrado?", !!anchor);
+
 
         const popup = await openPopup(anchor);
 
