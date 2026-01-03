@@ -59,15 +59,25 @@ const MAIN_TABLE_IDS = [
   "idFormVisualizarGrupoPesquisa:j_idt272_data",
 ];
   console.log("🔍 Aguardando tabela de pesquisadores...");
-async function getMainTbodyHandle() {
-      for (const id of MAIN_TABLE_IDS) {
-        const selector = normalizeIdForSelector(id);
-        const handle = await page.$(selector);
-        if (handle) return handle;
-      }
-      return null;
+function escapeCssId(id) {
+  // simples escape para ':' e caracteres especiais usados aqui
+  return id.replace(/([:\.\#\[\],=])/g, "\\$1");
+}
+
+async function findExistingSelector(page, ids, perIdTimeout = 30000) {
+  // tenta um a um, com timeout curto, e retorna o selector encontrado ou null
+  for (const id of ids) {
+    const selector = `#${escapeCssId(id)}`;
+    try {
+      await page.waitForSelector(selector, { timeout: perIdTimeout });
+      return selector;
+    } catch (e) {
+      // não encontrado, continua
     }
-  const tbodyHandle = await getMainTbodyHandle();
+  }
+  return null;
+}
+ const tbodyHandle = await findExistingSelector(page,  MAIN_TABLE_IDS, 5000);
 
   await page.waitForSelector(tbodyHandle);
   console.log("✅ Tabela encontrada");
@@ -78,7 +88,7 @@ async function getMainTbodyHandle() {
   const resultados = [];
 
   for (let i = 0; i < totalRows; i++) {
-    const rowNth = `${rowSelectorBase}:nth-of-type(${i + 1})`;
+    const rowNth = `${tbodyHandle} > tr:nth-of-type(${i + 1})`;
     console.log("----------------------------------------");
     console.log(`➡️ Processando linha ${i + 1} de ${totalRows}`);
 

@@ -16,7 +16,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const outputPath = path.join(__dirname, "../../data/resultado_final_estudantes.json");
+const outputPath = path.join(__dirname, "../../data/resultado_final_pesquisador.json");
 const outputDir = path.dirname(outputPath);
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
@@ -39,9 +39,9 @@ async function findExistingSelector(page, ids, perIdTimeout = 30000) {
   return null;
 }
 
-async function scrapeEstudantes() {
+async function scrapePesquisadores1() {
   console.log("========================================");
-  console.log("Iniciando scraping de estudantes");
+  console.log("Iniciando scraping de pesquisador");
   console.log("========================================");
 
   const browser = await puppeteer.launch({
@@ -79,9 +79,8 @@ async function scrapeEstudantes() {
 
   // possíveis ids (sem escapar)
   const TBODY_IDS = [
-    "idFormVisualizarGrupoPesquisa:j_idt288_data",
-    "idFormVisualizarGrupoPesquisa:j_idt289_data",
-    "#idFormVisualizarGrupoPesquisa:j_idt294_data"
+     "idFormVisualizarGrupoPesquisa:j_idt277_data",
+  "idFormVisualizarGrupoPesquisa:j_idt272_data",
   ];
 
   console.log("Procurando tbody com um dos possíveis ids...");
@@ -97,7 +96,7 @@ async function scrapeEstudantes() {
   // conta linhas usando o selector correto
   const rowSelector = `${tbodySelector} > tr`;
   const totalRows = await page.$$eval(rowSelector, els => els.length);
-  console.log(`Total de estudantes encontrados: ${totalRows}`);
+  console.log(`Total de pesquisadores encontrados: ${totalRows}`);
 
   const resultados = [];
 
@@ -153,4 +152,4 @@ async function scrapeEstudantes() {
   return resultados;
 }
 
-export default scrapeEstudantes;
+export default scrapePesquisadores1;

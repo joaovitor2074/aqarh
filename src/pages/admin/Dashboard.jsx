@@ -13,6 +13,7 @@ import Card from "../../ui/Card";
 import Button from "../../ui/Button";
 
 //funcoes
+import toast from "react-hot-toast";
 
 
 
@@ -26,11 +27,76 @@ import {
   LogoIcon,
   MegaphoneIcon
 } from "../../icons";
+const handleScrapeToast = ({ etapa = "processo", status, mensagem }) => {
+  const id = `scrape-${etapa}`
+
+  if (status === "iniciando") {
+    toast.loading(`⏳ ${etapa} iniciando...`, { id })
+  }
+
+  if (status === "pronto") {
+    toast.success(`✅ ${etapa} pronto`, { id })
+  }
+
+  if (status === "finalizado") {
+    toast.success(`🎉 ${etapa} finalizado`, { id })
+  }
+
+  if (status === "erro") {
+    toast.error(`❌ Erro em ${etapa}: ${mensagem || "Erro desconhecido"}`, {
+      id,
+    })
+  }
+}
+
+
 
 export default function Dashboard() {
   const [totalMembros, setTotalMembros] = useState(0);
   const [totalLinhas, setTotalLinhas] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+useEffect(() => {
+  const eventSource = new EventSource(
+    "http://localhost:3000/adminjv/scrape/status"
+  )
+
+eventSource.onmessage = (event) => {
+  console.log("🔥 SSE RAW:", event.data)
+
+  let data
+  try {
+    data = JSON.parse(event.data)
+  } catch {
+    console.warn("⚠️ SSE inválido:", event.data)
+    return
+  }
+
+  const { etapa, status, mensagem } = data
+
+  console.log("📡 SSE:", { etapa, status, mensagem })
+
+  /* =========================
+     CONTROLE DE LOADING
+  ========================= */
+  if (status === "iniciando") {
+    setLoading(true)
+  }
+
+  if (status === "finalizado" || status === "erro") {
+    setLoading(false)
+  }
+
+  /* =========================
+     TOAST CENTRALIZADO
+  ========================= */
+  handleScrapeToast({ etapa, status, mensagem })
+}
+
+}, [])
+
+
+
 
 
   useEffect(() => {
@@ -61,31 +127,29 @@ export default function Dashboard() {
   }, []);
 
 
-const handleScrape = async () => {
-  try {
-    setLoading(true)
+  const handleScrape = async () => {
+    try {
 
-    const response = await fetch("http://localhost:3000/adminjv/scrape/run", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+      const response = await fetch("http://localhost:3000/adminjv/scrape/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
 
-    if (!response.ok) {
-      const text = await response.text()
-      throw new Error(`Erro HTTP ${response.status}: ${text}`)
+      if (!response.ok) {
+        const text = await response.text()
+        throw new Error(`Erro HTTP ${response.status}: ${text}`)
+      }
+
+      const data = await response.json()
+      console.log("Resposta do scrape:", data)
+
+    } catch (error) {
+      console.error("Erro ao verificar atualizações", error)
+    } finally {
     }
-
-    const data = await response.json()
-    console.log("Resposta do scrape:", data)
-
-  } catch (error) {
-    console.error("Erro ao verificar atualizações", error)
-  } finally {
-    setLoading(false)
   }
-}
 
 
 
@@ -100,9 +164,10 @@ const handleScrape = async () => {
 
         <h2 className="text-2xl font-semibold text-gray-800 flex">Visão Geral</h2>
 
-        <Button onClick={handleScrape}>
-          {"Verificar atualizações"}
+        <Button onClick={handleScrape} disabled={loading}>
+          {loading ? "Executando scraping..." : "Verificar atualizações"}
         </Button>
+
         {/* Grid de Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard icon={<UsersIcon className="w-6 h-6" />} title="Membros" value={totalMembros} />

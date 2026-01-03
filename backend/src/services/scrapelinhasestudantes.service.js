@@ -37,11 +37,13 @@ const HEADLESS =
 /* ===== TABELA DE PESQUISADORES (IDs FIXOS QUE ALTERNAM) ===== */
 // Nota: IDs são fornecidos sem escapes; normalizeIdForSelector fará o escape correto.
 const MAIN_TABLE_IDS = [
-  "idFormVisualizarGrupoPesquisa\\:j_idt289_data",
+  "idFormVisualizarGrupoPesquisa:j_idt288_data",
+    "idFormVisualizarGrupoPesquisa:j_idt289_data",
+    "#idFormVisualizarGrupoPesquisa:j_idt294_data"
 ];
 
 /* ===== LINK DO ESPELHO (PESQUISADOR) ===== */
-const LINK_SELECTOR = "a[id*='idBtnVisualizarEspelhoPesquisador']";
+const LINK_SELECTOR = "a[id*='idBtnVisualizarEspelhoEstudante']";
 
 /* ===== POPUP ===== */
 const POPUP_TBODY_SELECTOR = "tbody[id$='tblEspelhoRHLPAtuacao_data']";
@@ -260,9 +262,7 @@ export default async function scrapeLinhasEstudantes() {
     } catch (e) {
       console.error("[scrapeLinhas] Falha ao gravar resultados parciais:", e);
     }
-    if (browser) {
-      try { await browser.close(); } catch { }
-    }
+    
     throw err;
   }
 }

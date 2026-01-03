@@ -5,6 +5,8 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import membrosRoutes from "./routes/membros.routes.js";
 import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
+
+//rotas backend
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
 const app = express();

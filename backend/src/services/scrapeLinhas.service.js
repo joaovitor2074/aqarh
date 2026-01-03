@@ -256,9 +256,5 @@ export default async function scrapeLinhas() {
     } catch (e) {
       console.error("[scrapeLinhas] Falha ao gravar resultados parciais:", e);
     }
-    if (browser) {
-      try { await browser.close(); } catch { }
-    }
-    throw err;
   }
 }

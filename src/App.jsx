@@ -18,6 +18,7 @@ import Comunicados from './pages/admin/Comunicados'
 
 //extras
 import Config from './pages/admin/Config'
+import { Toaster } from "react-hot-toast"
 
 
 
@@ -32,6 +33,7 @@ function AppContent() {
   return (
     <div className="app-root">
       {!hideLayout && <Header />}
+      <Toaster position="top-right" />
 
       <main>
         <Routes>
