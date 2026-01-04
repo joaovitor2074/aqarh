@@ -33,7 +33,16 @@ function AppContent() {
   return (
     <div className="app-root">
       {!hideLayout && <Header />}
-      <Toaster position="top-right" />
+       <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3000,
+        style: {
+          fontSize: '14px',
+        },
+      }}
+    />
+
 
       <main>
         <Routes>
@@ -46,7 +55,7 @@ function AppContent() {
             path="/admin/adelton"
             element={
               <ProtectedRoute>
-                <Dashboard/>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
@@ -55,11 +64,11 @@ function AppContent() {
             path="/admin/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard/>
+                <Dashboard />
               </ProtectedRoute>
-            }/>
+            } />
 
-          
+
 
           <Route
             path="/admin/pesquisador"
@@ -73,7 +82,7 @@ function AppContent() {
             path="/admin/membros"
             element={
               <ProtectedRoute>
-                <Membros/>
+                <Membros />
               </ProtectedRoute>
             }
           />
@@ -82,25 +91,25 @@ function AppContent() {
             path="/admin/projetos"
             element={
               <ProtectedRoute>
-                <Admprojetos/>
+                <Admprojetos />
               </ProtectedRoute>
             }
           />
 
-          <Route 
+          <Route
             path="/admin/linhaspesquisas"
             element={
               <ProtectedRoute>
-                <Linhaspesquisas/>
+                <Linhaspesquisas />
               </ProtectedRoute>
             }
           />
 
-          <Route 
+          <Route
             path="/admin/comunicados"
             element={
               <ProtectedRoute>
-                <Comunicados/>
+                <Comunicados />
               </ProtectedRoute>
             }
           />
@@ -110,11 +119,11 @@ function AppContent() {
 
 
           {/* rotas extras */}
-            <Route
+          <Route
             path="/admin/config"
             element={
               <ProtectedRoute>
-                <Config/>
+                <Config />
               </ProtectedRoute>
             }
           />

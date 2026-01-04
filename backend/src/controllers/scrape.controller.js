@@ -15,7 +15,7 @@ export async function runScrape(req, res) {
   try {
     scrapeEmitter.emit("status", {
       etapa: "browser",
-      status: "iniciando"
+      status: "iniciando",
     });
 
     const CHROME_PATH =
@@ -31,13 +31,13 @@ export async function runScrape(req, res) {
 
     scrapeEmitter.emit("status", {
       etapa: "browser",
-      status: "pronto"
+      status: "pronto",
     });
 
     // 🔹 BLOCO 1 (paralelo)
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores + estudantes",
-      status: "iniciando"
+      status: "iniciando",
     });
 
     const [pesquisador, estudantes] = await Promise.all([
@@ -47,13 +47,13 @@ export async function runScrape(req, res) {
 
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores + estudantes",
-      status: "finalizado"
+      status: "finalizado",
     });
 
     // 🔹 BLOCO 2 (paralelo)
     scrapeEmitter.emit("status", {
       etapa: "linhas",
-      status: "iniciando"
+      status: "iniciando",
     });
 
     const [linhas, linhasEstudantes] = await Promise.all([
@@ -63,8 +63,13 @@ export async function runScrape(req, res) {
 
     scrapeEmitter.emit("status", {
       etapa: "linhas",
-      status: "finalizado"
+      status: "finalizado",
     });
+scrapeEmitter.emit("status", {
+  etapa: "scraping",
+  status: "sucesso",
+  mensagem: "Scraping concluído com sucesso"
+});
 
     return res.json({
       pesquisador,

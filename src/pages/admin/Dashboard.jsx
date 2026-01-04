@@ -27,27 +27,35 @@ import {
   LogoIcon,
   MegaphoneIcon
 } from "../../icons";
-const handleScrapeToast = ({ etapa = "processo", status, mensagem }) => {
-  const id = `scrape-${etapa}`
+const TOAST_ID = "scrape-processo"
 
+const handleScrapeToast = ({ etapa = "processo", status, mensagem }) => {
   if (status === "iniciando") {
-    toast.loading(`⏳ ${etapa} iniciando...`, { id })
+    // toast.loading(`⏳ ${etapa} iniciando...`, { id: TOAST_ID })
   }
 
   if (status === "pronto") {
-    toast.success(`✅ ${etapa} pronto`, { id })
+    toast.loading(`⚙️ ${etapa} pronto`, { id: TOAST_ID })
   }
 
   if (status === "finalizado") {
-    toast.success(`🎉 ${etapa} finalizado`, { id })
+    toast.loading(`📦 ${etapa} finalizado`, { id: TOAST_ID })
+  }
+
+  if (status === "sucesso") {
+    toast.success(`🚀 ${mensagem || "Scraping finalizado com sucesso"}`, {
+      id: TOAST_ID,
+    })
   }
 
   if (status === "erro") {
-    toast.error(`❌ Erro em ${etapa}: ${mensagem || "Erro desconhecido"}`, {
-      id,
-    })
+    toast.error(
+      `❌ Erro em ${etapa}: ${mensagem || "Erro desconhecido"}`,
+      { id: TOAST_ID }
+    )
   }
 }
+
 
 
 
@@ -61,43 +69,38 @@ useEffect(() => {
     "http://localhost:3000/adminjv/scrape/status"
   )
 
-eventSource.onmessage = (event) => {
-  console.log("🔥 SSE RAW:", event.data)
+  eventSource.onmessage = (event) => {
+    console.log("🔥 SSE RAW:", event.data)
 
-  let data
-  try {
-    data = JSON.parse(event.data)
-  } catch {
-    console.warn("⚠️ SSE inválido:", event.data)
-    return
+    let data
+    try {
+      data = JSON.parse(event.data)
+    } catch {
+      console.warn("⚠️ SSE inválido:", event.data)
+      return
+    }
+
+    const { etapa, status, mensagem } = data
+
+    console.log("📡 SSE:", { etapa, status, mensagem })
+
+    /* =========================
+       CONTROLE DE LOADING
+    ========================= */
+    
+
+    /* =========================
+       TOAST CENTRALIZADO
+    ========================= */
+    handleScrapeToast({ etapa, status, mensagem })
   }
 
-  const { etapa, status, mensagem } = data
-
-  console.log("📡 SSE:", { etapa, status, mensagem })
-
-  /* =========================
-     CONTROLE DE LOADING
-  ========================= */
-  if (status === "iniciando") {
-    setLoading(true)
+  // 🔴 ISSO AQUI É O QUE FALTAVA
+  return () => {
+    console.log("🔌 Fechando conexão SSE")
+    eventSource.close()
   }
-
-  if (status === "finalizado" || status === "erro") {
-    setLoading(false)
-  }
-
-  /* =========================
-     TOAST CENTRALIZADO
-  ========================= */
-  handleScrapeToast({ etapa, status, mensagem })
-}
-
 }, [])
-
-
-
-
 
   useEffect(() => {
     async function carregarTotal() {
