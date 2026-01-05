@@ -81,10 +81,11 @@ async function scrapePesquisadores1() {
   const TBODY_IDS = [
      "idFormVisualizarGrupoPesquisa:j_idt277_data",
   "idFormVisualizarGrupoPesquisa:j_idt272_data",
+  "idFormVisualizarGrupoPesquisa:j_idt271_data",
   ];
 
   console.log("Procurando tbody com um dos possíveis ids...");
-  const tbodySelector = await findExistingSelector(page, TBODY_IDS, 5000);
+  const tbodySelector = await findExistingSelector(page, TBODY_IDS, 4000);
 
   if (!tbodySelector) {
     await browser.close();
@@ -92,6 +93,7 @@ async function scrapePesquisadores1() {
   }
 
   console.log("Tbody encontrado ->", tbodySelector);
+
 
   // conta linhas usando o selector correto
   const rowSelector = `${tbodySelector} > tr`;

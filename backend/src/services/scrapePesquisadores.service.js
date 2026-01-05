@@ -36,7 +36,7 @@ async function scrapePesquisadores() {
   console.log("========================================");
 
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     executablePath: CHROME_PATH,
     defaultViewport: null,
     args: ["--no-sandbox", "--disable-setuid-sandbox"]

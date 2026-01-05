@@ -39,7 +39,7 @@ const HEADLESS =
 const MAIN_TABLE_IDS = [
   "idFormVisualizarGrupoPesquisa:j_idt288_data",
     "idFormVisualizarGrupoPesquisa:j_idt289_data",
-    "#idFormVisualizarGrupoPesquisa:j_idt294_data"
+    "idFormVisualizarGrupoPesquisa:j_idt294_data"
 ];
 
 /* ===== LINK DO ESPELHO (PESQUISADOR) ===== */
@@ -83,7 +83,7 @@ export default async function scrapeLinhasEstudantes() {
 
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       executablePath: CHROME_PATH,
       defaultViewport: null,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],

@@ -51,23 +51,7 @@
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Educação Inclusiva",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+        "grupo": "Grup"
       }
     ]
   },
@@ -207,10 +191,6 @@
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Educação Inclusiva",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
@@ -752,22 +732,6 @@
       {
         "linha_pesquisa": "Engenharia Sanitária e Ambiental",
         "grupo": "Agricultura Irrigada em áreas de Cerrado"
-      },
-      {
-        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Modelagem de água no solo",
-        "grupo": "Tecnologias sustentáveis na gestão de cultivos irrigados no Cerrado"
-      },
-      {
-        "linha_pesquisa": "Engenharia de água e solo",
-        "grupo": "Agricultura Irrigada em áreas de Cerrado"
-      },
-      {
-        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
   },
@@ -967,35 +931,7 @@
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Agronomia Ciência do Solo",
-        "grupo": "Grupo de Pesquisa e Extensão em Manejo de Solo e Água (GPEMSA)"
-      },
-      {
-        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Avaliação Biologica de Extratos Vegetais e Substâncias Isoladas: atividade alelopática",
-        "grupo": "GPPMi - Grupo de Pesquisa em Plantas e Micro-organismos"
-      },
-      {
-        "linha_pesquisa": "Isolamento e identificação de metabólitos secundários produzidos por plantas e microrganismos",
-        "grupo": "GPPMi - Grupo de Pesquisa em Plantas e Micro-organismos"
-      },
-      {
-        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Química de Produtos Naturais",
-        "grupo": "Grupo Biomassa"
+        "grupo": "Grupo de Pesquisa"
       }
     ]
   },

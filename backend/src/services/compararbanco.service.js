@@ -1,112 +1,136 @@
-import scrapePesquisadores from "./scrapePesquisadores.service.js";
 import scrapePesquisadores1 from "./scrapepesquisador1.service.js";
 import scrapeEstudantes from "./scrapeestudantes.service.js";
-import { normalizarLinhasPesquisa,normalizarPesquisadores, } from "./normalizarPesquisadores.service.js";
+
+import {
+  normalizarPesquisadores,
+  normalizarLinhasPesquisa,
+  deduplicarLinhas,
+  detectarNovasLinhas,
+  vincularPesquisadorLinhas
+} from "./normalizarPesquisadores.service.js";
+
 import { detectarNovosPesquisadores } from "./compararpesquisadores.service.js";
 import { db } from "../config/db.js";
-
 
 import scrapeLinhas from "./scrapeLinhas.service.js";
 import scrapeLinhasEstudantes from "./scrapelinhasestudantes.service.js";
 
-
+/* =====================================================
+   PESQUISADORES
+===================================================== */
 export async function processarScrapePesquisador() {
-  // 1️⃣ SCRAPE
   const brutos = await scrapePesquisadores1();
-
-  // 2️⃣ NORMALIZA
   const normalizados = normalizarPesquisadores(brutos);
 
-  // 3️⃣ BUSCA NO BANCO
   const [rows] = await db.query(`
-    SELECT nome
-    FROM pesquisadores
-    WHERE tipo_vinculo = 'pesquisador'
+    SELECT nome FROM pesquisadores WHERE tipo_vinculo = 'pesquisador'
   `);
 
-  // 4️⃣ COMPARA
   const novos = detectarNovosPesquisadores(normalizados, rows);
+
+  // 🔥 INSERÇÃO
+  for (const p of novos) {
+    await db.query(
+      `INSERT INTO pesquisadores (nome, titulacao_max, tipo_vinculo)
+       VALUES (?, ?, 'pesquisador')`,
+      [p.nome, p.titulacao_max]
+    );
+  }
 
   return {
     total_lattes: normalizados.length,
     total_banco: rows.length,
-    novos_encontrados: novos.length,
-    novos_pesquisadores: novos
+    novos_encontrados: novos.length
   };
 }
 
-
-export async function processarEstudantes(){
+/* =====================================================
+   ESTUDANTES
+===================================================== */
+export async function processarEstudantes() {
   const brutos = await scrapeEstudantes();
+  const normalizados = normalizarPesquisadores(brutos);
 
-  const normalizados  = normalizarPesquisadores(brutos);
-
-  // 3️⃣ BUSCA NO BANCO
   const [rows] = await db.query(`
-    SELECT nome
-    FROM pesquisadores
-    WHERE tipo_vinculo = 'estudante'
+    SELECT nome FROM pesquisadores WHERE tipo_vinculo = 'estudante'
   `);
 
-  // 4️⃣ COMPARA
   const novos = detectarNovosPesquisadores(normalizados, rows);
 
+  for (const e of novos) {
+    await db.query(
+      `INSERT INTO pesquisadores (nome, tipo_vinculo)
+       VALUES (?, 'estudante')`,
+      [e.nome]
+    );
+  }
+
   return {
     total_lattes: normalizados.length,
     total_banco: rows.length,
-    novos_encontrados: novos.length,
-    novos_estudantes: novos
+    novos_encontrados: novos.length
   };
-  
-
 }
 
+/* =====================================================
+   LINHAS DE PESQUISA (PESQUISADORES)
+===================================================== */
 export async function processarScrapeLinhas() {
-  // 1️⃣ SCRAPE
   const brutos = await scrapeLinhas();
-
-  // 2️⃣ NORMALIZA
   const normalizados = normalizarLinhasPesquisa(brutos);
+  const unicos = deduplicarLinhas(normalizados);
 
-  // 3️⃣ BUSCA NO BANCO
   const [rows] = await db.query(`
-    SELECT nome
-    FROM linhas_pesquisa
+    SELECT nome, grupo FROM linhas_pesquisa
   `);
 
-  // 4️⃣ COMPARA (reutilizando a mesma função)
-  const novas = detectarNovosPesquisadores(normalizados, rows);
+  const novas = detectarNovasLinhas(unicos, rows);
+
+  for (const l of novas) {
+    await db.query(
+      `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo)
+       VALUES (?, ?, 1)`,
+      [l.nome, l.grupo]
+    );
+  }
+
+  await vincularPesquisadorLinhas(normalizados);
 
   return {
-    total_lattes: normalizados.length,
+    total_lattes: unicos.length,
     total_banco: rows.length,
-    novos_encontrados: novas.length,
-    novas_linhas: novas
+    novos_encontrados: novas.length
   };
 }
 
-
-export async function processarScrapelinhasEstudantes() {
-  // 1️⃣ SCRAPE
+/* =====================================================
+   LINHAS DE PESQUISA (ESTUDANTES)
+===================================================== */
+export async function processarScrapeLinhasEstudantes() {
   const brutos = await scrapeLinhasEstudantes();
-
-  // 2️⃣ NORMALIZA
   const normalizados = normalizarLinhasPesquisa(brutos);
+  const unicos = deduplicarLinhas(normalizados);
 
-  // 3️⃣ BUSCA NO BANCO
   const [rows] = await db.query(`
-    SELECT nome
-    FROM linhas_pesquisa
+    SELECT nome, grupo FROM linhas_pesquisa
   `);
 
-  // 4️⃣ COMPARA
-  const novas = detectarNovosPesquisadores(normalizados, rows);
+  const novas = detectarNovasLinhas(unicos, rows);
+
+  for (const l of novas) {
+    await db.query(
+      `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo)
+       VALUES (?, ?, 1)`,
+      [l.nome, l.grupo]
+    );
+  }
+
+  
+  await vincularPesquisadorLinhas(normalizados);
 
   return {
-    total_lattes: normalizados.length,
+    total_lattes: unicos.length,
     total_banco: rows.length,
-    novos_encontrados: novas.length,
-    novas_linhas_estudantes: novas
+    novos_encontrados: novas.length
   };
 }
-

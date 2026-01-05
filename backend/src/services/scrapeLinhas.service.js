@@ -31,14 +31,15 @@ const CHROME_PATH =
   process.env.CHROME_PATH ||
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
-const HEADLESS =
-  process.env.HEADLESS === "1" || process.env.HEADLESS === "false";
+// const HEADLESS =
+//   process.env.HEADLESS === "1" || process.env.HEADLESS === "true";
 
 /* ===== TABELA DE PESQUISADORES (IDs FIXOS QUE ALTERNAM) ===== */
 // Nota: IDs são fornecidos sem escapes; normalizeIdForSelector fará o escape correto.
 const MAIN_TABLE_IDS = [
   "idFormVisualizarGrupoPesquisa:j_idt277_data",
   "idFormVisualizarGrupoPesquisa:j_idt272_data",
+  "idFormVisualizarGrupoPesquisa:j_idt271_data"
 ];
 
 /* ===== LINK DO ESPELHO (PESQUISADOR) ===== */
@@ -83,7 +84,7 @@ export default async function scrapeLinhas() {
 
   try {
     browser = await puppeteer.launch({
-      headless: HEADLESS,
+      headless: true,
       executablePath: CHROME_PATH,
       defaultViewport: null,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],

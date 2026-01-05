@@ -45,7 +45,7 @@ async function scrapeEstudantes() {
   console.log("========================================");
 
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     executablePath: CHROME_PATH,
     defaultViewport: null,
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
@@ -81,7 +81,8 @@ async function scrapeEstudantes() {
   const TBODY_IDS = [
     "idFormVisualizarGrupoPesquisa:j_idt288_data",
     "idFormVisualizarGrupoPesquisa:j_idt289_data",
-    "#idFormVisualizarGrupoPesquisa:j_idt294_data"
+    "idFormVisualizarGrupoPesquisa:j_idt289_data",
+    "idFormVisualizarGrupoPesquisa:j_idt294_data"
   ];
 
   console.log("Procurando tbody com um dos possíveis ids...");

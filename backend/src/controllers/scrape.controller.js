@@ -3,7 +3,7 @@ import {
   processarScrapePesquisador,
   processarEstudantes,
   processarScrapeLinhas,
-  processarScrapelinhasEstudantes
+  processarScrapeLinhasEstudantes
 } from "../services/compararbanco.service.js";
 
 import { scrapeEmitter } from "../utils/scrapeEmitter.js";
@@ -23,7 +23,7 @@ export async function runScrape(req, res) {
       "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       executablePath: CHROME_PATH,
       defaultViewport: null,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -58,7 +58,7 @@ export async function runScrape(req, res) {
 
     const [linhas, linhasEstudantes] = await Promise.all([
       processarScrapeLinhas(browser),
-      processarScrapelinhasEstudantes(browser),
+      processarScrapeLinhasEstudantes(browser),
     ]);
 
     scrapeEmitter.emit("status", {
