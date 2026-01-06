@@ -4,9 +4,11 @@ import scrapeEstudantes from "./scrapeestudantes.service.js";
 import {
   normalizarPesquisadores,
   normalizarLinhasPesquisa,
+  normalizarVinculos,
   deduplicarLinhas,
   detectarNovasLinhas,
-  vincularPesquisadorLinhas
+  vincularPesquisadorLinhas,
+  
 } from "./normalizarPesquisadores.service.js";
 
 import { detectarNovosPesquisadores } from "./compararpesquisadores.service.js";
@@ -86,6 +88,8 @@ export async function processarScrapeLinhas() {
 
   const novas = detectarNovasLinhas(unicos, rows);
 
+
+
   for (const l of novas) {
     await db.query(
       `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo)
@@ -93,8 +97,9 @@ export async function processarScrapeLinhas() {
       [l.nome, l.grupo]
     );
   }
+  const vinculos = normalizarVinculos(brutos);
 
-  await vincularPesquisadorLinhas(normalizados);
+  await vincularPesquisadorLinhas(vinculos);
 
   return {
     total_lattes: unicos.length,
@@ -126,7 +131,9 @@ export async function processarScrapeLinhasEstudantes() {
   }
 
   
-  await vincularPesquisadorLinhas(normalizados);
+  const vinculos = normalizarVinculos(brutos);
+
+  await vincularPesquisadorLinhas(vinculos);
 
   return {
     total_lattes: unicos.length,

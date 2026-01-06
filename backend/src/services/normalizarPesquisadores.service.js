@@ -1,3 +1,5 @@
+import {db} from "../config/db.js"
+
 export function normalizarPesquisadores(brutos) {
   return brutos
     .filter(p => p.nome && !p.error)
@@ -84,5 +86,18 @@ export async function vincularPesquisadorLinhas(dados) {
   }
 }
 
+export function normalizarVinculos(brutos) {
+  return brutos
+    .filter(p => p.nome && Array.isArray(p.linhas_pesquisa))
+    .map(p => ({
+      pesquisador_nome: p.nome.trim().toUpperCase(),
+      linhas_pesquisa: p.linhas_pesquisa
+        .filter(lp => lp.linha_pesquisa && lp.grupo)
+        .map(lp => ({
+          linha_pesquisa: lp.linha_pesquisa.trim(),
+          grupo: lp.grupo.trim()
+        }))
+    }));
+}
 
 
