@@ -141,3 +141,6 @@ export async function processarScrapeLinhasEstudantes() {
     novos_encontrados: novas.length
   };
 }
+
+
+//faltando verificacao dos dados como as notificacooes etc 
