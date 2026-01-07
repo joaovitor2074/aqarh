@@ -351,7 +351,7 @@ export async function processarScrapeLinhas(browser = null, chunkOptions = null)
    LINHAS DE PESQUISA (ESTUDANTES) - VERSÃO PARALELA
 ===================================================== */
 export async function processarScrapeLinhasEstudantes(browser = null, chunkOptions = null) {
-  return await pro(scrapeLinhasEstudantes, 'estudantes', browser, chunkOptions);
+  return await processarLinhasBase(scrapeLinhasEstudantes, 'estudantes', browser, chunkOptions);
 }
 
 /* =====================================================

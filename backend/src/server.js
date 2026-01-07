@@ -9,6 +9,8 @@ import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
 //rotas backend
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
+import {testScrapeEstudantes} from "./functions/estudantes.js"
+
 const app = express();
 
 
@@ -27,6 +29,8 @@ app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
 // Rotas
 app.use("/api", authRoutes);
 app.use("/adminjv", adminjvRoutes);
+
+app.get('/test/estudantes', testScrapeEstudantes);
 
 app.listen(process.env.PORT, () => {
   console.log("Servidor rodando na porta " + process.env.PORT);

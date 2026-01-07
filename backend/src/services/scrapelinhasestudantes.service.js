@@ -1,4 +1,4 @@
-// scrapeLinhasEstudantes.js
+// scrapeLinhasEstudantes.js - VERSÃO COM TIMEOUTS CORRIGIDOS
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import fs from "fs/promises";
@@ -18,45 +18,47 @@ const outputPath = path.join(
   "../../data/resultado_linha_estudantes.json"
 );
 
-// ⚡ CONFIGURAÇÕES OTIMIZADAS
+// ⚡ CONFIGURAÇÕES OTIMIZADAS COM TIMEOUTS AUMENTADOS
 const CONFIG = {
   url: process.env.SCRAPE_URL || "http://dgp.cnpq.br/dgp/espelhogrupo/6038878475345897",
   chromePath: process.env.CHROME_PATH || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-  retryAttempts: 5, // Aumentado para mais tentativas
+  retryAttempts: 3,
   
   timeouts: {
-    navigation: 120000,    // 2 minutos
-    selector: 90000,       // 1.5 minutos
-    popup: 120000,         // 2 minutos para popup abrir
-    pageLoad: 60000,       // 1 minuto para página carregar
-    tableLoad: 45000       // 45 segundos para tabela
+    navigation: 180000,    // 3 minutos
+    selector: 120000,      // 2 minutos
+    popup: 30000,          // 30 segundos
+    pageLoad: 60000,       // 1 minuto
+    tableLoad: 30000,      // 30 segundos
+    protocol: 120000       // 2 minutos para protocol timeout (NOVO)
   },
   
   delays: {
     afterClick: 3000,      // 3 segundos após clicar
-    betweenStudents: 5000, // 5 segundos entre estudantes
-    beforeRetry: 8000      // 8 segundos antes de retry
-  }
+    betweenStudents: 4000, // 4 segundos entre estudantes
+    beforeRetry: 10000,    // 10 segundos antes de retry
+    afterPopupClose: 2000  // 2 segundos após fechar popup
+  },
+  
+  maxConcurrentPopups: 1,  // Apenas 1 popup por vez
+  closePopupAfterMs: 30000 // Fecha popup automaticamente após 30 segundos
 };
 
-// IDs das tabelas de estudantes (corrigidos com base na sua experiência)
+// IDs das tabelas de estudantes
 const TABLE_IDS = [
   "idFormVisualizarGrupoPesquisa:j_idt288_data",
   "idFormVisualizarGrupoPesquisa:j_idt289_data", 
   "idFormVisualizarGrupoPesquisa:j_idt294_data"
 ];
 
-// ⚡⚡⚡ SELECTORS CORRIGIDOS - BASEADO NO QUE FUNCIONOU PARA PESQUISADORES ⚡⚡⚡
+// ⚡⚡⚡ SELECTORS ⚡⚡⚡
 const SELECTORS = {
   link: "a[id*='idBtnVisualizarEspelhoEstudante']",
-  // ⚠️ IMPORTANTE: Usando o mesmo seletor que funcionou para pesquisadores
-  popupTable: "#formVisualizarRH\\:tblEspelhoRHLPAtuacao_data", // ID exato da tabela
-  // Selectors alternativos para fallback
+  popupTable: "#formVisualizarRH\\:tblEspelhoRHLPAtuacao_data",
   popupTableAlt1: "table[id*='tblEspelhoRHLPAtuacao']",
-  popupTableAlt2: "table.ui-datatable-data", // Se usar PrimeFaces
-  popupTableAlt3: "tbody.ui-datatable-data", // Outro padrão comum
-  anyTable: "table", // Qualquer tabela
-  loadingIndicator: ".ui-datatable-loading",
+  popupTableAlt2: "table.ui-datatable-data",
+  popupTableAlt3: "tbody.ui-datatable-data",
+  anyTable: "table",
   noDataText: "Nenhum registro"
 };
 
@@ -77,300 +79,274 @@ async function safeWrite(data) {
     console.log(`✅ Resultados salvos em: ${outputPath}`);
   } catch (err) {
     console.error("❌ Erro ao gravar arquivo:", err);
-    // Não relançar erro para não interromper o scraping
   }
 }
 
 /* =========================
-   FUNÇÃO PARA DETECTAR E EXTRAIR DADOS DA POPUP
+   FUNÇÃO AUXILIAR: LIMPAR NAVEGADOR
+========================= */
+async function cleanupBrowser(browser, mainPage) {
+  try {
+    if (!browser) return;
+    
+    const pages = await browser.pages();
+    let closedCount = 0;
+    
+    for (const page of pages) {
+      if (page !== mainPage && !page.isClosed()) {
+        try {
+          await page.close();
+          closedCount++;
+        } catch (error) {
+          // Ignora erros ao fechar
+        }
+      }
+    }
+    
+    if (closedCount > 0) {
+      console.log(`  🧹 Fechadas ${closedCount} popups pendentes`);
+    }
+  } catch (error) {
+    console.warn(`  ⚠️  Erro na limpeza: ${error.message}`);
+  }
+}
+
+/* =========================
+   FUNÇÃO PARA ABRIR POPUP DE FORMA CONFIÁVEL (CORRIGIDA)
+========================= */
+async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
+  console.log(`  🔗 Abrindo popup para: ${studentName} (tentativa ${attempt})`);
+  
+  // Limpa popups antes de abrir nova
+  await cleanupBrowser(page.browser(), page);
+  
+  try {
+    // Método 1: Clique normal que abre nova guia
+    console.log(`  🖱️  Clicando no link...`);
+    
+    // Prepara listener para nova página ANTES de clicar
+    const browser = page.browser();
+    const existingPages = await browser.pages();
+    
+    // Clica no link (deve abrir nova guia)
+    await Promise.all([
+      linkHandle.click({ delay: 50 }),
+      sleep(1000) // Pequeno delay após clique
+    ]);
+    
+    // Aguarda nova página aparecer (com timeout aumentado)
+    const startTime = Date.now();
+    let newPage = null;
+    
+    while (Date.now() - startTime < CONFIG.timeouts.popup) {
+      const currentPages = await browser.pages();
+      const newPages = currentPages.filter(p => 
+        !existingPages.includes(p) && !p.isClosed()
+      );
+      
+      if (newPages.length > 0) {
+        newPage = newPages[0];
+        console.log(`  ✅ Nova guia detectada`);
+        break;
+      }
+      
+      await sleep(500);
+    }
+    
+    if (!newPage) {
+      throw new Error("Nova guia não foi aberta");
+    }
+    
+    // Aguarda a página carregar
+    try {
+      await newPage.waitForNavigation({ 
+        waitUntil: 'networkidle0', 
+        timeout: CONFIG.timeouts.pageLoad 
+      });
+    } catch (navError) {
+      // Tenta waitForSelector como fallback
+      console.log(`  ⏳ Aguardando conteúdo carregar...`);
+      await newPage.waitForSelector('body', { timeout: 10000 });
+    }
+    
+    await sleep(CONFIG.delays.afterClick);
+    return newPage;
+    
+  } catch (error) {
+    console.log(`  ⚠️  Método 1 falhou: ${error.message}`);
+    
+    // Método 2: Tenta extrair href e abrir manualmente
+    try {
+      console.log(`  🔗 Tentando método alternativo...`);
+      const href = await linkHandle.evaluate(el => el.getAttribute('href'));
+      
+      if (href && href !== '#' && !href.startsWith('javascript:')) {
+        const newPage = await page.browser().newPage();
+        const fullUrl = new URL(href, page.url()).href;
+        
+        console.log(`  🌐 Navegando para: ${fullUrl}`);
+        await newPage.goto(fullUrl, {
+          waitUntil: 'networkidle0',
+          timeout: CONFIG.timeouts.pageLoad
+        });
+        
+        return newPage;
+      }
+    } catch (altError) {
+      console.log(`  ⚠️  Método alternativo falhou: ${altError.message}`);
+    }
+    
+    throw new Error(`Não foi possível abrir popup: ${error.message}`);
+  }
+}
+
+/* =========================
+   FUNÇÃO PARA EXTRAIR DADOS DA POPUP
 ========================= */
 async function extractDataFromPopup(popupPage, studentName) {
-  console.log(`  🔍 Procurando tabela na popup para ${studentName}...`);
+  console.log(`  🔍 Extraindo dados para ${studentName}...`);
   
-  // Lista de selectors para tentar (em ordem de prioridade)
-  const tableSelectors = [
-    SELECTORS.popupTable,           // 1. ID exato que você mencionou
-    SELECTORS.popupTableAlt1,       // 2. ID parcial
-    SELECTORS.popupTableAlt2,       // 3. Classe PrimeFaces
-    SELECTORS.popupTableAlt3,       // 4. Outro padrão
-    SELECTORS.anyTable              // 5. Qualquer tabela
-  ];
-  
-  let linhas_pesquisa = [];
-  let tableFound = false;
-  let foundSelector = '';
-  
-  // Tenta cada selector
-  for (const selector of tableSelectors) {
-    try {
-      console.log(`  🔎 Tentando selector: ${selector}`);
-      
-      // Aguarda a tabela aparecer
-      await popupPage.waitForSelector(selector, {
-        visible: true,
-        timeout: selector === SELECTORS.anyTable ? 20000 : 35000
-      });
-      
-      tableFound = true;
-      foundSelector = selector;
-      console.log(`  ✅ Tabela encontrada com selector: ${selector}`);
-      break;
-      
-    } catch (error) {
-      console.log(`  ❌ Não encontrado com ${selector}: ${error.message}`);
-      continue;
-    }
-  }
-  
-  // Se não encontrou tabela, verifica se há mensagem de "sem dados"
-  if (!tableFound) {
-    console.log(`  ⚠️  Nenhuma tabela encontrada, verificando conteúdo...`);
-    
-    const pageContent = await popupPage.content();
-    const pageText = await popupPage.evaluate(() => document.body.innerText);
-    
-    console.log(`  📄 Tamanho do HTML: ${pageContent.length} caracteres`);
-    console.log(`  📝 Primeiros 300 caracteres do texto: "${pageText.substring(0, 300)}..."`);
-    
-    // Verifica mensagens comuns de "sem dados"
-    const noDataPatterns = [
-      'Não há dados',
-      'Nenhum registro',
-      'sem dados',
-      'não possui',
-      'vazio',
-      'empty',
-      'no data'
-    ];
-    
-    const hasNoData = noDataPatterns.some(pattern => 
-      pageText.toLowerCase().includes(pattern.toLowerCase())
-    );
-    
-    if (hasNoData) {
-      console.log(`  ℹ️  Popup indica que não há dados para ${studentName}`);
-      return [];
-    }
-    
-    // Tira screenshot para debug
-    await popupPage.screenshot({ 
-      path: `debug-popup-estudante-${studentName.replace(/[^a-z0-9]/gi, '_')}.png`,
-      fullPage: true 
+  try {
+    // Tenta encontrar a tabela
+    await popupPage.waitForSelector(SELECTORS.popupTable, {
+      timeout: 10000
+    }).catch(() => {
+      console.log(`  ⚠️  Tabela não encontrada, tentando alternativas...`);
     });
-    console.log(`  📸 Screenshot salvo para debug`);
     
-    return [];
-  }
-  
-  // Extrai dados da tabela encontrada
-  console.log(`  📊 Extraindo dados da tabela...`);
-  
-  // Aguarda um pouco para garantir que os dados estão carregados
-  await sleep(2000);
-  
-  // Verifica se a tabela tem linhas
-  const hasRows = await popupPage.evaluate((sel) => {
-    const table = document.querySelector(sel);
-    if (!table) return false;
-    
-    // Se for tbody, pega as tr diretamente
-    if (table.tagName.toLowerCase() === 'tbody') {
-      return table.querySelectorAll('tr').length > 0;
-    }
-    
-    // Se for table, procura tbody primeiro
-    const tbody = table.querySelector('tbody');
-    if (tbody) {
-      return tbody.querySelectorAll('tr').length > 0;
-    }
-    
-    // Caso contrário, tenta pegar trs direto da table
-    return table.querySelectorAll('tr').length > 0;
-  }, foundSelector);
-  
-  if (!hasRows) {
-    console.log(`  ⚠️  Tabela encontrada mas sem linhas de dados`);
-    return [];
-  }
-  
-  // Extrai os dados
-  linhas_pesquisa = await popupPage.evaluate((sel) => {
-    const extractRowsFromElement = (element) => {
+    // Extrai dados
+    const linhas_pesquisa = await popupPage.evaluate((selectors) => {
+      // Tenta vários selectors
+      const selectorsToTry = [
+        selectors.popupTable,
+        selectors.popupTableAlt1,
+        selectors.popupTableAlt2,
+        selectors.popupTableAlt3,
+        selectors.anyTable
+      ];
+      
+      let table = null;
+      for (const selector of selectorsToTry) {
+        table = document.querySelector(selector);
+        if (table) break;
+      }
+      
+      if (!table) return [];
+      
       const rows = [];
-      const trs = element.querySelectorAll('tr');
+      const trs = table.querySelectorAll('tr');
       
       trs.forEach(tr => {
-        const tds = tr.querySelectorAll('td');
-        if (tds.length >= 2) {
-          const linha = tds[0]?.innerText.trim() || '';
-          const grupo = tds[1]?.innerText.trim() || '';
+        const cells = tr.querySelectorAll('td');
+        if (cells.length >= 2) {
+          const linha = cells[0]?.textContent?.trim() || '';
+          const grupo = cells[1]?.textContent?.trim() || '';
           
-          if (linha || grupo) {
-            rows.push({ linha_pesquisa: linha, grupo: grupo });
+          // Filtra linhas válidas
+          if (linha && grupo && 
+              !linha.includes('ui-button') && 
+              !grupo.includes('ui-button')) {
+            rows.push({ 
+              linha_pesquisa: linha, 
+              grupo: grupo 
+            });
           }
         }
       });
       
       return rows;
-    };
+    }, {
+      popupTable: SELECTORS.popupTable,
+      popupTableAlt1: SELECTORS.popupTableAlt1,
+      popupTableAlt2: SELECTORS.popupTableAlt2,
+      popupTableAlt3: SELECTORS.popupTableAlt3,
+      anyTable: SELECTORS.anyTable
+    });
     
-    const element = document.querySelector(sel);
-    if (!element) return [];
+    console.log(`  ✅ ${linhas_pesquisa.length} linha(s) extraída(s)`);
+    return linhas_pesquisa;
     
-    // Se for tbody, extrai direto
-    if (element.tagName.toLowerCase() === 'tbody') {
-      return extractRowsFromElement(element);
-    }
-    
-    // Se for table, procura tbody
-    if (element.tagName.toLowerCase() === 'table') {
-      const tbody = element.querySelector('tbody');
-      if (tbody) {
-        return extractRowsFromElement(tbody);
-      }
-      // Se não tiver tbody, tenta extrair direto da table
-      return extractRowsFromElement(element);
-    }
-    
-    return [];
-  }, foundSelector);
-  
-  console.log(`  ✅ ${linhas_pesquisa.length} linha(s) extraída(s)`);
-  return linhas_pesquisa;
-}
-
-/* =========================
-   FUNÇÃO PARA ABRIR POPUP DE FORMA CONFIÁVEL
-========================= */
-async function openPopupReliably(page, linkHandle, studentName) {
-  console.log(`  🔗 Tentando abrir popup para: ${studentName}`);
-  
-  // Método 1: Usando evaluate para clicar e abrir em nova aba
-  try {
-    // Obtém a URL do link
-    const href = await linkHandle.evaluate(node => node.getAttribute('href'));
-    console.log(`  🔗 URL do link: ${href}`);
-    
-    if (!href || href === '#' || href.startsWith('javascript:')) {
-      // Se não tem href válido, usa click normal
-      console.log(`  ⚠️  Link sem href válido, usando click normal`);
-      await linkHandle.click({ delay: 100 });
-    } else {
-      // Abre nova aba diretamente com a URL
-      console.log(`  📄 Abrindo nova aba com URL...`);
-      const browser = page.browser();
-      const popupPage = await browser.newPage();
-      await popupPage.goto(href, { 
-        waitUntil: 'domcontentloaded',
-        timeout: CONFIG.timeouts.pageLoad 
-      });
-      return popupPage;
-    }
   } catch (error) {
-    console.log(`  ⚠️  Método de URL falhou, tentando click: ${error.message}`);
-    await linkHandle.click({ delay: 100 });
+    console.log(`  ❌ Erro na extração: ${error.message}`);
+    return [];
   }
-  
-  // Método 2: Espera por nova aba (fallback)
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject(new Error(`Timeout ao aguardar popup para ${studentName}`));
-    }, CONFIG.timeouts.popup);
-    
-    const targetHandler = async (target) => {
-      if (target.type() === 'page') {
-        try {
-          const popupPage = await target.page();
-          if (popupPage && popupPage !== page) {
-            clearTimeout(timeoutId);
-            page.browser().off('targetcreated', targetHandler);
-            console.log(`  📄 Popup aberta via targetcreated`);
-            resolve(popupPage);
-          }
-        } catch (error) {
-          console.warn(`  ⚠️  Erro ao obter página do target: ${error.message}`);
-        }
-      }
-    };
-    
-    page.browser().on('targetcreated', targetHandler);
-    
-    // Verifica se já abriu (às vezes abre instantaneamente)
-    setTimeout(async () => {
-      try {
-        const pages = await page.browser().pages();
-        const newPages = pages.filter(p => p !== page);
-        if (newPages.length > 0) {
-          clearTimeout(timeoutId);
-          page.browser().off('targetcreated', targetHandler);
-          console.log(`  📄 Popup já aberta encontrada`);
-          resolve(newPages[0]);
-        }
-      } catch (error) {
-        console.warn(`  ⚠️  Erro ao verificar páginas: ${error.message}`);
-      }
-    }, 2000);
-  });
 }
 
 /* =========================
-   FUNÇÃO PARA PROCESSAR UM ESTUDANTE
+   FUNÇÃO PARA FECHAR POPUP SEGURAMENTE
 ========================= */
-async function processStudent(page, rowHandle, index, total) {
+async function closePopupSafely(popupPage, studentName) {
+  if (!popupPage || popupPage.isClosed()) return;
+
+  try {
+    // await popupPage.close({ runBeforeUnload: false });
+    console.log(`  ✅ Popup fechada para ${studentName}`);
+  } catch (error) {
+    console.warn(`  ⚠️  Erro ao fechar popup: ${error.message}`);
+  }
+
+  await sleep(CONFIG.delays.afterPopupClose);
+}
+
+/* =========================
+   FUNÇÃO PARA PROCESSAR UM ESTUDANTE (COM RETRY)
+========================= */
+async function processStudent(mainPage, rowHandle, index, total) {
   const studentId = index + 1;
-  console.log(`\n[${studentId}/${total}] Iniciando processamento...`);
+  console.log(`\n[${studentId}/${total}] Processando...`);
   
   let studentName = `Estudante ${studentId}`;
+  let popupPage = null;
   
+  // Tenta múltiplas vezes
   for (let attempt = 1; attempt <= CONFIG.retryAttempts; attempt++) {
     try {
-      // Obtém nome do estudante
-      studentName = await rowHandle.$eval("td", (td) => td.innerText.trim());
-      console.log(`  👤 Nome: ${studentName} (Tentativa ${attempt}/${CONFIG.retryAttempts})`);
+      // Obtém nome
+      studentName = await rowHandle.$eval("td:first-child", (td) => 
+        td.textContent?.trim() || td.innerText?.trim() || `Estudante ${studentId}`
+      ).catch(() => `Estudante ${studentId}`);
+      
+      console.log(`  👤 ${studentName} (tentativa ${attempt}/${CONFIG.retryAttempts})`);
       
       // Verifica se é linha vazia
-      const rowText = await rowHandle.evaluate(el => el.innerText);
-      if (rowText.includes(SELECTORS.noDataText)) {
+      const rowText = await rowHandle.evaluate(el => 
+        el.textContent || el.innerText
+      );
+      
+      if (!rowText || rowText.includes(SELECTORS.noDataText)) {
         console.log(`  ⚠️  Linha vazia, pulando...`);
         return { nome: studentName, linhas_pesquisa: [] };
       }
       
-      // Localiza link
+      // Encontra link
       const linkHandle = await rowHandle.$(SELECTORS.link).catch(() => null);
       
       if (!linkHandle) {
-        console.warn(`  ⚠️  Link não encontrado para: ${studentName}`);
-        return { nome: studentName, error: "link_not_found" };
+        console.warn(`  ⚠️  Link não encontrado`);
+        return { 
+          nome: studentName, 
+          error: "link_not_found", 
+          linhas_pesquisa: [] 
+        };
       }
       
       // Abre popup
-      console.log(`  🖱️  Clicando no link...`);
-      const popupPage = await openPopupReliably(page, linkHandle, studentName);
+      popupPage = await openPopupReliably(mainPage, linkHandle, studentName, attempt);
       
-      // Configura popup
-      await popupPage.bringToFront();
-      popupPage.setDefaultTimeout(CONFIG.timeouts.selector);
+      // Extrai dados com timeout
+      const dataPromise = extractDataFromPopup(popupPage, studentName);
+      const timeoutPromise = sleep(CONFIG.timeouts.tableLoad).then(() => {
+        throw new Error("Timeout na extração de dados");
+      });
       
-      // Aguarda carregamento
-      console.log(`  ⏳ Aguardando popup carregar...`);
-      await sleep(CONFIG.delays.afterClick);
-      
-      // Extrai dados
-      const linhas_pesquisa = await extractDataFromPopup(popupPage, studentName);
-      
-      // Obtém URL
+      const linhas_pesquisa = await Promise.race([dataPromise, timeoutPromise]);
       const espelhoUrl = popupPage.url();
-      console.log(`  🌐 URL do popup: ${espelhoUrl}`);
+      
+      console.log(`  🌐 URL: ${espelhoUrl.substring(0, 100)}...`);
       
       // Fecha popup
-      try {
-        await popupPage.close();
-        console.log(`  ✅ Popup fechada`);
-      } catch (closeError) {
-        console.warn(`  ⚠️  Erro ao fechar popup: ${closeError.message}`);
-      }
-      
-      console.log(`  ✅ ${linhas_pesquisa.length} linha(s) coletada(s) para ${studentName}`);
+      await closePopupSafely(popupPage, studentName);
+      popupPage = null;
       
       return {
         nome: studentName,
@@ -379,33 +355,29 @@ async function processStudent(page, rowHandle, index, total) {
       };
       
     } catch (error) {
-      console.error(`  ❌ Tentativa ${attempt} falhou para ${studentName}:`, error.message);
+      console.error(`  ❌ Tentativa ${attempt} falhou: ${error.message}`);
       
-      // Fecha popups abertas
-      try {
-        const pages = await page.browser().pages();
-        for (const p of pages) {
-          if (p !== page && !p.isClosed()) {
-            try {
-              await p.close();
-              console.log(`  🧹 Popup órfã fechada`);
-            } catch {}
-          }
-        }
-      } catch {}
+      // Fecha popup se ainda estiver aberta
+      if (popupPage && !popupPage.isClosed()) {
+        await closePopupSafely(popupPage, studentName);
+        popupPage = null;
+      }
+      
+      // Limpa outras popups
+      await cleanupBrowser(mainPage.browser(), mainPage);
       
       if (attempt === CONFIG.retryAttempts) {
         console.error(`  💥 Todas as tentativas falharam para ${studentName}`);
         return { 
           nome: studentName, 
-          error: error.message,
+          error: `max_retries_exceeded: ${error.message}`,
           linhas_pesquisa: [] 
         };
       }
       
-      // Backoff
+      // Backoff exponencial
       const backoffTime = CONFIG.delays.beforeRetry * attempt;
-      console.log(`  ⏳ Aguardando ${backoffTime/1000}s antes da próxima tentativa...`);
+      console.log(`  ⏳ Aguardando ${backoffTime/1000}s antes de retry...`);
       await sleep(backoffTime);
     }
   }
@@ -415,27 +387,39 @@ async function processStudent(page, rowHandle, index, total) {
    FUNÇÃO PARA ENCONTRAR TABELA
 ========================= */
 async function findMainTable(page) {
-  console.log("[INFO] Procurando tabela de estudantes...");
+  console.log("[INFO] Procurando tabela...");
   
   for (const tableId of TABLE_IDS) {
-    const selector = escapeSelector(tableId);
-    console.log(`  🔍 Tentando selector: ${selector}`);
-    
     try {
-      await sleep(1000);
+      const selector = escapeSelector(tableId);
+      console.log(`  🔍 Tentando: ${selector}`);
       
-      const table = await page.waitForSelector(selector, {
-        timeout: 15000,
-        visible: true
-      });
+      await sleep(500);
+      const table = await page.$(selector);
       
       if (table) {
         const rowCount = await table.$$eval('tr', rows => rows.length);
-        console.log(`  ✅ Tabela encontrada: ${tableId} com ${rowCount} linhas`);
+        console.log(`  ✅ Tabela encontrada: ${tableId} (${rowCount} linhas)`);
         return table;
       }
     } catch (error) {
-      console.log(`  ❌ Tabela não encontrada com ID ${tableId}`);
+      console.log(`  ❌ Não encontrada: ${tableId}`);
+    }
+  }
+  
+  // Fallback
+  console.log(`  🔍 Fallback: procurando qualquer tabela...`);
+  const tables = await page.$$('table');
+  
+  for (const table of tables) {
+    const hasLinks = await table.$$eval(
+      'a[id*="Estudante"]', 
+      links => links.length > 0
+    );
+    
+    if (hasLinks) {
+      console.log(`  ✅ Tabela com links encontrada`);
+      return table;
     }
   }
   
@@ -443,226 +427,201 @@ async function findMainTable(page) {
 }
 
 /* =========================
-   FUNÇÃO PRINCIPAL
+   FUNÇÃO PRINCIPAL COM GESTÃO DE RECURSOS
 ========================= */
-export default async function scrapeLinhasEstudantes() {
-  console.log("🚀 INICIANDO SCRAPING DE LINHAS DE ESTUDANTES");
-  console.log("=============================================\n");
+export default async function scrapeLinhasEstudantes(browser) {
+  console.log("🚀 INICIANDO SCRAPING DE ESTUDANTES");
+  console.log("===================================\n");
   
-  const startTime = Date.now();
   const resultados = [];
-  let browser = null;
-  let page = null;
+  let mainPage = null;
   
   try {
-    // 1. INICIALIZAÇÃO
+    // 1. INICIALIZAÇÃO COM TIMEOUTS AUMENTADOS
     console.log("[1/4] Inicializando navegador...");
     
-    browser = await puppeteer.launch({
-      headless: false, // ⚠️ MANTENHA FALSE PARA DEBUG! Mude para "new" depois
-      executablePath: CONFIG.chromePath,
-      defaultViewport: null,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--start-maximized'
-      ],
-      ignoreHTTPSErrors: true,
-      timeout: 120000
-    });
     
     console.log("✅ Navegador inicializado");
     
     // 2. CONFIGURAÇÃO DA PÁGINA
     console.log("[2/4] Configurando página...");
     
-    page = await browser.newPage();
-    page.setDefaultNavigationTimeout(CONFIG.timeouts.navigation);
-    page.setDefaultTimeout(CONFIG.timeouts.selector);
+    mainPage = await browser.newPage();
+    mainPage.setDefaultNavigationTimeout(CONFIG.timeouts.navigation);
+    mainPage.setDefaultTimeout(CONFIG.timeouts.selector);
     
-    await page.setUserAgent(
+    await mainPage.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
       '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     );
     
     // 3. NAVEGAÇÃO
-    console.log("[3/4] Navegando para a página...");
-    console.log(`   📍 URL: ${CONFIG.url}`);
+    console.log("[3/4] Navegando para página...");
+    console.log(`   📍 ${CONFIG.url}`);
     
-    await page.goto(CONFIG.url, {
-      waitUntil: 'domcontentloaded',
+    await mainPage.goto(CONFIG.url, {
+      waitUntil: 'networkidle0',
       timeout: CONFIG.timeouts.navigation
     });
     
     console.log("✅ Página carregada");
     await sleep(3000);
     
-    // 4. LOCALIZAÇÃO DA TABELA
-    console.log("[4/4] Localizando tabela de estudantes...");
+    // 4. LOCALIZAR TABELA
+    console.log("[4/4] Procurando tabela...");
     
-    const tableHandle = await findMainTable(page);
+    const tableHandle = await findMainTable(mainPage);
     if (!tableHandle) {
-      await page.screenshot({ path: 'debug-no-table-estudantes.png', fullPage: true });
-      throw new Error("❌ Nenhuma tabela de estudantes encontrada");
+      throw new Error("Tabela não encontrada");
     }
     
-    // Obtém todas as linhas
+    // Obtém linhas
     const rows = await tableHandle.$$("tr");
-    const totalRows = rows.length;
-    console.log(`\n📊 TOTAL DE ESTUDANTES ENCONTRADOS: ${totalRows}`);
+    console.log(`\n📊 TOTAL DE LINHAS: ${rows.length}`);
     
-    if (totalRows === 0) {
-      console.warn("⚠️  Nenhum estudante encontrado na tabela");
+    // Filtra linhas com conteúdo
+    const studentRows = [];
+    for (let i = 0; i < rows.length; i++) {
+      const text = await rows[i].evaluate(el => el.textContent?.trim());
+      if (text && text.length > 0 && !text.includes(SELECTORS.noDataText)) {
+        studentRows.push({ row: rows[i], index: i });
+      }
+    }
+    
+    console.log(`📊 ESTUDANTES PARA PROCESSAR: ${studentRows.length}\n`);
+    
+    if (studentRows.length === 0) {
+      console.log("⚠️  Nenhum estudante encontrado");
       await safeWrite([]);
       return [];
     }
     
-    // 5. PROCESSAMENTO
-    console.log("\n🔄 INICIANDO PROCESSAMENTO DOS ESTUDANTES");
-    console.log("=========================================\n");
+    // 5. PROCESSAMENTO COM PAUSAS PERIÓDICAS
+    console.log("🔄 PROCESSANDO ESTUDANTES");
+    console.log("========================");
     
-    for (let i = 0; i < totalRows; i++) {
+    for (let i = 0; i < studentRows.length; i++) {
+      const { row, index } = studentRows[i];
+      
       try {
-        const result = await processStudent(page, rows[i], i, totalRows);
+        const result = await processStudent(mainPage, row, i, studentRows.length);
         resultados.push(result);
         
-        // Salva checkpoint
-        if ((i + 1) % 5 === 0) {
-          console.log(`\n💾 Checkpoint: Salvando ${i + 1}/${totalRows} estudantes...`);
+        // Checkpoint a cada 5 estudantes
+        if ((i + 1) % 5 === 0 || i === studentRows.length - 1) {
+          console.log(`\n💾 Checkpoint: ${i + 1}/${studentRows.length} estudantes`);
           await safeWrite(resultados);
+          
+          // Limpeza periódica
+          await cleanupBrowser(browser, mainPage);
+          
+          // Pausa mais longa a cada 20 estudantes
+          if ((i + 1) % 20 === 0 && i < studentRows.length - 1) {
+            console.log(`\n⏸️  Pausa de 10 segundos...`);
+            await sleep(10000);
+          }
         }
         
-        // Delay entre estudantes
-        if (i < totalRows - 1) {
-          console.log(`\n⏳ Aguardando ${CONFIG.delays.betweenStudents/1000}s antes do próximo...`);
+        // Delay normal entre estudantes
+        if (i < studentRows.length - 1) {
           await sleep(CONFIG.delays.betweenStudents);
         }
         
       } catch (error) {
-        console.error(`\n💥 Erro crítico no estudante ${i + 1}:`, error.message);
+        console.error(`\n💥 Erro crítico no estudante ${i + 1}: ${error.message}`);
         resultados.push({
           index: i + 1,
           error: error.message,
           linhas_pesquisa: []
         });
-        await sleep(CONFIG.delays.betweenStudents);
+        
+        await cleanupBrowser(browser, mainPage);
+        await sleep(5000); // Pausa mais longa após erro
       }
     }
     
     // 6. FINALIZAÇÃO
-    console.log("\n===========================================");
+    console.log("\n" + "=".repeat(50));
     console.log("✅ PROCESSAMENTO CONCLUÍDO");
-    console.log("===========================================");
+    console.log("=".repeat(50));
     
     await safeWrite(resultados);
     
     // Estatísticas
-    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-    const successful = resultados.filter(r => !r.error && r.linhas_pesquisa?.length >= 0).length;
+    const successful = resultados.filter(r => !r.error).length;
     const withData = resultados.filter(r => r.linhas_pesquisa?.length > 0).length;
-    const errors = resultados.filter(r => r.error).length;
     
     console.log(`\n📈 ESTATÍSTICAS:`);
-    console.log(`   ⏱️  Tempo total: ${totalTime}s`);
-    console.log(`   👥 Total processado: ${resultados.length}`);
+    console.log(`   👥 Total: ${resultados.length}`);
     console.log(`   ✅ Sucesso: ${successful}`);
     console.log(`   📊 Com dados: ${withData}`);
-    console.log(`   ❌ Erros: ${errors}`);
+    console.log(`   ❌ Erros: ${resultados.length - successful}`);
+    
+    // Exemplos
+    const examples = resultados
+      .filter(r => r.linhas_pesquisa?.length > 0)
+      .slice(0, 3);
+    
+    if (examples.length > 0) {
+      console.log(`\n📋 EXEMPLOS:`);
+      examples.forEach((result, idx) => {
+        console.log(`  ${idx + 1}. ${result.nome}`);
+        result.linhas_pesquisa.slice(0, 2).forEach((linha, i) => {
+          console.log(`     ${i + 1}. ${linha.linha_pesquisa}`);
+        });
+      });
+    }
     
     return resultados;
     
   } catch (error) {
-    console.error("\n💥 ERRO CRÍTICO NO SCRAPING:", error.message);
+    console.error("\n💥 ERRO CRÍTICO:", error.message);
     
     if (resultados.length > 0) {
-      console.log(`\n💾 Salvando resultados parciais (${resultados.length} registros)...`);
-      try {
-        await safeWrite(resultados);
-        console.log("✅ Resultados parciais salvos");
-      } catch (writeError) {
-        console.error("❌ Falha ao salvar resultados parciais:", writeError.message);
-      }
-    }
-    
-    if (page) {
-      try {
-        await page.screenshot({ path: 'error-screenshot-estudantes.png', fullPage: true });
-        console.log("📸 Screenshot do erro salvo");
-      } catch {}
+      console.log(`\n💾 Salvando resultados parciais (${resultados.length})...`);
+      await safeWrite(resultados);
     }
     
     throw error;
     
   } finally {
-    console.log("\n🧹 Finalizando e liberando recursos...");
+    console.log("\n🧹 FINALIZANDO...");
     
-    if (page && !page.isClosed()) {
-      try { await page.close(); } catch {}
-    }
-    
+    // Garante fechamento completo
     if (browser) {
-      try { await browser.close(); } catch {}
+      try {
+        // Fecha todas as páginas
+        const pages = await browser.pages();
+        for (const page of pages) {
+          if (!page.isClosed()) {
+            try {
+              await page.close();
+            } catch {}
+          }
+        }
+        
+        // Desconecta e fecha
+        if (mainPage && !mainPage.isClosed()) {
+  await mainPage.close();
+}
+        
+        // Garante que o processo termine
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        console.log("✅ Navegador fechado");
+      } catch (error) {
+        console.warn("⚠️  Erro ao fechar navegador:", error.message);
+      }
     }
     
     console.log("🎯 SCRAPING FINALIZADO");
   }
 }
 
-// Função para testar diretamente
-export async function testScrapeEstudantes() {
-  console.log("🧪 TESTE DIRETO DO SCRAPE DE ESTUDANTES");
-  console.log("=======================================\n");
-  
-  try {
-    const resultados = await scrapeLinhasEstudantes();
-    
-    console.log("\n✅ TESTE CONCLUÍDO COM SUCESSO!");
-    console.log(`📊 Total de estudantes processados: ${resultados.length}`);
-    
-    // Análise detalhada
-    const comDados = resultados.filter(r => r.linhas_pesquisa && r.linhas_pesquisa.length > 0);
-    const semDados = resultados.filter(r => r.linhas_pesquisa && r.linhas_pesquisa.length === 0);
-    const comErro = resultados.filter(r => r.error);
-    
-    console.log(`📈 Estatísticas:`);
-    console.log(`   ✅ Com dados: ${comDados.length}`);
-    console.log(`   ⚠️  Sem dados: ${semDados.length}`);
-    console.log(`   ❌ Com erro: ${comErro.length}`);
-    
-    // Mostra exemplos
-    if (comDados.length > 0) {
-      console.log("\n📋 Exemplos de estudantes com dados:");
-      comDados.slice(0, 3).forEach((result, i) => {
-        console.log(`\n  ${i + 1}. ${result.nome}`);
-        console.log(`     📊 ${result.linhas_pesquisa.length} linha(s) de pesquisa`);
-        result.linhas_pesquisa.slice(0, 2).forEach(linha => {
-          console.log(`        - ${linha.linha_pesquisa} | ${linha.grupo}`);
-        });
-      });
-    }
-    
-    if (comErro.length > 0) {
-      console.log("\n❌ Erros encontrados:");
-      comErro.slice(0, 3).forEach((result, i) => {
-        console.log(`  ${i + 1}. ${result.nome || `Índice ${result.index}`}`);
-        console.log(`     Erro: ${result.error}`);
-      });
-    }
-    
-    return resultados;
-    
-  } catch (error) {
-    console.error("\n❌ TESTE FALHOU:", error.message);
-    throw error;
-  }
-}
+// Função para teste rápido
 
-// Execução direta
+// Execução
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  console.log("🔧 MODO: Execução direta do scrape de estudantes");
-  
-  // Verifica se é um teste rápido
   const isTest = process.argv.includes('--test');
   
   if (isTest) {
