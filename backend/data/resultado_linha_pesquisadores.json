@@ -94,6 +94,10 @@
       {
         "linha_pesquisa": "Acessibilidade e Tecnologias Assistivas",
         "grupo": "Inclusão, Computação Aplicada e Sistemas Inteligentes"
+      },
+      {
+        "linha_pesquisa": "Algoritmos Inteligentes Aplicados à Robótica",
+        "grupo": "Inclusão, Computação Aplicada e Sistemas Inteligentes"
       }
     ]
   },
@@ -108,6 +112,34 @@
       {
         "linha_pesquisa": "Engenharia e Ciência de Alimentos",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Química e Desenvolvimento de Produtos Alimentícios",
+        "grupo": "Química, Meio Ambiente e Ensino de Ciências"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
   },
@@ -117,6 +149,18 @@
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Inteligência Artificial e Sistemas Inteligentes",
+        "grupo": "Núcleo de Computação Aplicada"
+      },
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
@@ -218,16 +262,16 @@
         "grupo": "Núcleo de Pesquisa em Informática e Robótica Aplicada"
       },
       {
+        "linha_pesquisa": "Análise de cadeias produtivas",
+        "grupo": "Agronegócio Sustentável"
+      },
+      {
         "linha_pesquisa": "Engenharia e Ciência de Alimentos",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
         "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Análise de cadeias produtivas",
-        "grupo": "Agronegócio Sustentável"
       },
       {
         "linha_pesquisa": "Acessibilidade e Tecnologia Assistiva",
@@ -285,6 +329,14 @@
       },
       {
         "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
@@ -367,11 +419,275 @@
   },
   {
     "nome": "Fábio Lustosa Souza",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0035335505",
+    "error": "Timeout ao aguardar popup para Fábio Lustosa Souza",
+    "linhas_pesquisa": []
+  },
+  {
+    "nome": "Francisco Adelton Alves Ribeiro",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0039345041",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Química e Meio Ambiente",
-        "grupo": "Química, Meio Ambiente e Ensino de Ciências"
+        "linha_pesquisa": "Modelagem Matemática como Metodologia de Ensino e Pesquisa em Ciências Exatas",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Gerlange Soares da Silva",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0046180770",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Giordania Tavares Costa Ribeiro",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0194032850",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Glayde Maria Carvalho Véras",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0008374112",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Fisiopatologia da reprodução e suas tecnologias em animais de produção",
+        "grupo": "PRODUÇÃO E SANIDADE ANIMAL, SUSTENTABILIDADE E SUAS TECNOLOGIAS"
+      },
+      {
+        "linha_pesquisa": "Manejo e controle sanitário de animais de produção voltados à saúde animal e humana",
+        "grupo": "PRODUÇÃO E SANIDADE ANIMAL, SUSTENTABILIDADE E SUAS TECNOLOGIAS"
+      },
+      {
+        "linha_pesquisa": "Produção e sustentabilidade na área animal",
+        "grupo": "PRODUÇÃO E SANIDADE ANIMAL, SUSTENTABILIDADE E SUAS TECNOLOGIAS"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Grigorio Duarte Neto",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0045913250",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Irakerley Alves Fernandes",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0035694505",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Irapuan Lira Feitosa Filho",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0056321414",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Jacques Alastair Martins Silva",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0150810717",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Jandherson Moura Silva",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0037785311",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Modelagem Matemática como Metodologia de Ensino e Pesquisa em Ciências Exatas",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Jetro Ialen Moreira Bento",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0054311977",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Jonas Pereira Gomes",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0043497756",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Emprego da língua portuguesa na contemporaneidade",
+        "grupo": "GRUPO DE PESQUISA EM LINGUAGENS, ARTES E TRADIÇÕES CULTURAIS - GPCULT"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Linguística",
+        "grupo": "GRUPO DE PESQUISA EM LINGUAGENS, ARTES E TRADIÇÕES CULTURAIS - GPCULT"
+      },
+      {
+        "linha_pesquisa": "Artes teatrais e musicais",
+        "grupo": "GRUPO DE PESQUISA EM LINGUAGENS, ARTES E TRADIÇÕES CULTURAIS - GPCULT"
+      }
+    ]
+  },
+  {
+    "nome": "José Brandão de Menezes Júnior",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0047858648",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Josielta Alves dos Santos",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0088091317",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
+  },
+  {
+    "nome": "Josyanne Araújo Neves",
+    "error": "Timeout ao aguardar popup para Josyanne Araújo Neves",
+    "linhas_pesquisa": []
+  },
+  {
+    "nome": "Lucinaldo dos Santos Silva",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0043591841",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
         "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
@@ -384,123 +700,344 @@
     ]
   },
   {
-    "index": 21,
-    "error": "popup_timeout"
+    "nome": "Marconi Batista Teixeira",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0003703070",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Fitotecnia/Olericultura",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
+      },
+      {
+        "linha_pesquisa": "Agricultura irrigada com água alterada",
+        "grupo": "Tecnologias sustentáveis na gestão de cultivos irrigados no Cerrado"
+      },
+      {
+        "linha_pesquisa": "Engenharia Sanitária e Ambiental",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
+      },
+      {
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Modelagem de água no solo",
+        "grupo": "Tecnologias sustentáveis na gestão de cultivos irrigados no Cerrado"
+      },
+      {
+        "linha_pesquisa": "Engenharia de água e solo",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 22,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Marcos Aurélio de Jesus Cardoso",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0036861871",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 23,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Marcos Vinicius de Freitas Borges",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0054165938",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Arquiteturas de software",
+        "grupo": "Engenharia de Software e Sistemas Distribuídos"
+      }
+    ]
   },
   {
-    "index": 24,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Mayara Oliveira Sousa Rodrigues",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0035605286",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Micologia: Taxonomia de fungos",
+        "grupo": "Diversidade, prospecção e coleção de fungos do Cerrado"
+      },
+      {
+        "linha_pesquisa": "Ensino de Biologia Celular e Molecular",
+        "grupo": "ENSINO DE BIOLOGIA E FORMAÇÃO DOCENTE NA REGIÃO MEIO-NORTE"
+      },
+      {
+        "linha_pesquisa": "Práticas da Docência e o Ensino de Biologia",
+        "grupo": "ENSINO DE BIOLOGIA E FORMAÇÃO DOCENTE NA REGIÃO MEIO-NORTE"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 25,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Miguel Ahid Jorge Junior",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0043139965",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "História e Memória da formação de professoras (es) no Maranhão e Biografias de Professoras (es) que atuaram nos espaços educacionais no Maranhão",
+        "grupo": "Grupo de Estudos e Pesquisa História e Memória da Formação de Professoras (es) no Maranhão"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 26,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Mikaella Silva Prado da Silveira",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0163615721",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 27,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Oswaldo Palma Lopes Sobrinho",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0045700915",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Química e Meio Ambiente",
+        "grupo": "Química, Meio Ambiente e Ensino de Ciências"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Química e Desenvolvimento de Produtos Alimentícios",
+        "grupo": "Química, Meio Ambiente e Ensino de Ciências"
+      },
+      {
+        "linha_pesquisa": "Engenharia de água e solo",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
+      }
+    ]
   },
   {
-    "index": 28,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Pablo Ricardo Cavalcante de Carvalho",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0138238820",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "História e Memória da formação de professoras (es) no Maranhão e Biografias de Professoras (es) que atuaram nos espaços educacionais no Maranhão",
+        "grupo": "Grupo de Estudos e Pesquisa História e Memória da Formação de Professoras (es) no Maranhão"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 29,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Paula Francineti de Araujo Tavares",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0006022260",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem de Línguas",
+        "grupo": "Linguagens, Cultura e Ensino: O Uso da Língua na Formação Técnica e Tecnológica (GPLINCE)"
+      },
+      {
+        "linha_pesquisa": "Ensino Aprendizagem de Línguas",
+        "grupo": "Linguagens,Cultura e ensino: o uso da língua na formação técnica e tecnológica"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 30,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Raimundo dos Santos Marcolino",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0093618140",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Fenômenos Biológicos e Físicos",
+        "grupo": "Núcleo de Estudos em Matemática Aplicada e Computação Científica"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Modelagem Matemática e Computacional",
+        "grupo": "Núcleo de Estudos em Matemática Aplicada e Computação Científica"
+      }
+    ]
   },
   {
-    "index": 31,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Suzi Morais Aires Martins",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0191819646",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Agronomia Ciência do Solo",
+        "grupo": "Grupo de Pesquisa e Extensão em Manejo de Solo e Água (GPEMSA)"
+      },
+      {
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Avaliação Biologica de Extratos Vegetais e Substâncias Isoladas: atividade alelopática",
+        "grupo": "GPPMi - Grupo de Pesquisa em Plantas e Micro-organismos"
+      },
+      {
+        "linha_pesquisa": "Isolamento e identificação de metabólitos secundários produzidos por plantas e microrganismos",
+        "grupo": "GPPMi - Grupo de Pesquisa em Plantas e Micro-organismos"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Química de Produtos Naturais",
+        "grupo": "Grupo Biomassa"
+      }
+    ]
   },
   {
-    "index": 32,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Thiago Gomes Alves",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0186304838",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Bioprospecção etnobotânica e suas aplicações",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 33,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Ticiana Leite Costa",
+    "error": "Timeout ao aguardar popup para Ticiana Leite Costa",
+    "linhas_pesquisa": []
   },
   {
-    "index": 34,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Vilma da Silva Mesquita Oliveira",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0039584305",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Educação Inclusiva",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
-    "index": 35,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 36,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 37,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 38,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 39,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 40,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 41,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 42,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 43,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 44,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 45,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 46,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 47,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 48,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 49,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
-  },
-  {
-    "index": 50,
-    "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed."
+    "nome": "Wady Lima Castro Junior",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0003017630",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Ciências Agrárias, de Alimentos, Tecnologia de Sementes e Agroecologia, Ecossistemas Aquáticos e Recursos Hídricos",
+        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
+      },
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "AGRICULTURA FAMILIAR, PRODUÇÃO E PROCESSAMENTO DE ALIMENTOS",
+        "grupo": "GRUPO DE PESQUISA EM DESENVOLVIMENTO RURAL, AMBIENTAL E SOCIAL - GDAS"
+      },
+      {
+        "linha_pesquisa": "Manejo da Agricultura Irrigada",
+        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
+      },
+      {
+        "linha_pesquisa": "Agronomia/Ciencias Agrárias, Experimentação Agrícola e Florestal, Tecnologia de alimentos",
+        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
+      },
+      {
+        "linha_pesquisa": "Hidrologia, Recursos Hídricos e Meio Ambiente",
+        "grupo": "Grupo de Pesquisa e Extensão em Manejo de Solo e Água (GPEMSA)"
+      },
+      {
+        "linha_pesquisa": "AGRONEGÓCIO",
+        "grupo": "GRUPO DE PESQUISA EM DESENVOLVIMENTO RURAL, AMBIENTAL E SOCIAL - GDAS"
+      }
+    ]
   }
 ]

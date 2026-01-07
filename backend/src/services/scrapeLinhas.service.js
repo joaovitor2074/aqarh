@@ -1,14 +1,14 @@
-// scrapeLinhas.js
+// scrapeLinhas.js - VERSÃO COM CORREÇÃO DE FECHAMENTO DE POPUP
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
 puppeteer.use(StealthPlugin());
 
 /* =========================
-   PATHS / OUTPUT
+   CONFIGURAÇÃO
 ========================= */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,245 +17,674 @@ const outputPath = path.join(
   __dirname,
   "../../data/resultado_linha_pesquisadores.json"
 );
-const outputDir = path.dirname(outputPath);
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-/* =========================
-   CONFIGURAÇÃO
-========================= */
-const URL =
-  process.env.SCRAPE_URL ||
-  "http://dgp.cnpq.br/dgp/espelhogrupo/6038878475345897";
+// ⚡ CONFIGURAÇÕES OTIMIZADAS
+const CONFIG = {
+  url: process.env.SCRAPE_URL || "http://dgp.cnpq.br/dgp/espelhogrupo/6038878475345897",
+  chromePath: process.env.CHROME_PATH || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  retryAttempts: 5,
+  
+  timeouts: {
+    navigation: 120000,    // 2 minutos
+    selector: 90000,       // 1.5 minutos
+    popup: 120000,         // 2 minutos para popup abrir
+    pageLoad: 60000,       // 1 minuto para página carregar
+    tableLoad: 45000       // 45 segundos para tabela
+  },
+  
+  delays: {
+    afterClick: 3000,      // 3 segundos após clicar
+    betweenResearchers: 5000, // 5 segundos entre pesquisadores
+    beforeRetry: 8000      // 8 segundos antes de retry
+  }
+};
 
-const CHROME_PATH =
-  process.env.CHROME_PATH ||
-  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-
-// const HEADLESS =
-//   process.env.HEADLESS === "1" || process.env.HEADLESS === "true";
-
-/* ===== TABELA DE PESQUISADORES (IDs FIXOS QUE ALTERNAM) ===== */
-// Nota: IDs são fornecidos sem escapes; normalizeIdForSelector fará o escape correto.
-const MAIN_TABLE_IDS = [
-  "idFormVisualizarGrupoPesquisa:j_idt277_data",
-  "idFormVisualizarGrupoPesquisa:j_idt272_data",
-  "idFormVisualizarGrupoPesquisa:j_idt271_data"
+// IDs das tabelas - mantém como estava
+const TABLE_IDS = [
+  "idFormVisualizarGrupoPesquisa:j_idt271_data",
+  "idFormVisualizarGrupoPesquisa:j_idt272_data", 
+  "idFormVisualizarGrupoPesquisa:j_idt277_data"
 ];
 
-/* ===== LINK DO ESPELHO (PESQUISADOR) ===== */
-const LINK_SELECTOR = "a[id*='idBtnVisualizarEspelhoPesquisador']";
-
-/* ===== POPUP ===== */
-const POPUP_TBODY_SELECTOR = "tbody[id$='tblEspelhoRHLPAtuacao_data']";
-
-/* ===== TIMEOUTS ===== */
-const NAV_TIMEOUT = 60_000;
-const SELECTOR_TIMEOUT = 60_000;
-const POPUP_TIMEOUT = 90_000;
-const BETWEEN_ITERATION_DELAY = 300;
+// ⚡⚡⚡ CORREÇÃO AQUI - NOVOS SELECTORS BASEADOS NO SEU COMENTÁRIO ⚡⚡⚡
+const SELECTORS = {
+  link: "a[id*='idBtnVisualizarEspelhoPesquisador']",
+  // ⚠️ O SELECTOR ORIGINAL ESTAVA ERRADO - CORRIGINDO:
+  popupTable: "#formVisualizarRH\\:tblEspelhoRHLPAtuacao_data", // ID exato que você mencionou
+  // Selectors alternativos para fallback:
+  popupTableAlt1: "table[id*='tblEspelhoRHLPAtuacao']",
+  popupTableAlt2: "table.ui-datatable-data", // Se usar PrimeFaces
+  popupTableAlt3: "tbody.ui-datatable-data", // Outro padrão comum
+  anyTable: "table", // Qualquer tabela
+  loadingIndicator: ".ui-datatable-loading",
+  noDataText: "Nenhum registro"
+};
 
 /* =========================
    HELPERS
 ========================= */
 const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-function normalizeIdForSelector(id) {
-  // remove backslashes if user already provided escaped id, then escape colons
-  const noBackslashes = id.replace(/\\/g, "");
-  return `#${noBackslashes.replace(/:/g, "\\:")}`;
+function escapeSelector(id) {
+  return `#${id.replace(/:/g, "\\:")}`;
 }
 
-function safeWrite(data) {
+async function safeWrite(data) {
   try {
-    fs.writeFileSync(outputPath, JSON.stringify(data, null, 2), "utf-8");
+    const outputDir = path.dirname(outputPath);
+    await fs.mkdir(outputDir, { recursive: true });
+    await fs.writeFile(outputPath, JSON.stringify(data, null, 2), 'utf-8');
+    console.log(`✅ Resultados salvos em: ${outputPath}`);
   } catch (err) {
-    console.error("[scrapeLinhas] Erro ao gravar arquivo de saída:", err);
+    console.error("❌ Erro ao gravar arquivo:", err);
   }
 }
 
 /* =========================
-   SERVICE
+   FUNÇÃO PARA DETECTAR E EXTRAIR DADOS DA POPUP
 ========================= */
-export default async function scrapeLinhas() {
-  console.log("[scrapeLinhas] Iniciando scraping de pesquisadores...");
-
-  let browser;
-  const resultados = []; // coletamos aqui e gravamos apenas no final
-
-  try {
-    browser = await puppeteer.launch({
-      headless: true,
-      executablePath: CHROME_PATH,
-      defaultViewport: null,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-    page.on("request", (req) => {
-      const type = req.resourceType();
-      if (["image", "stylesheet", "font"].includes(type)) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-
-
-    page.setDefaultTimeout(SELECTOR_TIMEOUT);
-    page.setDefaultNavigationTimeout(NAV_TIMEOUT);
-
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-      "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    );
-
-    console.log("[scrapeLinhas] Abrindo página...");
-    await page.goto(URL, { waitUntil: "domcontentloaded" });
-
-
-    /* ===== LOCALIZA A TABELA CORRETA ===== */
-    async function getMainTbodyHandle() {
-      for (const id of MAIN_TABLE_IDS) {
-        const selector = normalizeIdForSelector(id);
-        const handle = await page.$(selector);
-        if (handle) return handle;
-      }
-      return null;
-    }
-
-    const tbodyHandle = await getMainTbodyHandle();
-    if (!tbodyHandle) {
-      throw new Error("Tabela principal de pesquisadores não encontrada.");
-    }
-
-    const rows = await tbodyHandle.$$("tr");
-    console.log(`[scrapeLinhas] Total de pesquisadores: ${rows.length}`);
-
-
-
-    /* ===== FUNÇÃO PARA ABRIR POPUP (VERSÃO ESTÁVEL) ===== */
-    async function openPopup(anchorHandle) {
-      let resolvePopup;
-      const popupPromise = new Promise((res) => (resolvePopup = res));
-
-      const onTargetCreated = async (target) => {
-        try {
-          if (target.type && target.type() === "page") {
-            const p = await target.page();
-            if (p) resolvePopup(p);
-          }
-        } catch {
-          // ignore
-        }
-      };
-
-      browser.on("targetcreated", onTargetCreated);
-
-      try {
-        await anchorHandle.click({ delay: 50 });
-
-        const popup = await Promise.race([
-          popupPromise,
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("popup_timeout")), POPUP_TIMEOUT)
-          ),
-        ]);
-
-        await popup.bringToFront();
-        popup.setDefaultTimeout(SELECTOR_TIMEOUT);
-        return popup;
-      } finally {
-        try { browser.off("targetcreated", onTargetCreated); } catch { }
-      }
-    }
-
-    /* =========================
-       LOOP PRINCIPAL
-    ========================= */
-    for (let i = 0; i < rows.length; i++) {
-      console.log(`\n[${i + 1}/${rows.length}] Processando pesquisador...`);
-
-      try {
-        const row = rows[i];
-
-        // pega o nome (primeira td)
-        const nome = await row.$eval("td", (td) => td.innerText.trim());
-        console.log("→ Nome:", nome);
-        const rowText = await row.evaluate(el => el.innerText);
-        if (rowText.includes("Nenhum registro")) {
-          resultados.push({ nome, linhas_pesquisa: [] });
-          continue;
-        }
-
-
-        const anchor = await row.$(LINK_SELECTOR);
-        if (!anchor) {
-          console.warn("→ link_not_found para:", nome);
-          resultados.push({ nome, error: "link_not_found" });
-          await sleep(BETWEEN_ITERATION_DELAY);
-          continue;
-        }
-
-        const popup = await openPopup(anchor);
-
-        // espera a tabela do popup
-        await popup.waitForSelector(POPUP_TBODY_SELECTOR, { timeout: SELECTOR_TIMEOUT });
-
-        const linhas_pesquisa = await popup.evaluate((sel) => {
-          return Array.from(document.querySelectorAll(`${sel} tr`)).map((tr) => {
-            const tds = tr.querySelectorAll("td");
-            return {
-              linha_pesquisa: tds[0]?.innerText.trim() || "",
-              grupo: tds[1]?.innerText.trim() || "",
-            };
-          });
-        }, POPUP_TBODY_SELECTOR);
-
-        resultados.push({
-          nome,
-          espelhoUrl: popup.url(),
-          linhas_pesquisa,
-        });
-
-        console.log(`✔ ${linhas_pesquisa.length} linhas coletadas`);
-
-        // fechar popup
-        try { await popup.close(); } catch (e) { /* ignore */ }
-
-        // espera curta entre iterações
-        await sleep(BETWEEN_ITERATION_DELAY);
-      } catch (err) {
-        console.error(`✖ Erro no índice ${i + 1}:`, err && err.message ? err.message : err);
-        resultados.push({ index: i + 1, error: err && err.message ? err.message : String(err) });
-        // não gravamos aqui: gravação será feita apenas ao final
-        await sleep(BETWEEN_ITERATION_DELAY);
-      }
-    }
-
-    /* ========== gravação FINAL (apenas uma vez, após concluir o loop) ========== */
-    safeWrite: {
-      try {
-        safeWrite(resultados);
-        console.log(`[scrapeLinhas] Resultados gravados em: ${outputPath}`);
-      } catch (writeErr) {
-        console.error("[scrapeLinhas] Falha ao gravar resultado final:", writeErr);
-      }
-    }
-
-    await browser.close();
-    console.log("[scrapeLinhas] Finalizado com sucesso.");
-    return resultados;
-  } catch (err) {
-    // Em caso de erro crítico, gravamos o que já foi coletado para não perder tudo
-    console.error("[scrapeLinhas] Erro crítico durante scraping:", err && err.message ? err.message : err);
+async function extractDataFromPopup(popupPage, researcherName) {
+  console.log(`  🔍 Procurando tabela na popup para ${researcherName}...`);
+  
+  // Lista de selectors para tentar (em ordem de prioridade)
+  const tableSelectors = [
+    SELECTORS.popupTable,           // 1. ID exato que você mencionou
+    SELECTORS.popupTableAlt1,       // 2. ID parcial
+    SELECTORS.popupTableAlt2,       // 3. Classe PrimeFaces
+    SELECTORS.popupTableAlt3,       // 4. Outro padrão
+    SELECTORS.anyTable              // 5. Qualquer tabela
+  ];
+  
+  let linhas_pesquisa = [];
+  let tableFound = false;
+  let foundSelector = '';
+  
+  // Tenta cada selector
+  for (const selector of tableSelectors) {
     try {
-      if (resultados.length > 0) {
-        safeWrite(resultados);
-        console.log("[scrapeLinhas] Resultados parciais gravados após falha.");
-      }
-    } catch (e) {
-      console.error("[scrapeLinhas] Falha ao gravar resultados parciais:", e);
+      console.log(`  🔎 Tentando selector: ${selector}`);
+      
+      // Aguarda a tabela aparecer
+      await popupPage.waitForSelector(selector, {
+        visible: true,
+        timeout: selector === SELECTORS.anyTable ? 20000 : 35000
+      });
+      
+      tableFound = true;
+      foundSelector = selector;
+      console.log(`  ✅ Tabela encontrada com selector: ${selector}`);
+      break;
+      
+    } catch (error) {
+      console.log(`  ❌ Não encontrado com ${selector}: ${error.message}`);
+      continue;
     }
   }
+  
+  // Se não encontrou tabela, verifica se há mensagem de "sem dados"
+  if (!tableFound) {
+    console.log(`  ⚠️  Nenhuma tabela encontrada, verificando conteúdo...`);
+    
+    const pageContent = await popupPage.content();
+    const pageText = await popupPage.evaluate(() => document.body.innerText);
+    
+    console.log(`  📄 Tamanho do HTML: ${pageContent.length} caracteres`);
+    console.log(`  📝 Primeiros 300 caracteres do texto: "${pageText.substring(0, 300)}..."`);
+    
+    // Verifica mensagens comuns de "sem dados"
+    const noDataPatterns = [
+      'Não há dados',
+      'Nenhum registro',
+      'sem dados',
+      'não possui',
+      'vazio',
+      'empty',
+      'no data'
+    ];
+    
+    const hasNoData = noDataPatterns.some(pattern => 
+      pageText.toLowerCase().includes(pattern.toLowerCase())
+    );
+    
+    if (hasNoData) {
+      console.log(`  ℹ️  Popup indica que não há dados para ${researcherName}`);
+      return [];
+    }
+    
+    // Tira screenshot para debug
+    await popupPage.screenshot({ 
+      path: `debug-popup-${researcherName.replace(/[^a-z0-9]/gi, '_')}.png`,
+      fullPage: true 
+    });
+    console.log(`  📸 Screenshot salvo para debug`);
+    
+    return [];
+  }
+  
+  // Extrai dados da tabela encontrada
+  console.log(`  📊 Extraindo dados da tabela...`);
+  
+  // Aguarda um pouco para garantir que os dados estão carregados
+  await sleep(2000);
+  
+  // Verifica se a tabela tem linhas
+  const hasRows = await popupPage.evaluate((sel) => {
+    const table = document.querySelector(sel);
+    if (!table) return false;
+    
+    // Se for tbody, pega as tr diretamente
+    if (table.tagName.toLowerCase() === 'tbody') {
+      return table.querySelectorAll('tr').length > 0;
+    }
+    
+    // Se for table, procura tbody primeiro
+    const tbody = table.querySelector('tbody');
+    if (tbody) {
+      return tbody.querySelectorAll('tr').length > 0;
+    }
+    
+    // Caso contrário, tenta pegar trs direto da table
+    return table.querySelectorAll('tr').length > 0;
+  }, foundSelector);
+  
+  if (!hasRows) {
+    console.log(`  ⚠️  Tabela encontrada mas sem linhas de dados`);
+    return [];
+  }
+  
+  // Extrai os dados
+  linhas_pesquisa = await popupPage.evaluate((sel) => {
+    const extractRowsFromElement = (element) => {
+      const rows = [];
+      const trs = element.querySelectorAll('tr');
+      
+      trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 2) {
+          const linha = tds[0]?.innerText.trim() || '';
+          const grupo = tds[1]?.innerText.trim() || '';
+          
+          if (linha || grupo) {
+            rows.push({ linha_pesquisa: linha, grupo: grupo });
+          }
+        }
+      });
+      
+      return rows;
+    };
+    
+    const element = document.querySelector(sel);
+    if (!element) return [];
+    
+    // Se for tbody, extrai direto
+    if (element.tagName.toLowerCase() === 'tbody') {
+      return extractRowsFromElement(element);
+    }
+    
+    // Se for table, procura tbody
+    if (element.tagName.toLowerCase() === 'table') {
+      const tbody = element.querySelector('tbody');
+      if (tbody) {
+        return extractRowsFromElement(tbody);
+      }
+      // Se não tiver tbody, tenta extrair direto da table
+      return extractRowsFromElement(element);
+    }
+    
+    return [];
+  }, foundSelector);
+  
+  console.log(`  ✅ ${linhas_pesquisa.length} linha(s) extraída(s)`);
+  return linhas_pesquisa;
+}
+
+/* =========================
+   FUNÇÃO PARA ABRIR POPUP DE FORMA CONFIÁVEL - CORRIGIDA
+========================= */
+async function openPopupReliably(page, linkHandle, researcherName) {
+  console.log(`  🔗 Tentando abrir popup para: ${researcherName}`);
+  
+  // Limpa qualquer popup existente antes de abrir nova
+  await closeAllPopupsExceptMain(page);
+  
+  // Método 1: Usando evaluate para clicar e abrir em nova aba
+  try {
+    // Obtém a URL do link
+    const href = await linkHandle.evaluate(node => node.getAttribute('href'));
+    console.log(`  🔗 URL do link: ${href}`);
+    
+    if (!href || href === '#' || href.startsWith('javascript:')) {
+      // Se não tem href válido, usa click normal
+      console.log(`  ⚠️  Link sem href válido, usando click normal`);
+      await linkHandle.click({ delay: 100 });
+      
+      // Aguarda abertura da popup
+      return await waitForPopup(page, researcherName);
+    } else {
+      // Abre nova aba diretamente com a URL
+      console.log(`  📄 Abrindo nova aba com URL...`);
+      const browser = page.browser();
+      const popupPage = await browser.newPage();
+      
+      try {
+        await popupPage.goto(href, { 
+          waitUntil: 'domcontentloaded',
+          timeout: CONFIG.timeouts.pageLoad 
+        });
+        return popupPage;
+      } catch (error) {
+        // Se falhar, fecha a página e tenta outro método
+        await popupPage.close().catch(() => {});
+        throw error;
+      }
+    }
+  } catch (error) {
+    console.log(`  ⚠️  Método de URL falhou, tentando click: ${error.message}`);
+    await linkHandle.click({ delay: 100 });
+    return await waitForPopup(page, researcherName);
+  }
+}
+
+/* =========================
+   FUNÇÃO AUXILIAR: AGUARDAR POPUP
+========================= */
+async function waitForPopup(page, researcherName) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(`Timeout ao aguardar popup para ${researcherName}`));
+    }, CONFIG.timeouts.popup);
+    
+    const targetHandler = async (target) => {
+      if (target.type() === 'page') {
+        try {
+          const popupPage = await target.page();
+          if (popupPage && popupPage !== page) {
+            clearTimeout(timeoutId);
+            page.browser().off('targetcreated', targetHandler);
+            console.log(`  📄 Popup aberta via targetcreated`);
+            resolve(popupPage);
+          }
+        } catch (error) {
+          console.warn(`  ⚠️  Erro ao obter página do target: ${error.message}`);
+        }
+      }
+    };
+    
+    page.browser().on('targetcreated', targetHandler);
+    
+    // Verifica se já abriu (às vezes abre instantaneamente)
+    setTimeout(async () => {
+      try {
+        const pages = await page.browser().pages();
+        const newPages = pages.filter(p => p !== page && !p.isClosed());
+        if (newPages.length > 0) {
+          clearTimeout(timeoutId);
+          page.browser().off('targetcreated', targetHandler);
+          console.log(`  📄 Popup já aberta encontrada`);
+          resolve(newPages[0]);
+        }
+      } catch (error) {
+        console.warn(`  ⚠️  Erro ao verificar páginas: ${error.message}`);
+      }
+    }, 2000);
+  });
+}
+
+/* =========================
+   FUNÇÃO AUXILIAR: FECHAR TODAS AS POPUPS
+========================= */
+async function closeAllPopupsExceptMain(page) {
+  try {
+    const pages = await page.browser().pages();
+    for (const p of pages) {
+      if (p !== page && !p.isClosed()) {
+        try {
+          await p.close();
+          console.log(`  🧹 Popup órfã fechada`);
+        } catch (error) {
+          // Ignora erros ao fechar
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`  ⚠️  Erro ao fechar popups: ${error.message}`);
+  }
+}
+
+/* =========================
+   FUNÇÃO PARA PROCESSAR UM PESQUISADOR - CORRIGIDA
+========================= */
+async function processResearcher(page, rowHandle, index, total) {
+  const researcherId = index + 1;
+  console.log(`\n[${researcherId}/${total}] Iniciando processamento...`);
+  
+  let researcherName = `Pesquisador ${researcherId}`;
+  let popupPage = null;
+  
+  for (let attempt = 1; attempt <= CONFIG.retryAttempts; attempt++) {
+    try {
+      // Obtém nome do pesquisador
+      researcherName = await rowHandle.$eval("td", (td) => td.innerText.trim());
+      console.log(`  👤 Nome: ${researcherName} (Tentativa ${attempt}/${CONFIG.retryAttempts})`);
+      
+      // Verifica se é linha vazia
+      const rowText = await rowHandle.evaluate(el => el.innerText);
+      if (rowText.includes(SELECTORS.noDataText)) {
+        console.log(`  ⚠️  Linha vazia, pulando...`);
+        return { nome: researcherName, linhas_pesquisa: [] };
+      }
+      
+      // Localiza link
+      const linkHandle = await rowHandle.$(SELECTORS.link).catch(() => null);
+      
+      if (!linkHandle) {
+        console.warn(`  ⚠️  Link não encontrado para: ${researcherName}`);
+        return { nome: researcherName, error: "link_not_found" };
+      }
+      
+      // Abre popup
+      console.log(`  🖱️  Clicando no link...`);
+      popupPage = await openPopupReliably(page, linkHandle, researcherName);
+      
+      // Configura popup
+      await popupPage.bringToFront();
+      popupPage.setDefaultTimeout(CONFIG.timeouts.selector);
+      
+      // Aguarda carregamento
+      console.log(`  ⏳ Aguardando popup carregar...`);
+      await sleep(CONFIG.delays.afterClick);
+      
+      // Extrai dados
+      const linhas_pesquisa = await extractDataFromPopup(popupPage, researcherName);
+      
+      // Obtém URL
+      const espelhoUrl = popupPage.url();
+      console.log(`  🌐 URL do popup: ${espelhoUrl}`);
+      
+      // Fecha popup IMEDIATAMENTE após extrair dados
+      try {
+        await popupPage.close();
+        console.log(`  ✅ Popup fechada`);
+        popupPage = null; // Marca como já fechada
+      } catch (closeError) {
+        console.warn(`  ⚠️  Erro ao fechar popup: ${closeError.message}`);
+        // Tenta forçar fechamento se ainda estiver aberta
+        if (popupPage && !popupPage.isClosed()) {
+          try {
+            await popupPage.evaluate(() => window.close());
+          } catch {}
+        }
+        popupPage = null;
+      }
+      
+      console.log(`  ✅ ${linhas_pesquisa.length} linha(s) coletada(s) para ${researcherName}`);
+      
+      return {
+        nome: researcherName,
+        espelhoUrl,
+        linhas_pesquisa
+      };
+      
+    } catch (error) {
+      console.error(`  ❌ Tentativa ${attempt} falhou para ${researcherName}:`, error.message);
+      
+      // Fecha popup se ainda estiver aberta
+      if (popupPage && !popupPage.isClosed()) {
+        try {
+          await popupPage.close();
+          console.log(`  🧹 Popup fechada após erro`);
+        } catch {}
+        popupPage = null;
+      }
+      
+      // Fecha outras popups abertas
+      await closeAllPopupsExceptMain(page);
+      
+      if (attempt === CONFIG.retryAttempts) {
+        console.error(`  💥 Todas as tentativas falharam para ${researcherName}`);
+        return { 
+          nome: researcherName, 
+          error: error.message,
+          linhas_pesquisa: [] 
+        };
+      }
+      
+      // Backoff
+      const backoffTime = CONFIG.delays.beforeRetry * attempt;
+      console.log(`  ⏳ Aguardando ${backoffTime/1000}s antes da próxima tentativa...`);
+      await sleep(backoffTime);
+    }
+  }
+}
+
+/* =========================
+   FUNÇÃO PARA ENCONTRAR TABELA
+========================= */
+async function findMainTable(page) {
+  console.log("[INFO] Procurando tabela principal...");
+  
+  for (const tableId of TABLE_IDS) {
+    const selector = escapeSelector(tableId);
+    console.log(`  🔍 Tentando selector: ${selector}`);
+    
+    try {
+      await sleep(1000);
+      
+      const table = await page.waitForSelector(selector, {
+        timeout: 15000,
+        visible: true
+      });
+      
+      if (table) {
+        const rowCount = await table.$$eval('tr', rows => rows.length);
+        console.log(`  ✅ Tabela encontrada: ${tableId} com ${rowCount} linhas`);
+        return table;
+      }
+    } catch (error) {
+      console.log(`  ❌ Tabela não encontrada com ID ${tableId}`);
+    }
+  }
+  
+  return null;
+}
+
+/* =========================
+   FUNÇÃO PRINCIPAL
+========================= */
+export default async function scrapeLinhas() {
+  console.log("🚀 INICIANDO SCRAPING DE LINHAS DE PESQUISA");
+  console.log("===========================================\n");
+  
+  const startTime = Date.now();
+  const resultados = [];
+  let browser = null;
+  let page = null;
+  
+  try {
+    // 1. INICIALIZAÇÃO
+    console.log("[1/4] Inicializando navegador...");
+    
+    browser = await puppeteer.launch({
+      headless: false, // Mantenha false para ver o que acontece
+      executablePath: CONFIG.chromePath,
+      defaultViewport: null,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--start-maximized',
+        '--disable-blink-features=AutomationControlled' // Adicionado para stealth
+      ],
+      ignoreHTTPSErrors: true,
+      timeout: 120000
+    });
+    
+    console.log("✅ Navegador inicializado");
+    
+    // 2. CONFIGURAÇÃO DA PÁGINA
+    console.log("[2/4] Configurando página...");
+    
+    page = await browser.newPage();
+    page.setDefaultNavigationTimeout(CONFIG.timeouts.navigation);
+    page.setDefaultTimeout(CONFIG.timeouts.selector);
+    
+    // Configurações de stealth
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+      '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    );
+    
+    // Esconde WebDriver
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] });
+    });
+    
+    // 3. NAVEGAÇÃO
+    console.log("[3/4] Navegando para a página...");
+    console.log(`   📍 URL: ${CONFIG.url}`);
+    
+    await page.goto(CONFIG.url, {
+      waitUntil: 'domcontentloaded',
+      timeout: CONFIG.timeouts.navigation
+    });
+    
+    console.log("✅ Página carregada");
+    await sleep(3000);
+    
+    // 4. LOCALIZAÇÃO DA TABELA
+    console.log("[4/4] Localizando tabela de pesquisadores...");
+    
+    const tableHandle = await findMainTable(page);
+    if (!tableHandle) {
+      await page.screenshot({ path: 'debug-no-table.png', fullPage: true });
+      throw new Error("❌ Nenhuma tabela de pesquisadores encontrada");
+    }
+    
+    // Obtém todas as linhas
+    const rows = await tableHandle.$$("tr");
+    const totalRows = rows.length;
+    console.log(`\n📊 TOTAL DE PESQUISADORES ENCONTRADOS: ${totalRows}`);
+    
+    if (totalRows === 0) {
+      console.warn("⚠️  Nenhum pesquisador encontrado na tabela");
+      await safeWrite([]);
+      return [];
+    }
+    
+    // 5. PROCESSAMENTO
+    console.log("\n🔄 INICIANDO PROCESSAMENTO DOS PESQUISADORES");
+    console.log("===========================================\n");
+    
+    for (let i = 0; i < totalRows; i++) {
+      try {
+        const result = await processResearcher(page, rows[i], i, totalRows);
+        resultados.push(result);
+        
+        // Salva checkpoint
+        if ((i + 1) % 5 === 0) {
+          console.log(`\n💾 Checkpoint: Salvando ${i + 1}/${totalRows} pesquisadores...`);
+          await safeWrite(resultados);
+          
+          // Limpa popups acumuladas a cada checkpoint
+          await closeAllPopupsExceptMain(page);
+        }
+        
+        // Delay entre pesquisadores
+        if (i < totalRows - 1) {
+          console.log(`\n⏳ Aguardando ${CONFIG.delays.betweenResearchers/1000}s antes do próximo...`);
+          await sleep(CONFIG.delays.betweenResearchers);
+        }
+        
+      } catch (error) {
+        console.error(`\n💥 Erro crítico no pesquisador ${i + 1}:`, error.message);
+        resultados.push({
+          index: i + 1,
+          error: error.message,
+          linhas_pesquisa: []
+        });
+        
+        // Limpa popups após erro
+        await closeAllPopupsExceptMain(page);
+        
+        await sleep(CONFIG.delays.betweenResearchers);
+      }
+    }
+    
+    // 6. FINALIZAÇÃO
+    console.log("\n===========================================");
+    console.log("✅ PROCESSAMENTO CONCLUÍDO");
+    console.log("===========================================");
+    
+    await safeWrite(resultados);
+    
+    // Estatísticas
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+    const successful = resultados.filter(r => !r.error && r.linhas_pesquisa?.length >= 0).length;
+    const withData = resultados.filter(r => r.linhas_pesquisa?.length > 0).length;
+    const errors = resultados.filter(r => r.error).length;
+    
+    console.log(`\n📈 ESTATÍSTICAS:`);
+    console.log(`   ⏱️  Tempo total: ${totalTime}s`);
+    console.log(`   👥 Total processado: ${resultados.length}`);
+    console.log(`   ✅ Sucesso: ${successful}`);
+    console.log(`   📊 Com dados: ${withData}`);
+    console.log(`   ❌ Erros: ${errors}`);
+    
+    return resultados;
+    
+  } catch (error) {
+    console.error("\n💥 ERRO CRÍTICO NO SCRAPING:", error.message);
+    
+    if (resultados.length > 0) {
+      console.log(`\n💾 Salvando resultados parciais (${resultados.length} registros)...`);
+      try {
+        await safeWrite(resultados);
+        console.log("✅ Resultados parciais salvos");
+      } catch (writeError) {
+        console.error("❌ Falha ao salvar resultados parciais:", writeError.message);
+      }
+    }
+    
+    if (page) {
+      try {
+        await page.screenshot({ path: 'error-screenshot.png', fullPage: true });
+        console.log("📸 Screenshot do erro salvo");
+      } catch {}
+    }
+    
+    throw error;
+    
+  } finally {
+    console.log("\n🧹 Finalizando e liberando recursos...");
+    
+    // Fecha TODAS as páginas antes de fechar o browser
+    if (browser) {
+      try {
+        const pages = await browser.pages();
+        for (const p of pages) {
+          if (!p.isClosed()) {
+            try {
+              await p.close();
+            } catch {}
+          }
+        }
+        
+        await browser.close();
+        console.log("✅ Navegador fechado");
+      } catch (error) {
+        console.warn("⚠️  Erro ao fechar navegador:", error.message);
+      }
+    }
+    
+    console.log("🎯 SCRAPING FINALIZADO");
+  }
+}
+
+// Execução direta
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  scrapeLinhas().catch(error => {
+    console.error("\n💥 SCRAPING FALHOU:", error.message);
+    process.exit(1);
+  });
 }
