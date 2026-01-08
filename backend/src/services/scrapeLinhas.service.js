@@ -567,7 +567,7 @@ async function findMainTable(page) {
    FUNÇÃO PRINCIPAL - CORRIGIDA
 ========================= */
 export default async function scrapeLinhasEstudantes(browser) {
-  console.log("🚀 INICIANDO SCRAPING DE LINHAS DE ESTUDANTES");
+  console.log("🚀 INICIANDO SCRAPING DE LINHAS DE PESQUISADORES");
   console.log("=============================================\n");
   
   const startTime = Date.now();

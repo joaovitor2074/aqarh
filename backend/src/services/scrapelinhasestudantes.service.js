@@ -431,7 +431,7 @@ async function findMainTable(page) {
    FUNÇÃO PRINCIPAL COM GESTÃO DE RECURSOS
 ========================= */
 export default async function scrapeLinhasEstudantes(browser) {
-  console.log("🚀 INICIANDO SCRAPING DE ESTUDANTES");
+  console.log("🚀 INICIANDO SCRAPING DE ESTUDANTE");
   console.log("===================================\n");
   
   const resultados = [];
