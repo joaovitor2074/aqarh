@@ -35,9 +35,9 @@ const CONFIG = {
   
   delays: {
     afterClick: 1000,      // 1 segundos após clicar
-    betweenStudents: 2000, // 2 segundos entre estudantes
-    beforeRetry: 10000,    // 10 segundos antes de retry
-    afterPopupClose: 1000  // 2 segundos após fechar popup
+    betweenStudents: 500, // 2 segundos entre estudantes
+    beforeRetry: 5000,    // 10 segundos antes de retry
+    afterPopupClose: 500  // 2 segundos após fechar popup
   },
   
   maxConcurrentPopups: 2,  // Apenas 1 popup por vez
@@ -466,7 +466,7 @@ export default async function scrapeLinhas(browser) {
     });
     
     console.log("✅ Página carregada");
-    await sleep(3000);
+    await sleep(1500);
     
     // 4. LOCALIZAR TABELA
     console.log("[4/4] Procurando tabela...");
@@ -519,7 +519,7 @@ export default async function scrapeLinhas(browser) {
           // Pausa mais longa a cada 20 estudantes
           if ((i + 1) % 20 === 0 && i < studentRows.length - 1) {
             console.log(`\n⏸️  Pausa de 10 segundos...`);
-            await sleep(5000);
+            await sleep(1000);
           }
         }
         
@@ -537,7 +537,7 @@ export default async function scrapeLinhas(browser) {
         });
         
         await cleanupBrowser(browser, mainPage);
-        await sleep(5000); // Pausa mais longa após erro
+        await sleep(2000); // Pausa mais longa após erro
       }
     }
     

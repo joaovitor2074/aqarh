@@ -27,17 +27,17 @@ const CONFIG = {
   timeouts: {
     navigation: 180000,    // 3 minutos
     selector: 120000,      // 2 minutos
-    popup: 30000,          // 30 segundos
+    popup: 20000,          // 30 segundos
     pageLoad: 60000,       // 1 minuto
     tableLoad: 30000,      // 30 segundos
     protocol: 120000       // 2 minutos para protocol timeout (NOVO)
   },
   
   delays: {
-    afterClick: 1000,      // 1 segundos após clicar
-    betweenStudents: 2000, // 2 segundos entre estudantes
-    beforeRetry: 10000,    // 10 segundos antes de retry
-    afterPopupClose: 1000  // 2 segundos após fechar popup
+    afterClick: 500,      // 1 segundos após clicar
+    betweenStudents: 5000, // 2 segundos entre estudantes
+    beforeRetry: 5000,    // 10 segundos antes de retry
+    afterPopupClose: 500  // 2 segundos após fechar popup
   },
   
   maxConcurrentPopups: 1,  // Apenas 1 popup por vez
@@ -131,7 +131,7 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
     // Clica no link (deve abrir nova guia)
     await Promise.all([
       linkHandle.click({ delay: 100 }),
-      sleep(1000) // Pequeno delay após clique
+      sleep(700) // Pequeno delay após clique
     ]);
     
     // Aguarda nova página aparecer (com timeout aumentado)
@@ -519,7 +519,7 @@ export default async function scrapeLinhasEstudantes(browser) {
           // Pausa mais longa a cada 20 estudantes
           if ((i + 1) % 20 === 0 && i < studentRows.length - 1) {
             console.log(`\n⏸️  Pausa de 10 segundos...`);
-            await sleep(5000);
+            await sleep(1000);
           }
         }
         
