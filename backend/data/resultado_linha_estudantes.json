@@ -1,21 +1,15 @@
 [
   {
-    "nome": "Adriana Alves da Silva Chaves",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0032857829",
+    "nome": "Abias Rodrigues da Cruz",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0050280708",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      }
-    ]
-  },
-  {
-    "nome": "Adriana da Conceição Pinheiro Vieira",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0045627690",
-    "linhas_pesquisa": [
+      },
       {
-        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
       },
       {
         "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
@@ -28,29 +22,19 @@
     ]
   },
   {
-    "nome": "Afonso Henrique Rodrigues Carvalho",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0185760902",
+    "nome": "Adjaci Dias de Brito",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0050280708",
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
-        "linha_pesquisa": "Produção de Polímeros a base de polissacarídeos",
-        "grupo": "GRUPO DE BIODIESEL E MATERIAIS"
-      }
-    ]
-  },
-  {
-    "nome": "Agda Matias da Costa",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0111456479",
-    "linhas_pesquisa": [
-      {
-        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
       },
       {
-        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
@@ -60,29 +44,11 @@
     ]
   },
   {
-    "nome": "Antonio Dos Santos Gomes Junior",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0338815813",
+    "nome": "Alanna Nascimento Delgado Mota",
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0040612627",
     "linhas_pesquisa": [
       {
         "linha_pesquisa": "Bioprospecção e Desenvolvimento de Bioprocessos e Bioprodutos",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      }
-    ]
-  },
-  {
-    "nome": "Brenda Abigail Freire de Jesus Coelho",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0408477563",
-    "linhas_pesquisa": [
-      {
-        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
@@ -90,34 +56,5 @@
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
-  },
-  {
-    "nome": "Bruna Beatriz da Rocha Vieira",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0283415614",
-    "linhas_pesquisa": [
-      {
-        "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      },
-      {
-        "linha_pesquisa": "Educação Inclusiva",
-        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
-      }
-    ]
-  },
-  {
-    "nome": "Camilly Juliana dos Santos Branco",
-    "espelhoUrl": "http://dgp.cnpq.br/dgp/faces/errorPage.jsf",
-    "linhas_pesquisa": []
-  },
-  {
-    "nome": "Daiane Larissa Costa dos Santos Fernandes",
-    "error": "max_retries_exceeded: Não foi possível abrir popup: Nova guia não foi aberta",
-    "linhas_pesquisa": []
-  },
-  {
-    "nome": "Daniel Augusto da Conceição",
-    "error": "max_retries_exceeded: Não foi possível abrir popup: Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
-    "linhas_pesquisa": []
   }
 ]

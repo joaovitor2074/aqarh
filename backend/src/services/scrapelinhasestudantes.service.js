@@ -34,10 +34,10 @@ const CONFIG = {
   },
   
   delays: {
-    afterClick: 3000,      // 3 segundos após clicar
-    betweenStudents: 4000, // 4 segundos entre estudantes
+    afterClick: 1000,      // 1 segundos após clicar
+    betweenStudents: 2000, // 2 segundos entre estudantes
     beforeRetry: 10000,    // 10 segundos antes de retry
-    afterPopupClose: 2000  // 2 segundos após fechar popup
+    afterPopupClose: 1000  // 2 segundos após fechar popup
   },
   
   maxConcurrentPopups: 1,  // Apenas 1 popup por vez
@@ -130,7 +130,7 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
     
     // Clica no link (deve abrir nova guia)
     await Promise.all([
-      linkHandle.click({ delay: 50 }),
+      linkHandle.click({ delay: 100 }),
       sleep(1000) // Pequeno delay após clique
     ]);
     
@@ -176,6 +176,7 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
     console.log(`  ⚠️  Método 1 falhou: ${error.message}`);
     
     // Método 2: Tenta extrair href e abrir manualmente
+
     try {
       console.log(`  🔗 Tentando método alternativo...`);
       const href = await linkHandle.evaluate(el => el.getAttribute('href'));
@@ -518,7 +519,7 @@ export default async function scrapeLinhasEstudantes(browser) {
           // Pausa mais longa a cada 20 estudantes
           if ((i + 1) % 20 === 0 && i < studentRows.length - 1) {
             console.log(`\n⏸️  Pausa de 10 segundos...`);
-            await sleep(10000);
+            await sleep(5000);
           }
         }
         

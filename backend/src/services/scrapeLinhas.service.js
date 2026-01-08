@@ -33,9 +33,9 @@ const CONFIG = {
   },
   
   delays: {
-    afterClick: 3000,      // 3 segundos após clicar
-    betweenStudents: 5000, // 5 segundos entre estudantes
-    beforeRetry: 8000      // 8 segundos antes de retry
+    afterClick: 1000,      // 3 segundos após clicar
+    betweenStudents: 1000, // 5 segundos entre estudantes
+    beforeRetry: 4000      // 8 segundos antes de retry
   }
 };
 
