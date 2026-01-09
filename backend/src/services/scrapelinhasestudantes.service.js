@@ -35,8 +35,8 @@ const CONFIG = {
   
   delays: {
     afterClick: 500,      // 1 segundos após clicar
-    betweenStudents: 5000, // 2 segundos entre estudantes
-    beforeRetry: 5000,    // 10 segundos antes de retry
+    betweenStudents: 500, // 2 segundos entre estudantes
+    beforeRetry:25000,    // 10 segundos antes de retry
     afterPopupClose: 500  // 2 segundos após fechar popup
   },
   
