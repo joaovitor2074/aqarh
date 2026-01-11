@@ -15,6 +15,7 @@ import Membros from './pages/admin/Membros'
 import Admprojetos from './pages/admin/Admprojetos'
 import Linhaspesquisas from './pages/admin/LinhasPesquisa'
 import Comunicados from './pages/admin/Comunicados'
+import Notificacoes from './pages/admin/Notificacoes'
 
 //extras
 import Config from './pages/admin/Config'
@@ -28,7 +29,7 @@ function AppContent() {
   const location = useLocation()
 
   // Esconde header e footer na página de login
-  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config" || location.pathname === "/admin/dashboard"
+  const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config" || location.pathname === "/admin/dashboard" || location.pathname === "/admin/notificacoes"
 
   return (
     <div className="app-root">
@@ -112,6 +113,15 @@ function AppContent() {
                 <Comunicados />
               </ProtectedRoute>
             }
+          />
+
+          <Route
+          path='/admin/notificacoes'
+          element={
+            <ProtectedRoute>
+              <Notificacoes/>
+            </ProtectedRoute>
+          }
           />
 
 

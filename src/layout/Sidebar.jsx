@@ -4,6 +4,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 // Tailwind classes usando o estilo IFMA
+import { FaBell } from "react-icons/fa";
 // Verde IFMA: #006A4E
 
 export default function Sidebar() {
@@ -13,6 +14,7 @@ export default function Sidebar() {
     { label: "Projetos", path: "/admin/projetos", icon: ProjectsIcon },
     { label: "Linhas de Pesquisa", path: "/admin/linhaspesquisas", icon: FlaskIcon },
     { label: "Comunicados", path: "/admin/comunicados", icon: MegaphoneIcon },
+    {label: "Notificações", path: "/admin/notificacoes", icon: FaBell },
     { label: "Configurações", path: "/admin/config", icon: ConfigIcon },
   ];
 
