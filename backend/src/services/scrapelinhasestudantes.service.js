@@ -115,7 +115,7 @@ async function cleanupBrowser(browser, mainPage) {
    FUNÇÃO PARA ABRIR POPUP DE FORMA CONFIÁVEL (CORRIGIDA)
 ========================= */
 async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
-  console.log(`  🔗 Abrindo popup para: ${studentName} (tentativa ${attempt})`);
+  console.log(`  🔗 Abrindo popup para: *nome oculto* (tentativa ${attempt})`);
   
   // Limpa popups antes de abrir nova
   await cleanupBrowser(page.browser(), page);
@@ -205,7 +205,7 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
    FUNÇÃO PARA EXTRAIR DADOS DA POPUP
 ========================= */
 async function extractDataFromPopup(popupPage, studentName) {
-  console.log(`  🔍 Extraindo dados para ${studentName}...`);
+  console.log(`  🔍 Extraindo dados para *nome oculto*...`);
   
   try {
     // Tenta encontrar a tabela
@@ -281,7 +281,7 @@ async function closePopupSafely(popupPage, studentName) {
 
   try {
     // await popupPage.close({ runBeforeUnload: false });
-    console.log(`  ✅ Popup fechada para ${studentName}`);
+    console.log(`  ✅ Popup fechada para *nome oculto*`);
   } catch (error) {
     console.warn(`  ⚠️  Erro ao fechar popup: ${error.message}`);
   }
@@ -307,7 +307,7 @@ async function processStudent(mainPage, rowHandle, index, total) {
         td.textContent?.trim() || td.innerText?.trim() || `Estudante ${studentId}`
       ).catch(() => `Estudante ${studentId}`);
       
-      console.log(`  👤 ${studentName} (tentativa ${attempt}/${CONFIG.retryAttempts})`);
+      console.log(`  👤 *nome oculto* (tentativa ${attempt}/${CONFIG.retryAttempts})`);
       
       // Verifica se é linha vazia
       const rowText = await rowHandle.evaluate(el => 
@@ -368,7 +368,7 @@ async function processStudent(mainPage, rowHandle, index, total) {
       await cleanupBrowser(mainPage.browser(), mainPage);
       
       if (attempt === CONFIG.retryAttempts) {
-        console.error(`  💥 Todas as tentativas falharam para ${studentName}`);
+        console.error(`  💥 Todas as tentativas falharam para *nome oculto`);
         return { 
           nome: studentName, 
           error: `max_retries_exceeded: ${error.message}`,
@@ -435,11 +435,11 @@ export default async function scrapeLinhasEstudantes(browser) {
   console.log("===================================\n");
   
   const resultados = [];
-  let mainPage = null;
+  let maiamePage = null;
   
   try {
     // 1. INICIALIZAÇÃO COM TIMEOUTS AUMENTADOS
-    console.log("[1/4] Inicializando navegador...");
+    console.log("[1/4] Inicializando mevegador...");
     
     
     console.log("✅ Navegador inicializado");

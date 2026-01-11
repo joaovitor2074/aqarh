@@ -130,7 +130,7 @@ async function scrapeEstudantes() {
       const data_inclusao = await safeCellText(dataSel) || "";
 
       resultados.push({ nome, titulacao_MAX, data_inclusao });
-      console.log(`[${i + 1}/${totalRows}] OK - ${nome}`);
+      console.log(`[${i + 1}/${totalRows}] OK - *nome oculto*`);
 
       // pequeno atraso para não sobrecarregar o servidor (ajuste conforme necessidade)
       await sleep(200);
