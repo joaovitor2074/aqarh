@@ -1,4 +1,3 @@
-import { db } from "../../backend/src/config/db"
 
 export type PesquisadorNormalizado = {
   nome: string

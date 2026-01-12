@@ -4,7 +4,7 @@ import { scrapeStatus } from "../controllers/scrapeStatus.controller.js";
 import { db } from "../config/db.js";
 
 
-import { listarNotificacoes, AprovarNotificacao } from "../controllers/notificacoes.controller.js";
+import { listarNotificacoes, AprovarNotificacao,AprovarNotificacaoLinha } from "../controllers/notificacoes.controller.js";
 
 const router = Router()
 
@@ -17,21 +17,38 @@ router.get("/scrape/status", scrapeStatus) // ⬅️ FALTAVA ISSO
 router.get("/scrape/notificacoes", listarNotificacoes )
 router.post("/scrape/notificacao/aprovar/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    // Buscar a notificação no banco pelo ID
-    const [notificacao] = await db.query(
-      "SELECT dados FROM notificacoes_scraping WHERE id = ?",
+    const { id } = req.params;
+
+    const [[notificacao]] = await db.query(
+      "SELECT tipo, dados FROM notificacoes_scraping WHERE id = ?",
       [id]
     );
 
-    if (!notificacao || notificacao.length === 0) {
+    if (!notificacao) {
       return res.status(404).json({ error: "Notificação não encontrada" });
     }
+console.log("📌 Tipo da notificação:", notificacao.tipo);
 
-    // Aprovar e inserir no banco de pesquisadores
-    await AprovarNotificacao(notificacao[0].dados);
+    // 🔥 AQUI ESTÁ O PONTO-CHAVE
+    switch (notificacao.tipo) {
+      case "NOVO_PESQUISADOR":
+        await AprovarNotificacao(notificacao.dados);
+        break;
+      case "NOVO_ESTUDANTE":
+        await AprovarNotificacao(notificacao.dados);
+        break;
 
-    // Opcional: atualizar status da notificação
+      case "NOVA_LINHA":
+        await AprovarNotificacaoLinha(id);
+        break;
+
+      default:
+        return res.status(400).json({
+          error: `Tipo de notificação não suportado: ${notificacao.tipo}`
+        });
+    }
+
+    // Atualiza status
     await db.query(
       "UPDATE notificacoes_scraping SET status = 'aprovado' WHERE id = ?",
       [id]
@@ -39,7 +56,7 @@ router.post("/scrape/notificacao/aprovar/:id", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ error: "Erro ao aprovar notificação" });
   }
 });

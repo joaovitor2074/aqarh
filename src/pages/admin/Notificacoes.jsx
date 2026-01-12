@@ -79,7 +79,6 @@ const handleIgnorartodos = () => {
           <h1 className="text-2xl font-semibold mb-6">
             Notificações de Scraping
           </h1>
-          <div className="btns-not flex float-end">
              <button
                       onClick={() => handleAprovarTodos()}
                       className="px-5 py-6 bg-green-500 text-white rounded hover:bg-green-600 transition"
@@ -92,7 +91,7 @@ const handleIgnorartodos = () => {
                     >
                       ignorar todos
               </button>
-          </div>
+          
         </div>
 
 

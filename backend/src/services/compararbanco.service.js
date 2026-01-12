@@ -317,8 +317,12 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
       status: "iniciando",
       mensagem: `Inserindo ${novas.length} novas linhas...`
     });
+    const notificacoesCriadas = await criarNotificacoes(
+      "NOVA_LINHA",
+      novas
+    );
+    console.log(notificacoesCriadas)
 
-    const notificacoesCriadas = await criarNotificacoes(novas);
 
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}_vinculos`,
@@ -339,7 +343,7 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
 
     return {
       total_lattes: unicos.length,
-      total_banco: dbLinhas.length + linhasInseridas,
+      total_banco: dbLinhas.length,
       novos_encontrados: novas.length,
       novas_notificacao: notificacoesCriadas,
       vinculos_processados: vinculosProcessados,
