@@ -1,16 +1,67 @@
-# React + Vite
+# 🔬 GIEPI – Gerenciador de Informações de Pesquisa Institucional
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O **GIEPI** é um sistema backend desenvolvido para **coletar, organizar, normalizar e gerenciar dados acadêmicos** de pesquisadores, linhas de pesquisa e projetos institucionais, com foco em automação e padronização de informações.
 
-Currently, two official plugins are available:
+O projeto utiliza **scraping de dados do Lattes**, processamento assíncrono e armazenamento em banco de dados, servindo como base para geração de informações institucionais, comunicados e histórico acadêmico.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🎯 Objetivo do Projeto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Automatizar a coleta de dados acadêmicos
+- Evitar preenchimento manual repetitivo
+- Centralizar informações de pesquisadores e linhas de pesquisa
+- Facilitar atualizações institucionais futuras
+- Servir como base para sistemas administrativos e sites institucionais
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ⚙️ Funcionalidades
+
+- 🔎 Scraping de dados públicos do Lattes
+- 📄 Armazenamento de dados brutos em JSON
+- 🔄 Normalização dos dados coletados
+- 🗃️ Persistência em banco de dados
+- 🔗 Relacionamento entre pesquisadores e linhas de pesquisa
+- 📡 Acompanhamento do status do scraping (SSE)
+- 🛠️ Controle manual de execução via painel administrativo *(em desenvolvimento)*
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- Node.js
+- JavaScript / TypeScript
+- Puppeteer + Puppeteer Extra (Stealth)
+- Express
+- MySQL
+- SSE (Server-Sent Events)
+- JSON
+
+---
+
+## 🧠 Conceitos Aplicados
+
+- Programação assíncrona
+- Scraping de dados
+- Normalização de dados
+- Arquitetura backend
+- Relacionamentos em banco de dados
+- Organização de projetos Node.js
+- Boas práticas de código
+
+---
+
+## 📂 Estrutura do Projeto (resumida)
+
+```txt
+backend/
+├── src/
+│   ├── routes/
+│   ├── controllers/
+│   ├── services/
+│   ├── utils/
+│   └── database/
+├── scripts/
+├── output/
+└── server.js
