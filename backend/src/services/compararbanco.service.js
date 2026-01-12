@@ -51,87 +51,12 @@ async function getCachedLinhasPesquisa() {
 }
 
 // Função para inserção em batch (muito mais rápido)
-async function batchInsertPesquisadores(pesquisadores, tipoVinculo) {
-  if (pesquisadores.length === 0) return 0;
-
-  const values = pesquisadores.map(p =>
-    [p.nome, p.titulacao_max || null, tipoVinculo]
-  );
-
-  const placeholders = values.map(() => '(?, ?, ?)').join(',');
-  const flattenedValues = values.flat();
-
-  try {
-    const [result] = await db.query(
-      `INSERT INTO pesquisadores (nome, titulacao_maxima, tipo_vinculo) 
-       VALUES ${placeholders} 
-       ON DUPLICATE KEY UPDATE 
-         titulacao_maxima = COALESCE(VALUES(titulacao_maxima), titulacao_maxima),
-         updated_at = CURRENT_TIMESTAMP`,
-      flattenedValues
-    );
-
-    return result.affectedRows;
-  } catch (error) {
-    // Fallback para inserção individual em caso de erro
-    console.warn('Batch insert falhou, usando inserção individual:', error.message);
-    let successCount = 0;
-
-    for (const p of pesquisadores) {
-      try {
-        await db.query(
-          `INSERT INTO pesquisadores (nome, titulacao_maxima, tipo_vinculo)
-           VALUES (?, ?, ?)
-           ON DUPLICATE KEY UPDATE 
-             titulacao_maxima = COALESCE(?, titulacao_maxima)`,
-          [p.nome, p.titulacao_max || null, tipoVinculo, p.titulacao_max || null]
-        );
-        successCount++;
-      } catch (err) {
-        console.error(`Erro ao inserir pesquisador ${p.nome}:`, err.message);
-      }
-    }
-
-    return successCount;
-  }
-}
+//nao exite mais
 
 //faltando verificacao dos dados como as notificacooes etc 
-async function batchInsertLinhasPesquisa(linhas) {
-  if (linhas.length === 0) return 0;
+//nao exite
 
-  const values = linhas.map(l => [l.nome, l.grupo, 1]);
-  const placeholders = values.map(() => '(?, ?, ?)').join(',');
-  const flattenedValues = values.flat();
 
-  try {
-    const [result] = await db.query(
-      `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo) 
-       VALUES ${placeholders}`,
-      flattenedValues
-    );
-
-    return result.affectedRows;
-  } catch (error) {
-    console.warn('Batch insert de linhas falhou, usando individual:', error.message);
-    let successCount = 0;
-
-    for (const l of linhas) {
-      try {
-        await db.query(
-          `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo)
-           VALUES (?, ?, 1)`,
-          [l.nome, l.grupo]
-        );
-        successCount++;
-      } catch (err) {
-        console.error(`Erro ao inserir linha ${l.nome}:`, err.message);
-      }
-    }
-
-    return successCount;
-  }
-}
 
 // Limpa cache
 function clearCache() {
