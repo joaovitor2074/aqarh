@@ -56,12 +56,17 @@ O projeto utiliza **scraping de dados do Lattes**, processamento assíncrono e a
 
 ```txt
 backend/
+├── data/
 ├── src/
-│   ├── routes/
+|   ├── config/
 │   ├── controllers/
+|   ├── functions/
+|   ├── imports
+|   ├── jobs
+|   ├── middlewares/
+│   ├── routes/
 │   ├── services/
 │   ├── utils/
-│   └── database/
 ├── scripts/
 ├── output/
 └── server.js
