@@ -139,10 +139,18 @@ class ScrapeManager {
 async function launchBrowser(label) {
   const browser = await puppeteer.launch({
     ...BROWSER_CONFIG,
-    args: [...BROWSER_CONFIG.args, `--user-data-dir=./temp/${label}`]
+
+    // 🔥 ESSENCIAL para evitar Runtime.callFunctionOn timeout
+
+    args: [
+      ...BROWSER_CONFIG.args,
+      `--user-data-dir=./temp/${label}`
+    ],
   });
+
   return browser;
 }
+
 
 // =========================
 // LINHAS SEQUENCIAL

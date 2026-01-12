@@ -1,7 +1,12 @@
+//CONMFIGURACOES GERAIS
 import dotenv from "dotenv";
 dotenv.config();
+
+//IMPORTS NORMAIS
 import express from "express";
 import cors from "cors";
+
+//
 import authRoutes from "./routes/auth.routes.js";
 import membrosRoutes from "./routes/membros.routes.js";
 import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";

@@ -14,6 +14,8 @@ import scrapeLinhas from "./scrapeLinhas.service.js";
 import scrapeLinhasEstudantes from "./scrapelinhasestudantes.service.js";
 import { scrapeEmitter } from "../utils/scrapeEmitter.js";
 
+import {criarNotificacoes } from "./notificacao.service.js";
+
 // Cache para reduzir queries repetidas
 const cache = {
   pesquisadores: null,
@@ -161,6 +163,8 @@ export async function processarScrapePesquisador(browser = null) {
     const normalizados = normalizarPesquisadores(brutos);
     const dbPesquisadores = await getCachedPesquisadores('pesquisador');
     const novos = detectarNovosPesquisadores(normalizados, dbPesquisadores);
+    console.log("DB CACHE:", dbPesquisadores.length);
+    console.log("NORMALIZADOS:", normalizados.length);
     
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores_insercao",
@@ -168,7 +172,8 @@ export async function processarScrapePesquisador(browser = null) {
       mensagem: `Inserindo ${novos.length} novos pesquisadores...`
     });
     
-    const inseridos = await batchInsertPesquisadores(novos, 'pesquisador');
+    const notificacoesCriadas = await criarNotificacoes(novos);
+
     
     // Limpa cache após inserção
     clearCache();
@@ -176,15 +181,15 @@ export async function processarScrapePesquisador(browser = null) {
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores",
       status: "sucesso",
-      mensagem: `Pesquisadores processados: ${inseridos} novos inseridos`
+      mensagem: `Pesquisadores processados: ${notificacoesCriadas} novas notificacoes`
     });
     
     return {
       total_lattes: normalizados.length,
-      total_banco: dbPesquisadores.length + inseridos,
+      total_banco: dbPesquisadores.length,
       novos_encontrados: novos.length,
-      novos_inseridos: inseridos,
-      duplicados_ignorados: novos.length - inseridos
+      novos_inseridos: notificacoesCriadas,
+      duplicados_ignorados: novos.length - notificacoesCriadas
     };
     
   } catch (error) {
@@ -220,28 +225,29 @@ export async function processarEstudantes(browser = null) {
     const dbEstudantes = await getCachedPesquisadores('estudante');
     const novos = detectarNovosPesquisadores(normalizados, dbEstudantes);
     
+    
     scrapeEmitter.emit("status", {
       etapa: "estudantes_insercao",
       status: "iniciando",
       mensagem: `Inserindo ${novos.length} novos estudantes...`
     });
     
-    const inseridos = await batchInsertPesquisadores(novos, 'estudante');
+   const notificacoesCriadas = await criarNotificacoes(novos);
     
     clearCache();
     
     scrapeEmitter.emit("status", {
       etapa: "estudantes",
       status: "sucesso",
-      mensagem: `Estudantes processados: ${inseridos} novos inseridos`
+      mensagem: `Estudantes processados: ${notificacoesCriadas} novos pendentes`
     });
     
     return {
-      total_lattes: normalizados.length,
-      total_banco: dbEstudantes.length + inseridos,
-      novos_encontrados: novos.length,
-      novos_inseridos: inseridos,
-      duplicados_ignorados: novos.length - inseridos
+        total_lattes: normalizados.length,
+  total_banco: dbEstudantes.length, // não mudou
+  novos_encontrados: novos.length,
+  novos_pendentes: notificacoesCriadas,
+  duplicados_ignorados: normalizados.length - novos.length
     };
     
   } catch (error) {
@@ -302,7 +308,7 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
       mensagem: `Inserindo ${novas.length} novas linhas...`
     });
     
-    const linhasInseridas = await batchInsertLinhasPesquisa(novas);
+    const notificacoesCriadas = await criarNotificacoes(novas);
     
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}_vinculos`,
@@ -318,14 +324,14 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}`,
       status: "sucesso",
-      mensagem: `Linhas ${tipo} processadas: ${linhasInseridas} novas linhas, ${vinculosProcessados} vínculos`
+      mensagem: `Linhas ${tipo} processadas: ${notificacoesCriadas} novas notificacoes, ${vinculosProcessados} vínculos`
     });
     
     return {
       total_lattes: unicos.length,
       total_banco: dbLinhas.length + linhasInseridas,
       novos_encontrados: novas.length,
-      novos_inseridos: linhasInseridas,
+      novas_notificacao: notificacoesCriadas,
       vinculos_processados: vinculosProcessados,
       chunk: chunkOptions
     };
@@ -565,3 +571,4 @@ export async function limparRegistrosAntigos(dias = 30) {
     throw error;
   }
 }
+

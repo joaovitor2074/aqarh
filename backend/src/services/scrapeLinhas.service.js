@@ -27,21 +27,21 @@ const CONFIG = {
   timeouts: {
     navigation: 180000,    // 3 minutos
     selector: 120000,      // 2 minutos
-    popup: 30000,          // 30 segundos
-    pageLoad: 60000,       // 1 minuto
+    popup: 40000,          // 30 segundos
+    pageLoad: 80000,       // 1 minuto
     tableLoad: 30000,      // 30 segundos
     protocol: 120000       // 2 minutos para protocol timeout (NOVO)
   },
   
   delays: {
-    afterClick: 1000,      // 1 segundos após clicar
-    betweenStudents: 500, // 2 segundos entre estudantes
-    beforeRetry: 5000,    // 10 segundos antes de retry
-    afterPopupClose: 500  // 2 segundos após fechar popup
+    afterClick: 500,      // 1 segundos após clicar
+    betweenStudents: 200, // 2 segundos entre estudantes
+    beforeRetry: 2000,    // 10 segundos antes de retry
+    afterPopupClose: 700  // 2 segundos após fechar popup
   },
   
   maxConcurrentPopups: 2,  // Apenas 1 popup por vez
-  closePopupAfterMs: 30000 // Fecha popup automaticamente após 30 segundos
+  closePopupAfterMs: 40000 // Fecha popup automaticamente após 30 segundos
 };
 
 // IDs das tabelas de estudantes
@@ -146,11 +146,11 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
       
       if (newPages.length > 0) {
         newPage = newPages[0];
-        console.log(`  ✅ Nova guia detectada`);
+        console.log(`  ✅ Nova guia detectada`)
         break;
       }
       
-      await sleep(500);
+      await sleep(100);
     }
     
     if (!newPage) {
@@ -159,10 +159,10 @@ async function openPopupReliably(page, linkHandle, studentName, attempt = 1) {
     
     // Aguarda a página carregar
     try {
-      await newPage.waitForNavigation({ 
-        waitUntil: 'networkidle0', 
-        timeout: CONFIG.timeouts.pageLoad 
-      });
+      await Promise.race([
+  newPage.waitForSelector('body', { timeout: 8000 }),
+  newPage.waitForLoadState?.('domcontentloaded') // se existir
+]);;
     } catch (navError) {
       // Tenta waitForSelector como fallback
       console.log(`  ⏳ Aguardando conteúdo carregar...`);

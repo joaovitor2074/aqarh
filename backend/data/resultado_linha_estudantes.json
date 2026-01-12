@@ -306,11 +306,11 @@
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
-        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       },
       {
-        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "linha_pesquisa": "Engenharia e Ciência de Alimentos",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
       }
     ]
@@ -334,12 +334,12 @@
     "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0138425027",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
-        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
-      },
-      {
         "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Ensino e Aprendizagem da Matemática",
+        "grupo": "NÚCLEO DE INOVAÇÃO, ENSINO, PESQUISA E EXTENSÃO EM MATEMÁTICA"
       },
       {
         "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
@@ -704,12 +704,12 @@
     "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0407820752",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Adsorção aplicada à separação de espécies presentes em fase líquida",
-        "grupo": "Grupo de Estudos em Inorgânica e Catálise do Maranhão"
-      },
-      {
         "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Adsorção aplicada à separação de espécies presentes em fase líquida",
+        "grupo": "Grupo de Estudos em Inorgânica e Catálise do Maranhão"
       },
       {
         "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
@@ -861,8 +861,21 @@
   },
   {
     "nome": "Luciana Valéria Leão Lima",
-    "error": "max_retries_exceeded: Não foi possível abrir popup: Nova guia não foi aberta",
-    "linhas_pesquisa": []
+    "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0114793042",
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Implementação da Robótica Educacional e da Robótica de Competição",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Pesquisa e Inovação tecnológica para promoção da saúde humana e/ou educacional",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
+        "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      }
+    ]
   },
   {
     "nome": "Luis Fernandes de Sousa Filho",
@@ -933,12 +946,12 @@
     "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0421622776",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Adsorção aplicada à separação de espécies presentes em fase líquida",
-        "grupo": "Grupo de Estudos em Inorgânica e Catálise do Maranhão"
-      },
-      {
         "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Adsorção aplicada à separação de espécies presentes em fase líquida",
+        "grupo": "Grupo de Estudos em Inorgânica e Catálise do Maranhão"
       },
       {
         "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
@@ -1167,12 +1180,12 @@
     "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0407798307",
     "linhas_pesquisa": [
       {
-        "linha_pesquisa": "Detecção e quantificação de compostos de interesse biológico e ambiental em eletrodos impressos de carbono",
-        "grupo": "Grupo de Fotocatálise e Tecnologia Eletroquímica - GFTE"
-      },
-      {
         "linha_pesquisa": "Práticas Educativas em Educação Profissional e Tecnológica",
         "grupo": "Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI"
+      },
+      {
+        "linha_pesquisa": "Detecção e quantificação de compostos de interesse biológico e ambiental em eletrodos impressos de carbono",
+        "grupo": "Grupo de Fotocatálise e Tecnologia Eletroquímica - GFTE"
       },
       {
         "linha_pesquisa": "Práticas Pedagógicas no Ensino de Ciências e Matemática",
