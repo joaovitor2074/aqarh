@@ -14,7 +14,7 @@ import scrapeLinhas from "./scrapeLinhas.service.js";
 import scrapeLinhasEstudantes from "./scrapelinhasestudantes.service.js";
 import { scrapeEmitter } from "../utils/scrapeEmitter.js";
 
-import {criarNotificacoes } from "./notificacao.service.js";
+import { criarNotificacoes } from "./notificacao.service.js";
 
 // Cache para reduzir queries repetidas
 const cache = {
@@ -53,14 +53,14 @@ async function getCachedLinhasPesquisa() {
 // Função para inserção em batch (muito mais rápido)
 async function batchInsertPesquisadores(pesquisadores, tipoVinculo) {
   if (pesquisadores.length === 0) return 0;
-  
-  const values = pesquisadores.map(p => 
+
+  const values = pesquisadores.map(p =>
     [p.nome, p.titulacao_max || null, tipoVinculo]
   );
-  
+
   const placeholders = values.map(() => '(?, ?, ?)').join(',');
   const flattenedValues = values.flat();
-  
+
   try {
     const [result] = await db.query(
       `INSERT INTO pesquisadores (nome, titulacao_maxima, tipo_vinculo) 
@@ -70,13 +70,13 @@ async function batchInsertPesquisadores(pesquisadores, tipoVinculo) {
          updated_at = CURRENT_TIMESTAMP`,
       flattenedValues
     );
-    
+
     return result.affectedRows;
   } catch (error) {
     // Fallback para inserção individual em caso de erro
     console.warn('Batch insert falhou, usando inserção individual:', error.message);
     let successCount = 0;
-    
+
     for (const p of pesquisadores) {
       try {
         await db.query(
@@ -91,7 +91,7 @@ async function batchInsertPesquisadores(pesquisadores, tipoVinculo) {
         console.error(`Erro ao inserir pesquisador ${p.nome}:`, err.message);
       }
     }
-    
+
     return successCount;
   }
 }
@@ -99,23 +99,23 @@ async function batchInsertPesquisadores(pesquisadores, tipoVinculo) {
 //faltando verificacao dos dados como as notificacooes etc 
 async function batchInsertLinhasPesquisa(linhas) {
   if (linhas.length === 0) return 0;
-  
+
   const values = linhas.map(l => [l.nome, l.grupo, 1]);
   const placeholders = values.map(() => '(?, ?, ?)').join(',');
   const flattenedValues = values.flat();
-  
+
   try {
     const [result] = await db.query(
       `INSERT IGNORE INTO linhas_pesquisa (nome, grupo, ativo) 
        VALUES ${placeholders}`,
       flattenedValues
     );
-    
+
     return result.affectedRows;
   } catch (error) {
     console.warn('Batch insert de linhas falhou, usando individual:', error.message);
     let successCount = 0;
-    
+
     for (const l of linhas) {
       try {
         await db.query(
@@ -128,7 +128,7 @@ async function batchInsertLinhasPesquisa(linhas) {
         console.error(`Erro ao inserir linha ${l.nome}:`, err.message);
       }
     }
-    
+
     return successCount;
   }
 }
@@ -151,39 +151,45 @@ export async function processarScrapePesquisador(browser = null) {
       status: "iniciando",
       mensagem: "Iniciando scraping de pesquisadores..."
     });
-    
+
     const brutos = await scrapePesquisadores1(browser);
-    
+
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores_normalizacao",
       status: "iniciando",
       mensagem: `Normalizando ${brutos.length} pesquisadores...`
     });
-    
+
     const normalizados = normalizarPesquisadores(brutos);
     const dbPesquisadores = await getCachedPesquisadores('pesquisador');
+
     const novos = detectarNovosPesquisadores(normalizados, dbPesquisadores);
+
+
     console.log("DB CACHE:", dbPesquisadores.length);
     console.log("NORMALIZADOS:", normalizados.length);
-    
+
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores_insercao",
       status: "iniciando",
       mensagem: `Inserindo ${novos.length} novos pesquisadores...`
     });
-    
-    const notificacoesCriadas = await criarNotificacoes(novos);
 
-    
+    const notificacoesCriadas = await criarNotificacoes(
+      "NOVO_PESQUISADOR",
+      novos
+    );
+
+
     // Limpa cache após inserção
     clearCache();
-    
+
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores",
       status: "sucesso",
       mensagem: `Pesquisadores processados: ${notificacoesCriadas} novas notificacoes`
     });
-    
+
     return {
       total_lattes: normalizados.length,
       total_banco: dbPesquisadores.length,
@@ -191,7 +197,7 @@ export async function processarScrapePesquisador(browser = null) {
       novos_inseridos: notificacoesCriadas,
       duplicados_ignorados: novos.length - notificacoesCriadas
     };
-    
+
   } catch (error) {
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores",
@@ -212,44 +218,48 @@ export async function processarEstudantes(browser = null) {
       status: "iniciando",
       mensagem: "Iniciando scraping de estudantes..."
     });
-    
+
+    clearCache();
     const brutos = await scrapeEstudantes(browser);
-    
+
     scrapeEmitter.emit("status", {
       etapa: "estudantes_normalizacao",
       status: "iniciando",
       mensagem: `Normalizando ${brutos.length} estudantes...`
     });
-    
+
     const normalizados = normalizarPesquisadores(brutos);
     const dbEstudantes = await getCachedPesquisadores('estudante');
     const novos = detectarNovosPesquisadores(normalizados, dbEstudantes);
-    
-    
+
+
     scrapeEmitter.emit("status", {
       etapa: "estudantes_insercao",
       status: "iniciando",
       mensagem: `Inserindo ${novos.length} novos estudantes...`
     });
-    
-   const notificacoesCriadas = await criarNotificacoes(novos);
-    
-    clearCache();
-    
+
+    const notificacoesCriadas = await criarNotificacoes(
+      "NOVO_ESTUDANTE",
+      novos
+    );
+
+
+
     scrapeEmitter.emit("status", {
       etapa: "estudantes",
       status: "sucesso",
       mensagem: `Estudantes processados: ${notificacoesCriadas} novos pendentes`
     });
-    
+
     return {
-        total_lattes: normalizados.length,
-  total_banco: dbEstudantes.length, // não mudou
-  novos_encontrados: novos.length,
-  novos_pendentes: notificacoesCriadas,
-  duplicados_ignorados: normalizados.length - novos.length
+      total_lattes: normalizados.length,
+      total_banco: dbEstudantes.length, // não mudou
+      novos_encontrados: novos.length,
+      novos_pendentes: notificacoesCriadas,
+      duplicados_ignorados: normalizados.length - novos.length
     };
-    
+
   } catch (error) {
     scrapeEmitter.emit("status", {
       etapa: "estudantes",
@@ -271,12 +281,12 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
       mensagem: `Iniciando scraping de linhas (${tipo})...`,
       chunk: chunkOptions
     });
-    
+
     // Se temos opções de chunk, passa para a função de scrape
-    const brutos = chunkOptions 
+    const brutos = chunkOptions
       ? await scrapeFunction(browser, chunkOptions)
       : await scrapeFunction(browser);
-    
+
     if (!brutos || brutos.length === 0) {
       scrapeEmitter.emit("status", {
         etapa: `linhas_${tipo}`,
@@ -290,43 +300,43 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
         novos_inseridos: 0
       };
     }
-    
+
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}_normalizacao`,
       status: "iniciando",
       mensagem: `Processando ${brutos.length} registros de ${tipo}...`
     });
-    
+
     const normalizados = normalizarLinhasPesquisa(brutos);
     const unicos = deduplicarLinhas(normalizados);
     const dbLinhas = await getCachedLinhasPesquisa();
     const novas = detectarNovasLinhas(unicos, dbLinhas);
-    
+
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}_insercao`,
       status: "iniciando",
       mensagem: `Inserindo ${novas.length} novas linhas...`
     });
-    
+
     const notificacoesCriadas = await criarNotificacoes(novas);
-    
+
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}_vinculos`,
       status: "iniciando",
       mensagem: "Processando vínculos..."
     });
-    
+
     const vinculos = normalizarVinculos(brutos);
     const vinculosProcessados = await vincularPesquisadorLinhas(vinculos);
-    
+
     clearCache();
-    
+
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}`,
       status: "sucesso",
       mensagem: `Linhas ${tipo} processadas: ${notificacoesCriadas} novas notificacoes, ${vinculosProcessados} vínculos`
     });
-    
+
     return {
       total_lattes: unicos.length,
       total_banco: dbLinhas.length + linhasInseridas,
@@ -335,7 +345,7 @@ async function processarLinhasBase(scrapeFunction, tipo, browser = null, chunkOp
       vinculos_processados: vinculosProcessados,
       chunk: chunkOptions
     };
-    
+
   } catch (error) {
     scrapeEmitter.emit("status", {
       etapa: `linhas_${tipo}`,
@@ -371,26 +381,26 @@ export async function processarScrapeLinhasParalelo(browser = null, maxWorkers =
       status: "iniciando",
       mensagem: `Iniciando processamento paralelo com ${maxWorkers} workers...`
     });
-    
+
     // Primeiro, precisamos saber quantos itens temos para dividir
     // Isso requer uma função auxiliar no scrape
     const totalItems = await estimarTotalLinhas(browser);
     const itemsPorWorker = Math.ceil(totalItems / maxWorkers);
-    
+
     const workers = [];
     const results = [];
-    
+
     for (let i = 0; i < maxWorkers; i++) {
       const startIndex = i * itemsPorWorker;
       const endIndex = Math.min(startIndex + itemsPorWorker - 1, totalItems - 1);
-      
+
       if (startIndex >= totalItems) break;
-      
+
       workers.push(
         processarLinhasBase(
-          scrapeLinhas, 
-          'pesquisadores_paralelo', 
-          browser, 
+          scrapeLinhas,
+          'pesquisadores_paralelo',
+          browser,
           { workerId: i, startIndex, endIndex, totalItems }
         ).then(result => {
           results.push(result);
@@ -398,9 +408,9 @@ export async function processarScrapeLinhasParalelo(browser = null, maxWorkers =
         })
       );
     }
-    
+
     const workerResults = await Promise.allSettled(workers);
-    
+
     // Combina resultados
     const combinedResult = {
       total_lattes: 0,
@@ -410,7 +420,7 @@ export async function processarScrapeLinhasParalelo(browser = null, maxWorkers =
       vinculos_processados: 0,
       workers: []
     };
-    
+
     workerResults.forEach((result, index) => {
       if (result.status === 'fulfilled') {
         combinedResult.total_lattes += result.value.total_lattes || 0;
@@ -430,19 +440,19 @@ export async function processarScrapeLinhasParalelo(browser = null, maxWorkers =
         });
       }
     });
-    
+
     // Pega total do banco uma vez
     const [dbRows] = await db.query(`SELECT COUNT(*) as total FROM linhas_pesquisa`);
     combinedResult.total_banco = dbRows[0].total;
-    
+
     scrapeEmitter.emit("status", {
       etapa: "linhas_paralelo",
       status: "sucesso",
       mensagem: `Processamento paralelo concluído: ${combinedResult.novos_inseridos} novas linhas`
     });
-    
+
     return combinedResult;
-    
+
   } catch (error) {
     scrapeEmitter.emit("status", {
       etapa: "linhas_paralelo",
@@ -479,10 +489,10 @@ export async function executarProcessamentoCompleto(options = {}) {
     paralelo = false,
     maxWorkers = 2
   } = options;
-  
+
   const resultados = {};
   const startTime = Date.now();
-  
+
   try {
     scrapeEmitter.emit("status", {
       etapa: "processamento_completo",
@@ -490,18 +500,18 @@ export async function executarProcessamentoCompleto(options = {}) {
       mensagem: "Iniciando processamento completo...",
       options
     });
-    
+
     // Limpa cache no início
     clearCache();
-    
+
     if (pesquisadores) {
       resultados.pesquisadores = await processarScrapePesquisador();
     }
-    
+
     if (estudantes) {
       resultados.estudantes = await processarEstudantes();
     }
-    
+
     if (linhasPesquisadores) {
       if (paralelo) {
         resultados.linhasPesquisadores = await processarScrapeLinhasParalelo(null, maxWorkers);
@@ -509,13 +519,13 @@ export async function executarProcessamentoCompleto(options = {}) {
         resultados.linhasPesquisadores = await processarScrapeLinhas();
       }
     }
-    
+
     if (linhasEstudantes) {
       resultados.linhasEstudantes = await processarScrapeLinhasEstudantes();
     }
-    
+
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-    
+
     scrapeEmitter.emit("status", {
       etapa: "processamento_completo",
       status: "sucesso",
@@ -523,23 +533,23 @@ export async function executarProcessamentoCompleto(options = {}) {
       duracao: totalTime,
       resultados
     });
-    
+
     return {
       success: true,
       duracao: `${totalTime}s`,
       resultados
     };
-    
+
   } catch (error) {
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
-    
+
     scrapeEmitter.emit("status", {
       etapa: "processamento_completo",
       status: "erro",
       mensagem: `Erro após ${totalTime}s: ${error.message}`,
       duracao: totalTime
     });
-    
+
     return {
       success: false,
       duracao: `${totalTime}s`,
@@ -558,10 +568,10 @@ export async function limparRegistrosAntigos(dias = 30) {
        AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY)`,
       [dias, dias]
     );
-    
+
     console.log(`Limpeza: ${result.affectedRows} registros antigos removidos`);
     clearCache();
-    
+
     return {
       registros_removidos: result.affectedRows,
       dias_retidos: dias
