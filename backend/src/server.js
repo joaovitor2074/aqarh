@@ -15,6 +15,7 @@ import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
 import {testScrapeEstudantes} from "./functions/estudantes.js"
+import comunicadosRoutes from "./routes/comunicados.routes.js"
 
 const app = express();
 
@@ -35,7 +36,8 @@ app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
 app.use("/api", authRoutes);
 app.use("/adminjv", adminjvRoutes);
 
-app.get('/test/estudantes', testScrapeEstudantes);
+// app.get('/test/estudantes', testScrapeEstudantes);
+app.use('/comunicados',comunicadosRoutes )
 
 app.listen(process.env.PORT, () => {
   console.log("Servidor rodando na porta " + process.env.PORT);

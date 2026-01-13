@@ -5,6 +5,7 @@ import { db } from "../config/db.js";
 
 
 import { listarNotificacoes, AprovarNotificacao,AprovarNotificacaoLinha } from "../controllers/notificacoes.controller.js";
+import { criarComunicado,mapTipoNotificacaoParaComunicado } from "../controllers/comunicados.controller.js";
 
 const router = Router()
 
@@ -24,29 +25,47 @@ router.post("/scrape/notificacao/aprovar/:id", async (req, res) => {
       [id]
     );
 
-    if (!notificacao) {
-      return res.status(404).json({ error: "Notificação não encontrada" });
-    }
-console.log("📌 Tipo da notificação:", notificacao.tipo);
 
-    // 🔥 AQUI ESTÁ O PONTO-CHAVE
-    switch (notificacao.tipo) {
-      case "NOVO_PESQUISADOR":
-        await AprovarNotificacao(notificacao.dados);
-        break;
-      case "NOVO_ESTUDANTE":
-        await AprovarNotificacao(notificacao.dados);
-        break;
 
-      case "NOVA_LINHA":
-        await AprovarNotificacaoLinha(id);
-        break;
+   const tipoComunicado = mapTipoNotificacaoParaComunicado(notificacao.tipo);
 
-      default:
-        return res.status(400).json({
-          error: `Tipo de notificação não suportado: ${notificacao.tipo}`
-        });
-    }
+if (!tipoComunicado) {
+  return res.status(400).json({
+    error: `Tipo de notificação não suportado: ${notificacao.tipo}`
+  });
+}
+
+switch (notificacao.tipo) {
+  case "NOVO_PESQUISADOR":
+    await AprovarNotificacao(notificacao.dados);
+
+    await criarComunicado({
+      tipo: tipoComunicado,
+      titulo: "Novo pesquisador no grupo",
+      descricao: `Um novo pesquisador foi adicionado ao grupo.`,
+    });
+    break;
+
+  case "NOVO_ESTUDANTE":
+    await AprovarNotificacao(notificacao.dados);
+
+    await criarComunicado({
+      tipo: tipoComunicado,
+      titulo: "Novo estudante no grupo",
+      descricao: `Um novo estudante passou a integrar o grupo.`,
+    });
+    break;
+
+  case "NOVA_LINHA":
+    await AprovarNotificacaoLinha(id);
+
+    await criarComunicado({
+      tipo: tipoComunicado,
+      titulo: "Nova linha de pesquisa",
+      descricao: `Uma nova linha de pesquisa foi cadastrada.`,
+    });
+    break;
+}
 
     // Atualiza status
     await db.query(
