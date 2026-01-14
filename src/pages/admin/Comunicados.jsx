@@ -24,7 +24,7 @@ export default function Comunicados() {
     try {
       const res = await fetch("http://localhost:3000/comunicados/rascunhos")
       const data = await res.json()
-      setComunicados(data)
+      setComunicados(data.comunicados || []);
     } catch (err) {
       console.error("Erro ao carregar comunicados:", err)
     } finally {

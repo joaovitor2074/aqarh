@@ -11,8 +11,12 @@ export default function Notificacoes() {
   useEffect(() => {
     async function carregarNotificacoes() {
       try {
-        const res = await fetch("http://localhost:3000/adminjv/scrape/notificacoes")
+        const res = await fetch(
+          "http://localhost:3000/adminjv/scrape/notificacoes"
+        )
+
         if (!res.ok) throw new Error("Erro ao buscar notificações")
+
         const data = await res.json()
         setNotificacoes(data)
       } catch (err) {
@@ -27,74 +31,54 @@ export default function Notificacoes() {
 
   const handleAprovar = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/adminjv/scrape/notificacao/aprovar/${id}`, {
-        method: "POST"
-      })
+      const res = await fetch(
+        `http://localhost:3000/adminjv/scrape/notificacao/aprovar/${id}`,
+        { method: "POST" }
+      )
+
       if (!res.ok) throw new Error("Falha ao aprovar")
 
-      // Remove notificação aprovada da lista
-      setNotificacoes((prev) => prev.filter(n => n.id !== id))
+      setNotificacoes(prev => prev.filter(n => n.id !== id))
       toast.success("Notificação aprovada ✅")
     } catch (err) {
       toast.error(err.message)
     }
   }
 
-const handleIgnorar = () => {
-  setNotificacoes([]);
-  toast("notificações ignoradas 🗑️", { icon: "🗑️" });
-};
+  const handleAprovarTodos = async () => {
+    try {
+      for (const n of notificacoes) {
+        const res = await fetch(
+          `http://localhost:3000/adminjv/scrape/notificacao/aprovar/${n.id}`,
+          { method: "POST" }
+        )
+        if (!res.ok) throw new Error("Erro ao aprovar notificações")
+      }
 
-const handleIgnorartodos = () => {
-  setNotificacoes([]);
-  toast("todas as notificações ignoradas 🗑️", { icon: "🗑️" });
-}
-
-
- const handleAprovarTodos = async () => {
-  try {
-    // Percorre todas as notificações
-    for (const n of notificacoes) {
-      const res = await fetch(
-        `http://localhost:3000/adminjv/scrape/notificacao/aprovar/${n.id}`,
-        { method: "POST" }
-      );
-      if (!res.ok) throw new Error(`Falha ao aprovar ${n.tipo}`);
+      setNotificacoes([])
+      toast.success("Todas as notificações aprovadas ✅")
+    } catch (err) {
+      toast.error(err.message)
     }
-
-    // Limpa a lista de notificações
-    setNotificacoes([]);
-    toast.success("Todas as notificações foram aprovadas ✅");
-  } catch (err) {
-    toast.error(err.message);
   }
-};
-
 
   return (
     <AdminLayout>
       <Toaster position="top-right" />
-      <div className="p-6">
-        <div className="flex ">
-          <h1 className="text-2xl font-semibold mb-6">
+
+      <div className="p-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold">
             Notificações de Scraping
           </h1>
-             <button
-                      onClick={() => handleAprovarTodos()}
-                      className="px-5 py-6 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                    >
-                      Aprovar todos
-              </button>
-             <button
-                      onClick={() => handleIgnorartodos()}
-                      className="px-5 py-6 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                    >
-                      ignorar todos
-              </button>
-          
+
+          <button
+            onClick={handleAprovarTodos}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Aprovar todas
+          </button>
         </div>
-
-
 
         {loading && <p>Carregando notificações...</p>}
         {erro && <p className="text-red-500">{erro}</p>}
@@ -104,34 +88,30 @@ const handleIgnorartodos = () => {
         )}
 
         <div className="space-y-4">
-          {notificacoes.map((n) => (
+          {notificacoes.map(n => (
             <div
               key={n.id}
-              className="border rounded-lg p-4 bg-white shadow hover:shadow-md transition-shadow"
+              className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition"
             >
               <div className="flex justify-between items-center">
-                <strong className="capitalize">{n.tipo.replaceAll("_", " ")}</strong>
-                <span className="text-sm text-gray-500">
+                <strong className="text-sm uppercase text-gray-700">
+                  {n.tipo.replaceAll("_", " ")}
+                </strong>
+                <span className="text-xs text-gray-400">
                   {new Date(n.criado_em).toLocaleString()}
                 </span>
               </div>
 
-              <pre className="mt-3 text-sm bg-gray-50 p-3 rounded overflow-auto">
-                {JSON.stringify(n.dados, null, 2)}
-              </pre>
+              <p className="mt-2 text-gray-700">
+                {n.descricao}
+              </p>
 
               <div className="mt-4 flex gap-2">
                 <button
                   onClick={() => handleAprovar(n.id)}
-                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                 >
                   Aprovar
-                </button>
-                <button
-                  onClick={() => handleIgnorar(n.id)}
-                  className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
-                >
-                  Ignorar
                 </button>
               </div>
             </div>

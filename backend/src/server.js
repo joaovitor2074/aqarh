@@ -37,7 +37,7 @@ app.use("/api", authRoutes);
 app.use("/adminjv", adminjvRoutes);
 
 // app.get('/test/estudantes', testScrapeEstudantes);
-app.use('/comunicados',comunicadosRoutes )
+app.use('/comunicados',comunicadosRoutes)
 
 app.listen(process.env.PORT, () => {
   console.log("Servidor rodando na porta " + process.env.PORT);
