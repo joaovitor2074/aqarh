@@ -3,6 +3,8 @@ import { db } from '../config/db.js';
 import { normalizarNome } from '../services/normalizacao.service.js';
 import { obterLinhasDePessoa } from '../services/arquivoBruto.service.js';
 import { aprovarPessoa } from '../services/aprovacao.service.js';
+import { criarOuBuscarLinha } from '../services/resolvers.service.js';
+import { logger } from '../services/log.service.js';
 
 export async function listarNotificacoes(req, res) {
   try {
