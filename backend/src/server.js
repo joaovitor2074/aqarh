@@ -1,11 +1,15 @@
 //CONMFIGURACOES GERAIS
 import dotenv from "dotenv";
 dotenv.config();
-import path from "path"
 
 //IMPORTS NORMAIS
 import express from "express";
 import cors from "cors";
+import path from "path"
+import { fileURLToPath } from "url"
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 
 //
 import authRoutes from "./routes/auth.routes.js";
@@ -29,18 +33,24 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.urlencoded({ extended: true }))
 
 app.use(express.json());
 app.use("/api/membros", membrosRoutes);
 app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
 
 
+// Servir arquivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'public/img/defaults')))
+
 // Rotas
 app.use("/api", authRoutes);
 app.use("/adminjv", adminjvRoutes);
 
 // app.get('/test/estudantes', testScrapeEstudantes);
-app.use('/comunicados',comunicadosRoutes)
+// Rotas - TODAS com /api
+app.use('/api/comunicados', comunicadosRoutes)
+
 
 app.use("/uploads", express.static(path.resolve("uploads")))
 
