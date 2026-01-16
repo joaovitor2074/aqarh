@@ -1,273 +1,586 @@
-import React, { useEffect, useState, useCallback } from "react";
-import AdminLayout from "../../layout/AdminLayout";
-import Card from "../../ui/Card";
-import Button from "../../ui/Button";
-import Modal from "../../ui/Modal";
-import Input from "../../ui/Input";
-import FormGroup from "../../ui/FormGroup";
-import { apiRequest } from "../../utils/api";
-import toast from "react-hot-toast";
+import React, { useEffect, useState, useCallback } from "react"
+import AdminLayout from "../../layout/AdminLayout"
+import Card from "../../ui/Card"
+import Button from "../../ui/Button"
+import Modal from "../../ui/Modal"
+import Input from "../../ui/Input"
+import FormGroup from "../../ui/FormGroup"
+import Select from "../../ui/Select"
+import { api } from "../../utils/api"
+import toast from "react-hot-toast"
+import styles from "../../styles/adminPages/membros.module.css"
+import {
+  FaSpinner,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaFilter,
+  FaUser,
+  FaUserGraduate,
+  FaEnvelope,
+  FaGraduationCap,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaIdCard,
+  FaBriefcase,
+  FaUniversity
+} from "react-icons/fa"
 
 export default function Membros() {
-  const [filtroAtivo, setFiltroAtivo] = useState("ativos"); // ativos | inativos | todos
-  const [filtroVinculo, setFiltroVinculo] = useState("todos"); // pesquisador | estudante | todos
-
-  const [openModal, setOpenModal] = useState(false);
-  const [membros, setMembros] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(null);
-
+  // Estados
+  const [membros, setMembros] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [estatisticas, setEstatisticas] = useState(null)
+  
+  // Filtros
+  const [filtroStatus, setFiltroStatus] = useState("todos")
+  const [filtroVinculo, setFiltroVinculo] = useState("todos")
+  const [filtroTitulacao, setFiltroTitulacao] = useState("todos")
+  
+  // Formulário
   const [form, setForm] = useState({
     nome: "",
     titulacao_maxima: "",
-    data_inclusao: "",
+    data_inclusao: new Date().toISOString().split('T')[0],
     email: "",
-  });
+    tipo_vinculo: "pesquisador",
+    ativo: true,
+    linha_pesquisa_id: null,
+    lattes_url: "",
+    orcid: "",
+    instituicao: "",
+    cargo: ""
+  })
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  // Função para montar query string e carregar membros
-  const carregarMembros = useCallback(async () => {
+  // Buscar todos os membros
+  const buscarMembros = useCallback(async () => {
     try {
-      setLoading(true);
-
-      const params = new URLSearchParams();
-
-      if (filtroAtivo === "ativos") params.set("ativo", "1");
-      else if (filtroAtivo === "inativos") params.set("ativo", "0");
-
-      if (filtroVinculo && filtroVinculo !== "todos")
-        params.set("tipo_vinculo", filtroVinculo);
-
-      const query = params.toString();
-      const path = query ? `/membros?${query}` : "/membros";
-
-      const data = await apiRequest(path);
-      setMembros(data || []);
+      setLoading(true)
+      
+      const params = new URLSearchParams()
+      if (filtroStatus !== "todos") {
+        params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
+      }
+      if (filtroVinculo !== "todos") {
+        params.append("tipo_vinculo", filtroVinculo)
+      }
+      if (filtroTitulacao !== "todos") {
+        params.append("titulacao_maxima", filtroTitulacao)
+      }
+      
+      const query = params.toString()
+      const url = `/api/membros${query ? `?${query}` : ""}`
+      const data = await api.get(url)
+      setMembros(data || [])
     } catch (error) {
-      console.error("❌ Erro ao carregar membros:", error);
-      toast.error(error.message || "Erro ao carregar membros");
+      console.error("❌ Erro ao carregar membros:", error)
+      toast.error(error.message || "Erro ao carregar membros")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [filtroAtivo, filtroVinculo]);
+  }, [filtroStatus, filtroVinculo, filtroTitulacao])
 
-  // recarrega quando filtros mudam
+  // Buscar estatísticas
+  const buscarEstatisticas = async () => {
+    try {
+      const data = await api.get("/api/membros/quantidade")
+      setEstatisticas(data)
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas:", error)
+    }
+  }
+
+  // Buscar linhas de pesquisa para o select
+  const [linhasPesquisa, setLinhasPesquisa] = useState([])
+  const buscarLinhasPesquisa = async () => {
+    try {
+      const data = await api.get("/api/linhas-pesquisa")
+      setLinhasPesquisa(data || [])
+    } catch (error) {
+      console.error("Erro ao buscar linhas de pesquisa:", error)
+    }
+  }
+
   useEffect(() => {
-    carregarMembros();
-  }, [carregarMembros]);
+    buscarMembros()
+    buscarEstatisticas()
+    buscarLinhasPesquisa()
+  }, [buscarMembros])
 
-  async function handleAddMembro() {
+  // Filtragem
+  const titulacoesUnicas = Array.from(new Set(membros.map(m => m.titulacao_maxima).filter(Boolean)))
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setForm(prev => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      await apiRequest("/membros", {
-        method: "POST",
-        body: JSON.stringify(form),
-      });
-
-      toast.success("Membro cadastrado com sucesso");
-      // reset correto do form
-      setForm({ nome: "", titulacao_maxima: "", data_inclusao: "", email: "" });
-      setOpenModal(false);
-      carregarMembros();
+      if (editing) {
+        await api.put(`/api/membros/${editing.id}`, form)
+        toast.success("Membro atualizado com sucesso!")
+      } else {
+        await api.post("/api/membros", form)
+        toast.success("Membro criado com sucesso!")
+      }
+      
+      setModalOpen(false)
+      setEditing(null)
+      resetForm()
+      buscarMembros()
+      buscarEstatisticas()
     } catch (error) {
-      toast.error(error.message || "Erro ao cadastrar membro");
+      toast.error(error.message || "Erro ao salvar membro")
     }
   }
 
-  async function handleDelete(id) {
-    if (!confirm("Deseja realmente excluir este membro?")) return;
+  const resetForm = () => {
+    setForm({
+      nome: "",
+      titulacao_maxima: "",
+      data_inclusao: new Date().toISOString().split('T')[0],
+      email: "",
+      tipo_vinculo: "pesquisador",
+      ativo: true,
+      linha_pesquisa_id: null,
+      lattes_url: "",
+      orcid: "",
+      instituicao: "",
+      cargo: ""
+    })
+  }
 
+  const handleEdit = (membro) => {
+    setEditing(membro)
+    setForm({
+      nome: membro.nome || "",
+      titulacao_maxima: membro.titulacao_maxima || "",
+      data_inclusao: membro.data_inclusao ? membro.data_inclusao.split('T')[0] : new Date().toISOString().split('T')[0],
+      email: membro.email || "",
+      tipo_vinculo: membro.tipo_vinculo || "pesquisador",
+      ativo: membro.ativo !== false,
+      linha_pesquisa_id: membro.linha_pesquisa_id || null,
+      lattes_url: membro.lattes_url || "",
+      orcid: membro.orcid || "",
+      instituicao: membro.instituicao || "",
+      cargo: membro.cargo || ""
+    })
+    setModalOpen(true)
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm("Tem certeza que deseja excluir este membro?")) return
+    
     try {
-      await apiRequest(`/membros/${id}`, { method: "DELETE" });
-      toast.success("Membro excluído com sucesso");
-      setMembros((prev) => prev.filter((m) => m.id !== id));
+      await api.delete(`/api/membros/${id}`)
+      toast.success("Membro excluído com sucesso!")
+      buscarMembros()
+      buscarEstatisticas()
     } catch (error) {
-      toast.error("Erro ao excluir membro");
+      toast.error(error.message || "Erro ao excluir membro")
     }
   }
 
-  async function saveEdit() {
+  const toggleStatus = async (id, atualStatus) => {
     try {
-      await apiRequest(`/membros/${editing.id}`, {
-        method: "PUT",
-        body: JSON.stringify(editing),
-      });
-
-      toast.success("Membro atualizado com sucesso");
-      setEditing(null);
-      carregarMembros();
+      await api.patch(`/api/membros/${id}`, { ativo: !atualStatus })
+      toast.success(`Membro ${!atualStatus ? 'ativado' : 'desativado'} com sucesso!`)
+      buscarMembros()
+      buscarEstatisticas()
     } catch (error) {
-      toast.error("Erro ao atualizar membro");
+      toast.error(error.message || "Erro ao alterar status")
     }
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className={styles.container}>
         {/* Cabeçalho */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-800">Pesquisadores</h2>
-          <div className="flex gap-3">
-            <select
-              value={filtroAtivo}
-              onChange={(e) => setFiltroAtivo(e.target.value)}
-              className="border rounded px-3 py-1"
-            >
-              <option value="ativos">Ativos</option>
-              <option value="inativos">Inativos (Egressos)</option>
-              <option value="todos">Todos</option>
-            </select>
-
-            <select
-              value={filtroVinculo}
-              onChange={(e) => setFiltroVinculo(e.target.value)}
-              className="border rounded px-3 py-1"
-            >
-              <option value="todos">Todos</option>
-              <option value="pesquisador">Pesquisadores</option>
-              <option value="estudante">Estudantes</option>
-            </select>
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.title}>Membros da Pesquisa</h1>
+            <p className={styles.subtitle}>
+              {estatisticas && (
+                <>
+                  Total: {estatisticas.total} | 
+                  Ativos: {estatisticas.ativos} | 
+                  Pesquisadores: {estatisticas.pesquisadores} | 
+                  Estudantes: {estatisticas.estudantes}
+                </>
+              )}
+            </p>
           </div>
-
-          <Button onClick={() => setOpenModal(true)}>Adicionar membro</Button>
+          
+          <Button 
+            onClick={() => setModalOpen(true)}
+            className={styles.btnNovo}
+          >
+            <FaPlus /> Novo Membro
+          </Button>
         </div>
 
-        {/* Lista */}
+        {/* Filtros */}
+        <Card className={styles.filtrosCard}>
+          <div className={styles.filtrosHeader}>
+            <FaFilter />
+            <h3>Filtros</h3>
+          </div>
+          
+          <div className={styles.filtrosGrid}>
+            <div className={styles.filtroGroup}>
+              <label>Status</label>
+              <div className={styles.filtroBotoes}>
+                <Button 
+                  onClick={() => setFiltroStatus("todos")}
+                  variant={filtroStatus === "todos" ? "primary" : "outline"}
+                >
+                  Todos
+                </Button>
+                <Button 
+                  onClick={() => setFiltroStatus("ativo")}
+                  variant={filtroStatus === "ativo" ? "primary" : "outline"}
+                >
+                  <FaCheckCircle /> Ativos
+                </Button>
+                <Button 
+                  onClick={() => setFiltroStatus("inativo")}
+                  variant={filtroStatus === "inativo" ? "primary" : "outline"}
+                >
+                  <FaTimesCircle /> Inativos
+                </Button>
+              </div>
+            </div>
+            
+            <div className={styles.filtroGroup}>
+              <label>Tipo de Vínculo</label>
+              <Select
+                value={filtroVinculo}
+                onChange={(e) => setFiltroVinculo(e.target.value)}
+                options={[
+                  { value: "todos", label: "Todos" },
+                  { value: "pesquisador", label: "Pesquisadores" },
+                  { value: "estudante", label: "Estudantes" },
+                  { value: "colaborador", label: "Colaboradores" }
+                ]}
+              />
+            </div>
+            
+            <div className={styles.filtroGroup}>
+              <label>Titulação</label>
+              <Select
+                value={filtroTitulacao}
+                onChange={(e) => setFiltroTitulacao(e.target.value)}
+                options={[
+                  { value: "todos", label: "Todas" },
+                  ...titulacoesUnicas.map(tit => ({
+                    value: tit,
+                    label: tit
+                  }))
+                ]}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Lista de membros */}
         <Card>
           {loading ? (
-            <p className="text-gray-500">Carregando membros...</p>
+            <div className={styles.loading}>
+              <FaSpinner className={styles.spinner} />
+              <p>Carregando membros...</p>
+            </div>
           ) : membros.length === 0 ? (
-            <p className="text-gray-500">Nenhum membro cadastrado.</p>
+            <div className={styles.emptyState}>
+              <FaUser className={styles.emptyIcon} />
+              <p>Nenhum membro encontrado</p>
+              <Button onClick={() => setModalOpen(true)}>
+                <FaPlus /> Adicionar primeiro membro
+              </Button>
+            </div>
           ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500 border-b">
-                  <th className="pb-3">Nome</th>
-                  <th className="pb-3">Email</th>
-                  <th className="pb-3">Titulação</th>
-                  <th className="pb-3">Incluído</th>
-                  <th className="pb-3">Tipo vínculo</th>
-                  <th className="pb-3">Ativo</th>
-                  <th className="pb-3">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {membros.map((membro) => (
-                  <tr key={membro.id} className="border-b last:border-0">
-                    <td className="py-3 font-medium">{membro.nome}</td>
-                    <td className="py-3">{membro.email ?? "—"}</td>
-                    <td className="py-3">{membro.titulacao_maxima ?? "—"}</td>
-                    <td className="py-3">
-                      {membro.data_inclusao
-                        ? new Date(membro.data_inclusao).toLocaleDateString("pt-BR")
-                        : "—"}
-                    </td>
-                    <td className="py-3 capitalize">{membro.tipo_vinculo ?? "—"}</td>
-                    <td className="py-3">{membro.ativo ? "Ativo" : "Inativo"}</td>
-
-                    <td className="py-3 flex gap-2">
-                      <button
-                        onClick={() => setEditing(membro)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(membro.id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded"
-                      >
-                        Excluir
-                      </button>
-                    </td>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Membro</th>
+                    <th>Contato</th>
+                    <th>Titulação</th>
+                    <th>Vínculo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {membros.map((membro) => (
+                    <tr key={membro.id}>
+                      <td className={styles.colMembro}>
+                        <div className={styles.avatar}>
+                          {membro.tipo_vinculo === "pesquisador" ? (
+                            <FaUser className={styles.avatarIcon} />
+                          ) : (
+                            <FaUserGraduate className={styles.avatarIcon} />
+                          )}
+                        </div>
+                        <div className={styles.membroInfo}>
+                          <strong>{membro.nome}</strong>
+                          {membro.cargo && (
+                            <span className={styles.cargo}>{membro.cargo}</span>
+                          )}
+                          {membro.instituicao && (
+                            <span className={styles.instituicao}>
+                              <FaUniversity /> {membro.instituicao}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      
+                      <td>
+                        <div className={styles.contato}>
+                          {membro.email && (
+                            <a href={`mailto:${membro.email}`} className={styles.email}>
+                              <FaEnvelope /> {membro.email}
+                            </a>
+                          )}
+                          {membro.lattes_url && (
+                            <a href={membro.lattes_url} target="_blank" rel="noopener noreferrer" className={styles.lattes}>
+                              <FaIdCard /> Lattes
+                            </a>
+                          )}
+                          {membro.orcid && (
+                            <span className={styles.orcid}>
+                              ORCID: {membro.orcid}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      
+                      <td>
+                        <div className={styles.titulacao}>
+                          <FaGraduationCap />
+                          <span>{membro.titulacao_maxima || "Não informada"}</span>
+                        </div>
+                        {membro.data_inclusao && (
+                          <div className={styles.dataInclusao}>
+                            <FaCalendarAlt />
+                            <span>{new Date(membro.data_inclusao).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        )}
+                      </td>
+                      
+                      <td>
+                        <span className={`${styles.vinculo} ${styles[membro.tipo_vinculo]}`}>
+                          {membro.tipo_vinculo === "pesquisador" ? "Pesquisador" : 
+                           membro.tipo_vinculo === "estudante" ? "Estudante" : 
+                           membro.tipo_vinculo === "colaborador" ? "Colaborador" : 
+                           membro.tipo_vinculo}
+                        </span>
+                      </td>
+                      
+                      <td>
+                        <span className={`${styles.status} ${membro.ativo ? styles.ativo : styles.inativo}`}>
+                          {membro.ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </td>
+                      
+                      <td className={styles.colAcoes}>
+                        <Button 
+                          onClick={() => handleEdit(membro)}
+                          variant="outline"
+                          size="sm"
+                          title="Editar"
+                        >
+                          <FaEdit />
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => toggleStatus(membro.id, membro.ativo)}
+                          variant={membro.ativo ? "warning" : "success"}
+                          size="sm"
+                          title={membro.ativo ? "Desativar" : "Ativar"}
+                        >
+                          {membro.ativo ? <FaTimesCircle /> : <FaCheckCircle />}
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => handleDelete(membro.id)}
+                          variant="danger"
+                          size="sm"
+                          title="Excluir"
+                        >
+                          <FaTrash />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
 
-        {/* Modal Novo */}
-        <Modal isOpen={openModal} onClose={() => setOpenModal(false)} title="Novo membro">
-          <div className="space-y-4">
-            <FormGroup label="Nome">
-              <Input name="nome" value={form.nome} onChange={handleChange} />
+        {/* Modal para criar/editar */}
+        <Modal
+          isOpen={modalOpen}
+          onClose={() => {
+            setModalOpen(false)
+            setEditing(null)
+            resetForm()
+          }}
+          title={editing ? "Editar Membro" : "Novo Membro"}
+          size="lg"
+        >
+          <form onSubmit={handleSubmit} className={styles.modalForm}>
+            <div className={styles.formRow}>
+              <FormGroup label="Nome Completo *" className={styles.formGroup}>
+                <Input
+                  name="nome"
+                  value={form.nome}
+                  onChange={handleChange}
+                  placeholder="Nome completo do membro"
+                  required
+                />
+              </FormGroup>
+              
+              <FormGroup label="Email" className={styles.formGroup}>
+                <Input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="email@exemplo.com"
+                />
+              </FormGroup>
+            </div>
+            
+            <div className={styles.formRow}>
+              <FormGroup label="Tipo de Vínculo *" className={styles.formGroup}>
+                <Select
+                  name="tipo_vinculo"
+                  value={form.tipo_vinculo}
+                  onChange={handleChange}
+                  options={[
+                    { value: "pesquisador", label: "Pesquisador" },
+                    { value: "estudante", label: "Estudante" },
+                    { value: "colaborador", label: "Colaborador" }
+                  ]}
+                  required
+                />
+              </FormGroup>
+              
+              <FormGroup label="Titulação Máxima" className={styles.formGroup}>
+                <Input
+                  name="titulacao_maxima"
+                  value={form.titulacao_maxima}
+                  onChange={handleChange}
+                  placeholder="Ex: Doutorado, Mestrado, Graduação"
+                />
+              </FormGroup>
+            </div>
+            
+            <div className={styles.formRow}>
+              <FormGroup label="Data de Inclusão" className={styles.formGroup}>
+                <Input
+                  name="data_inclusao"
+                  type="date"
+                  value={form.data_inclusao}
+                  onChange={handleChange}
+                />
+              </FormGroup>
+              
+              <FormGroup label="Linha de Pesquisa" className={styles.formGroup}>
+                <Select
+                  name="linha_pesquisa_id"
+                  value={form.linha_pesquisa_id || ""}
+                  onChange={handleChange}
+                  options={[
+                    { value: "", label: "Não vinculada" },
+                    ...linhasPesquisa.map(linha => ({
+                      value: linha.id,
+                      label: linha.nome
+                    }))
+                  ]}
+                />
+              </FormGroup>
+            </div>
+            
+            <div className={styles.formRow}>
+              <FormGroup label="Instituição" className={styles.formGroup}>
+                <Input
+                  name="instituicao"
+                  value={form.instituicao}
+                  onChange={handleChange}
+                  placeholder="Instituição de origem"
+                />
+              </FormGroup>
+              
+              <FormGroup label="Cargo/Função" className={styles.formGroup}>
+                <Input
+                  name="cargo"
+                  value={form.cargo}
+                  onChange={handleChange}
+                  placeholder="Cargo ou função"
+                />
+              </FormGroup>
+            </div>
+            
+            <div className={styles.formRow}>
+              <FormGroup label="URL Lattes" className={styles.formGroup}>
+                <Input
+                  name="lattes_url"
+                  value={form.lattes_url}
+                  onChange={handleChange}
+                  placeholder="https://lattes.cnpq.br/..."
+                />
+              </FormGroup>
+              
+              <FormGroup label="ORCID" className={styles.formGroup}>
+                <Input
+                  name="orcid"
+                  value={form.orcid}
+                  onChange={handleChange}
+                  placeholder="0000-0000-0000-0000"
+                />
+              </FormGroup>
+            </div>
+            
+            <FormGroup>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  name="ativo"
+                  checked={form.ativo}
+                  onChange={handleChange}
+                />
+                <span>Membro ativo</span>
+              </label>
             </FormGroup>
-
-            <FormGroup label="Titulação Máxima">
-              <Input
-                name="titulacao_maxima"
-                value={form.titulacao_maxima}
-                onChange={handleChange}
-              />
-            </FormGroup>
-
-            <FormGroup label="Email">
-              <Input name="email" value={form.email} onChange={handleChange} />
-            </FormGroup>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setOpenModal(false)}>
+            
+            <div className={styles.modalActions}>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setModalOpen(false)
+                  setEditing(null)
+                  resetForm()
+                }}
+              >
                 Cancelar
               </Button>
-              <Button onClick={handleAddMembro}>Salvar</Button>
+              <Button type="submit">
+                {editing ? "Atualizar" : "Criar Membro"}
+              </Button>
             </div>
-          </div>
-        </Modal>
-
-        {/* Modal Editar */}
-        <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Editar membro">
-          {editing && (
-            <div className="space-y-4">
-              <Input
-                value={editing.nome}
-                onChange={(e) => setEditing({ ...editing, nome: e.target.value })}
-              />
-
-              <Input
-                value={editing.titulacao_maxima}
-                onChange={(e) =>
-                  setEditing({ ...editing, titulacao_maxima: e.target.value })
-                }
-              />
-
-              <Input
-                value={editing.email}
-                onChange={(e) => setEditing({ ...editing, email: e.target.value })}
-              />
-
-              {/* opcional: allow editing tipo_vinculo e ativo */}
-              <div className="flex gap-2">
-                <select
-                  value={editing.tipo_vinculo || "pesquisador"}
-                  onChange={(e) => setEditing({ ...editing, tipo_vinculo: e.target.value })}
-                  className="border rounded px-2 py-1"
-                >
-                  <option value="pesquisador">pesquisador</option>
-                  <option value="estudante">estudante</option>
-                </select>
-
-                <select
-                  value={editing.ativo ? "1" : "0"}
-                  onChange={(e) => setEditing({ ...editing, ativo: Number(e.target.value) })}
-                  className="border rounded px-2 py-1"
-                >
-                  <option value="1">Ativo</option>
-                  <option value="0">Inativo</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button variant="secondary" onClick={() => setEditing(null)}>
-                  Cancelar
-                </Button>
-                <Button onClick={saveEdit}>Salvar</Button>
-              </div>
-            </div>
-          )}
+          </form>
         </Modal>
       </div>
     </AdminLayout>
-  );
+  )
 }
