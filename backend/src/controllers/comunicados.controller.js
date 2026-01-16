@@ -1,4 +1,5 @@
 import { db } from "../config/db.js";
+import fs from "fs"
 
 export async function MostrarComunicados(req, res) {
   try {
@@ -97,6 +98,66 @@ export async function AtivarComunicado(req, res) {
     console.error("Erro ao ativar comunicado:", error);
     return res.status(500).json({
       error: "Erro interno ao ativar comunicado"
+    });
+  }
+}
+export async function EditarComunicado(req, res) {
+  try {
+    const { id } = req.params;
+    const { titulo, descricao, tipo, imagem } = req.body;
+
+    // 1️⃣ Verifica se existe
+    const [rows] = await db.query(
+      `
+      SELECT status
+      FROM comunicados
+      WHERE id = ?
+      `,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        error: "Comunicado não encontrado"
+      });
+    }
+
+    // 2️⃣ Regra de negócio
+    if (rows[0].status !== "rascunho") {
+      return res.status(400).json({
+        error: "Apenas comunicados em rascunho podem ser editados"
+      });
+    }
+
+    //
+// 3️⃣ Atualiza dados
+    await db.query(
+      `
+      UPDATE comunicados
+      SET
+        titulo = ?,
+        descricao = ?,
+        tipo = ?,
+        imagem = ?
+      WHERE id = ?
+      `,
+      [
+        titulo,
+        descricao,
+        tipo,
+        imagem ?? null,
+        id
+      ]
+    );
+
+    return res.status(200).json({
+      message: "Comunicado atualizado com sucesso"
+    });
+
+  } catch (error) {
+    console.error("Erro ao editar comunicado:", error);
+    return res.status(500).json({
+      error: "Erro interno ao editar comunicado"
     });
   }
 }
@@ -205,4 +266,74 @@ export async function ReativarComunicado(req, res) {
   }
 }
 
+export async function AtualizarComunicado(req, res) {
+  try {
+    const { id } = req.params
+    const { titulo, descricao, tipo } = req.body
 
+    const [rows] = await db.query(
+      "SELECT imagem FROM comunicados WHERE id = ?",
+      [id]
+    )
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Comunicado não encontrado" })
+    }
+
+    let imagemFinal = rows[0].imagem
+
+    // 🔹 nova imagem
+    if (req.file) {
+      if (imagemFinal) {
+        const caminhoAntigo = path.join(process.cwd(), imagemFinal)
+        if (fs.existsSync(caminhoAntigo)) {
+          fs.unlinkSync(caminhoAntigo)
+        }
+      }
+
+      imagemFinal = `/uploads/${req.file.filename}`
+    }
+
+    await db.query(
+      `
+      UPDATE comunicados
+      SET
+        titulo = COALESCE(?, titulo),
+        descricao = COALESCE(?, descricao),
+        tipo = COALESCE(?, tipo),
+        imagem = ?
+      WHERE id = ?
+      `,
+      [titulo || null, descricao || null, tipo || null, imagemFinal, id]
+    )
+
+    return res.status(200).json({
+      message: "Comunicado atualizado com sucesso",
+      imagem: imagemFinal
+    })
+
+  } catch (error) {
+    console.error("Erro ao atualizar comunicado:", error)
+    return res.status(500).json({
+      error: "Erro interno ao atualizar comunicado"
+    })
+  }
+}
+
+
+export async function MostrarQuantidadeComunicados(req, res) {
+  try {
+    const [rows] = await db.query(`
+      SELECT COUNT(*) AS total_comunicados FROM comunicados;
+    `);
+
+    res.status(200).json({
+      totalComunicados: rows[0].total_comunicados
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      erro: "Erro ao buscar quantidade de comunicados"
+    });
+  }
+}

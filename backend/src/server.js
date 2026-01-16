@@ -1,6 +1,7 @@
 //CONMFIGURACOES GERAIS
 import dotenv from "dotenv";
 dotenv.config();
+import path from "path"
 
 //IMPORTS NORMAIS
 import express from "express";
@@ -18,6 +19,8 @@ import {testScrapeEstudantes} from "./functions/estudantes.js"
 import comunicadosRoutes from "./routes/comunicados.routes.js"
 
 const app = express();
+
+
 
 
 app.use(
@@ -38,6 +41,8 @@ app.use("/adminjv", adminjvRoutes);
 
 // app.get('/test/estudantes', testScrapeEstudantes);
 app.use('/comunicados',comunicadosRoutes)
+
+app.use("/uploads", express.static(path.resolve("uploads")))
 
 app.listen(process.env.PORT, () => {
   console.log("Servidor rodando na porta " + process.env.PORT);

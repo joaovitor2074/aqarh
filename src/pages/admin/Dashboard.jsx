@@ -21,30 +21,30 @@ export default function Dashboard() {
   /* =========================
      CARREGAMENTO DE TOTAIS
   ========================= */
-  useEffect(() => {
-    async function carregarDados() {
-      try {
-        const [membrosRes, linhasRes, comunicadosRes] = await Promise.all([
-          fetch("http://localhost:3000/api/membros/quantidade"),
-          fetch("http://localhost:3000/api/linhas-pesquisa/quantidade"),
-          fetch("http://localhost:3000/comunicados/rascunhos"),
-        ])
+useEffect(() => {
+  async function carregarDados() {
+    try {
+      const [membrosRes, linhasRes, comunicadosRes] = await Promise.all([
+        fetch("http://localhost:3000/api/membros/quantidade"),
+        fetch("http://localhost:3000/api/linhas-pesquisa/quantidade"),
+        fetch("http://localhost:3000/comunicados/quantcomunicados"),
+      ])
 
-        const membros = await membrosRes.json()
-        const linhas = await linhasRes.json()
-        const comunicados = await comunicadosRes.json()
+      const membros = await membrosRes.json()
+      const linhas = await linhasRes.json()
+      const comunicados = await comunicadosRes.json()
 
-        setTotalMembros(membros.total)
-        setTotalLinhas(linhas.total)
-        setTotalComunicados(comunicados.length)
-      } catch (error) {
-        console.error(error)
-        toast.error("Erro ao carregar dados do dashboard")
-      }
+      setTotalMembros(membros.total)
+      setTotalLinhas(linhas.total)
+      setTotalComunicados(comunicados.totalComunicados)
+    } catch (error) {
+      console.error(error)
+      toast.error("Erro ao carregar dados do dashboard")
     }
+  }
 
-    carregarDados()
-  }, [])
+  carregarDados()
+}, [])
 
   /* =========================
      SCRAPING

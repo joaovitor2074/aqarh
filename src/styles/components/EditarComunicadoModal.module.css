@@ -1,0 +1,68 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #121212;
+  padding: 24px;
+  width: 500px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+textarea {
+  min-height: 100px;
+}
+
+.dropzone {
+  margin-top: 12px;
+  padding: 20px;
+  border: 2px dashed #555;
+  text-align: center;
+  cursor: pointer;
+}
+
+.preview {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 6px;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save {
+  background: #1e90ff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
