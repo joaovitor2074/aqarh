@@ -1,110 +1,306 @@
 /* ================================
-   HEADER BASE
+   PALETA DE CORES
 ================================ */
-.headerBackground {
-  background-color: #006A4E;
+:root {
+  --primary-dark: #0B3C5D;      /* Cor principal - acadêmica */
+  --primary-main: #123B5A;      /* Cor institucional moderna */
+  --primary-light: #0F2A44;     /* Azul petróleo sóbrio */
+  --accent-color: #00C48C;      /* Verde institucional para destaques */
+  --accent-hover: #00996E;      /* Verde mais escuro para hover */
+  --text-light: #FFFFFF;
+  --text-muted: #B0D4FF;
+  --glass-bg: rgba(15, 42, 68, 0.85);
+  --shadow-primary: 0 8px 32px rgba(11, 60, 93, 0.25);
+  --shadow-elevated: 0 12px 40px rgba(11, 60, 93, 0.35);
+}
+
+/* ================================
+   HEADER PRINCIPAL
+================================ */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-main));
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-primary);
+}
+
+.header.scrolled {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-elevated);
+  height: 75px;
+}
+
+.headerContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 90px;
   display: flex;
   align-items: center;
-  height: 90px;
-}
-
-/* Ajuste da logo no desktop */
-.LogoColor {
-  color: white;
-  margin-left: 4rem;
-  transition: 0.3s ease;
-}
-
-.logoimg{
-  border-radius: 10%;
-  height: auto;
-  width: 195px;
-  margin: 0 50px
-}
-
-.divlogo{
-  margin-right: 4rem;
-}
-
-/* Remove a margem no mobile */
-@media (max-width: 768px) {
-  .LogoColor {
-    margin-left: 30%;
-    font-size: 1.4rem;
-  }
-}
-
-
-/* ================================
-   LINKS DO MENU (DESKTOP)
-================================ */
-.navItem a {
+  justify-content: space-between;
   position: relative;
-  padding-bottom: 4px;
-  transition: color 0.25s ease;
-}
-.navlink {
-  margin: 0 auto;
 }
 
-.navItem a:hover {
-  color: #94ffe2;
-  transition: 0.8s;
-}
-
-.navItem a::after {
-  content: "";
+.headerLine {
   position: absolute;
+  bottom: 0;
   left: 0;
-  bottom: -2px;
-  width: 0;
-  height: 2px;
-  background: #94ffe2;
-  transition: width 0.25s ease;
-}
-
-.navItem a:hover::after {
   width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--accent-color) 20%, 
+    var(--accent-color) 80%, 
+    transparent 100%
+  );
+  opacity: 0.7;
 }
 
 /* ================================
-   BOTÃO CTA
+   LOGO MODERNA
 ================================ */
-.ctaSmooth {
-  background: #00C48C;
-  color: white;
-  padding: 10px 20px;
-  margin: 10%  auto;
-  margin-right: 4rem;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background 0.3s ease, transform 0.3s ease;
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
 }
 
-.ctaSmooth:hover {
-  background: #00996E;
+.logoWrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+  padding: 4px;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.logoGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(0, 196, 140, 0.4) 0%, transparent 70%);
+  filter: blur(10px);
+  z-index: 1;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoMain {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #FFFFFF, #B0D4FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 1px;
+}
+
+.logoSubtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ================================
+   NAVEGAÇÃO DESKTOP
+================================ */
+.navDesktop {
+  flex: 1;
+  max-width: 600px;
+}
+
+.navList {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.navLink:hover {
+  opacity: 1;
+  color: var(--accent-color);
   transform: translateY(-2px);
 }
 
-/* Ajuste CTA no tablet/mobile */
-@media (max-width: 1024px) {
-  .ctaSmooth {
-    margin-right: 1rem;
+.navLink.active {
+  color: var(--accent-color);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.activeIndicator {
+  position: absolute;
+  bottom: -8px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
   }
 }
 
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 20px;
+  height: 2px;
+  background: var(--accent-color);
+  transition: transform 0.3s ease;
+}
+
+.navLink:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
 /* ================================
-   MOBILE MENU SLIDE
+   BOTÃO CTA MODERNO
 ================================ */
-.menuSlideIn {
-  transform: translateX(0);
+.ctaContainer {
+  margin-left: auto;
 }
 
-.menuSlideOut {
-  transform: translateX(100%);
+.ctaButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 196, 140, 0.3);
 }
 
-.fadeIn {
+.ctaButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.ctaButton:hover::before {
+  left: 100%;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 196, 140, 0.4);
+}
+
+.ctaIcon {
+  font-size: 1.2rem;
+}
+
+.ctaText {
+  font-size: 0.95rem;
+}
+
+/* ================================
+   MENU HAMBURGUER MODERNO
+================================ */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1100;
+}
+
+.hamburgerLine {
+  width: 100%;
+  height: 3px;
+  background: var(--text-light);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  transform-origin: left center;
+}
+
+.hamburger:hover .hamburgerLine {
+  background: var(--accent-color);
+}
+
+/* ================================
+   OVERLAY
+================================ */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(11, 60, 93, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 999;
   animation: fadeIn 0.3s ease;
 }
 
@@ -113,7 +309,305 @@
   to { opacity: 1; }
 }
 
-.hamburguer {
+/* ================================
+   MENU MOBILE MODERNO
+================================ */
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--primary-dark), var(--primary-main));
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.menuOpen {
+  transform: translateX(0);
+}
+
+.menuClosed {
+  transform: translateX(100%);
+}
+
+.mobileHeader {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobileLogo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mobileLogoImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.mobileLogoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.closeButton {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  margin-right: 10%;
+}
+
+.closeIcon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--text-light);
+  border-radius: 1px;
+}
+
+.closeIcon:first-child {
+  transform: rotate(45deg);
+}
+
+.closeIcon:last-child {
+  transform: rotate(-45deg);
+}
+
+.closeButton:hover .closeIcon {
+  background: var(--accent-color);
+}
+
+.mobileContent {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.mobileNav {
+  flex: 1;
+}
+
+.mobileList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobileItem {
+  margin-bottom: 0.25rem;
+}
+
+.mobileLink {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  color: var(--text-light);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobileLink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.mobileLink:hover::before {
+  left: 100%;
+}
+
+.mobileLink:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(5px);
+}
+
+.mobileLink.mobileActive {
+  background: rgba(0, 196, 140, 0.15);
+  color: var(--accent-color);
+}
+
+.mobileIcon {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+}
+
+.mobileLabel {
+  flex: 1;
+  font-weight: 500;
+}
+
+.mobileArrow {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.mobileLink:hover .mobileArrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobileFooter {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobileCta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(0, 196, 140, 0.2), rgba(0, 153, 110, 0.2));
+  border: 1px solid rgba(0, 196, 140, 0.3);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.mobileCta:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, rgba(0, 196, 140, 0.3), rgba(0, 153, 110, 0.3));
+  border-color: var(--accent-color);
+}
+
+.mobileCtaIcon {
+  font-size: 1.5rem;
+}
+
+.mobileCtaContent {
+  flex: 1;
+}
+
+.mobileCtaTitle {
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.mobileCtaSubtitle {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+@media (max-width: 1024px) {
+  .headerContainer {
+    padding: 0 1.5rem;
+  }
+  
+  .navList {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 0 1rem;
+    height: 80px;
+  }
+  
+  .header.scrolled {
+    height: 70px;
+  }
+  
+  .logoWrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .logoMain {
+    font-size: 1.5rem;
+  }
+  
+  .navDesktop,
+  .ctaContainer {
+    display: none;
+  }
+  
+  .hamburger {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileMenu {
+    width: 100%;
+  }
+  
+  .logoMain {
+    font-size: 1.3rem;
+  }
+  
+  .logoWrapper {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+/* ================================
+   ANIMAÇÕES E EFEITOS ESPECIAIS
+================================ */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efeito de partículas sutil no header */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(0, 196, 140, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(176, 212, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }

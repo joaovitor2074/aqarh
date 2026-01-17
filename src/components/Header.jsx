@@ -1,109 +1,169 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styles from "../styles/Header.module.css";
-
-
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeMenu, setActiveMenu] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 10);
     }
     window.addEventListener("scroll", handleScroll);
+    
+    // Identificar a página ativa
+    const path = location.pathname.split('/')[1] || 'inicio';
+    setActiveMenu(path);
+    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location]);
 
   return (
     <>
       {/* HEADER */}
       <header
-        className={`
-    fixed top-0 left-0 w-full z-50 
-    flex items-center justify-between 
-    transition-all duration-300 
-    px-4 md:px-6 
-    py-3 md:py-4
-    ${styles.headerBackground}
-  `}
+        className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}
       >
-        {/* Logo */}
-        <div className={`${styles.divlogo} flex items-center gap-3`}>
-          
+        <div className={styles.headerContainer}>
+          {/* Logo com efeito moderno */}
+          <div className={styles.logoContainer}>
+            <div className={styles.logoWrapper}>
+              <img
+                src="/img/header.png"
+                alt="Logo GIEPI"
+                className={styles.logo}
+              />
+              <div className={styles.logoGlow}></div>
+            </div>
+            <div className={styles.logoText}>
+              <span className={styles.logoMain}>GIEPI</span>
+              <span className={styles.logoSubtitle}>Grupo de Pesquisa</span>
+            </div>
+          </div>
 
-          <img
-            src="/img/header.png"
-            alt="Logo GIEPI"
-            className={`${styles.logoimg} w-9 h-9 md:w-11 md:h-11 object-contain`}
-            
-          />
+          {/* Menu Desktop com indicador ativo */}
+          <nav className={styles.navDesktop}>
+            <ul className={styles.navList}>
+              {[
+                { path: "/", label: "Início", key: "inicio" },
+                { path: "/pesquisas", label: "Pesquisas", key: "pesquisas" },
+                { path: "/projetos", label: "Projetos", key: "projetos" },
+                { path: "/publicacoes", label: "Publicações", key: "publicacoes" },
+                { path: "/equipe", label: "Equipe", key: "equipe" },
+              ].map((item) => (
+                <li key={item.key} className={styles.navItem}>
+                  <Link 
+                    to={item.path}
+                    className={`${styles.navLink} ${activeMenu === item.key ? styles.active : ""}`}
+                  >
+                    {item.label}
+                    {activeMenu === item.key && <span className={styles.activeIndicator}></span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* CTA Desktop com gradiente */}
+          <div className={styles.ctaContainer}>
+            <Link
+              to="/publicacoes"
+              className={styles.ctaButton}
+            >
+              <span className={styles.ctaIcon}>📚</span>
+              <span className={styles.ctaText}>Publicações</span>
+            </Link>
+          </div>
+
+          {/* Hamburguer Menu Moderno */}
+          <button
+            className={styles.hamburger}
+            onClick={() => setOpen(true)}
+            aria-label="Abrir menu"
+          >
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+          </button>
         </div>
 
-        {/* Menu Desktop */}
-        <nav className={`${styles.navlink} hidden md:flex`}>
-          <ul className="flex gap-8 text-lg text-white font-medium">
-            <li className={styles.navItem}><Link to="/">Início</Link></li>
-            <li className={styles.navItem}><Link to="/pesquisas">Pesquisas</Link></li>
-            <li className={styles.navItem}><Link to="/projetos">Projetos</Link></li>
-            <li className={styles.navItem}><Link to="/publicacoes">Publicações</Link></li>
-            <li className={styles.navItem}><Link to="/equipe">Equipe</Link></li>
-          </ul>
-        </nav>
-
-        {/* CTA desktop */}
-        <Link
-          to="/publicacoes"
-          className={`hidden md:inline-block ${styles.ctaSmooth}`}
-        >
-          Acessar Publicações
-        </Link>
-
-        {/* Hamburguer */}
-        <button
-          className= {`${styles.hamburguer} md:hidden text-3xl text-white `}
-          onClick={() => setOpen(true)}
-        >
-          ☰
-        </button>
+        {/* Linha decorativa */}
+        <div className={styles.headerLine}></div>
       </header>
-
 
       {/* OVERLAY */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 animate-fadeIn"
+          className={styles.overlay}
           onClick={() => setOpen(false)}
         ></div>
       )}
 
-      {/* MENU MOBILE */}
+      {/* MENU MOBILE Modernizado */}
       <aside
-        className={`
-          fixed top-0 right-0 w-64 h-full bg-white shadow-xl z-50 p-6 
-          transition-transform duration-300 md:hidden
-          ${open ? styles.menuSlideIn : styles.menuSlideOut}
-          ${styles.fadeIn}
-        `}
+        className={`${styles.mobileMenu} ${open ? styles.menuOpen : styles.menuClosed}`}
       >
-        <button className="text-3xl mb-5" onClick={() => setOpen(false)}>✕</button>
+        <div className={styles.mobileHeader}>
+          <div className={styles.mobileLogo}>
+            <img
+              src="/img/header.png"
+              alt="Logo GIEPI"
+              className={styles.mobileLogoImg}
+            />
+            <span className={styles.mobileLogoText}>GIEPI</span>
+          </div>
+          <button 
+            className={styles.closeButton}
+            onClick={() => setOpen(false)}
+            aria-label="Fechar menu"
+          >
+            <span className={styles.closeIcon}></span>
+            <span className={styles.closeIcon}></span>
+          </button>
+        </div>
 
-        <ul className=" flex flex-col gap-5 text-lg text-gray-800">
-          <li><Link to="/" onClick={() => setOpen(false)}>Início</Link></li>
-          <li><Link to="/pesquisas" onClick={() => setOpen(false)}>Pesquisas</Link></li>
-          <li><Link to="/projetos" onClick={() => setOpen(false)}>Projetos</Link></li>
-          <li><Link to="/publicacoes" onClick={() => setOpen(false)}>Publicações</Link></li>
-          <li><Link to="/equipe" onClick={() => setOpen(false)}>Equipe</Link></li>
-        </ul>
+        <div className={styles.mobileContent}>
+          <nav className={styles.mobileNav}>
+            <ul className={styles.mobileList}>
+              {[
+                { path: "/", label: "Início", icon: "🏠" },
+                { path: "/pesquisas", label: "Pesquisas", icon: "🔬" },
+                { path: "/projetos", label: "Projetos", icon: "📋" },
+                { path: "/publicacoes", label: "Publicações", icon: "📚" },
+                { path: "/equipe", label: "Equipe", icon: "👥" },
+              ].map((item, index) => (
+                <li key={index} className={styles.mobileItem}>
+                  <Link 
+                    to={item.path}
+                    className={`${styles.mobileLink} ${activeMenu === item.path.split('/')[1] ? styles.mobileActive : ""}`}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className={styles.mobileIcon}>{item.icon}</span>
+                    <span className={styles.mobileLabel}>{item.label}</span>
+                    <span className={styles.mobileArrow}>→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        <Link
-          to="/publicacoes"
-          onClick={() => setOpen(false)}
-          className={`block  bg-[#006A4E] text-center text-white py-2 rounded-md hover:bg-[#00996E] transition ${styles.ctaSmooth}`}
-        >
-          Acessar Publicações
-        </Link>
+          <div className={styles.mobileFooter}>
+            <Link
+              to="/publicacoes"
+              className={styles.mobileCta}
+              onClick={() => setOpen(false)}
+            >
+              <div className={styles.mobileCtaIcon}>📖</div>
+              <div className={styles.mobileCtaContent}>
+                <div className={styles.mobileCtaTitle}>Acessar Publicações</div>
+                <div className={styles.mobileCtaSubtitle}>Conheça nossas produções científicas</div>
+              </div>
+            </Link>
+          </div>
+        </div>
       </aside>
     </>
   );
