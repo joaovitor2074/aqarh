@@ -39,28 +39,27 @@ export default function LinhasPesquisas() {
 
   // Buscar todas as linhas
   const buscarLinhas = async () => {
-    try {
-      setLoading(true)
-      const data = await api.get("/api/linhas-pesquisa")
-      setLinhas(data || [])
-    } catch (error) {
-      console.error("❌ Erro ao carregar linhas de pesquisa:", error)
-      toast.error(error.message || "Erro ao carregar linhas de pesquisa")
-    } finally {
-      setLoading(false)
-    }
+  try {
+    setLoading(true)
+    const data = await api.get("/linhas-pesquisa") // REMOVER /api
+    setLinhas(data || [])
+  } catch (error) {
+    console.error("❌ Erro ao carregar linhas de pesquisa:", error)
+    toast.error(error.message || "Erro ao carregar linhas de pesquisa")
+  } finally {
+    setLoading(false)
   }
+}
 
-  // Buscar estatísticas
-  const buscarEstatisticas = async () => {
-    try {
-      const data = await api.get("/api/linhas-pesquisa/quantidade")
-      return data
-    } catch (error) {
-      console.error("Erro ao buscar estatísticas:", error)
-      return null
-    }
+const buscarEstatisticas = async () => {
+  try {
+    const data = await api.get("/linhas-pesquisa/quantidade") // REMOVER /api
+    return data
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error)
+    return null
   }
+}
 
   useEffect(() => {
     buscarLinhas()
@@ -92,10 +91,10 @@ export default function LinhasPesquisas() {
     e.preventDefault()
     try {
       if (editing) {
-        await api.put(`/api/linhas-pesquisa/${editing.id}`, form)
+        await api.put(`/linhas-pesquisa/${editing.id}`, form)
         toast.success("Linha de pesquisa atualizada com sucesso!")
       } else {
-        await api.post("/api/linhas-pesquisa", form)
+        await api.post("/linhas-pesquisa", form)
         toast.success("Linha de pesquisa criada com sucesso!")
       }
       
@@ -123,7 +122,7 @@ export default function LinhasPesquisas() {
     if (!confirm("Tem certeza que deseja excluir esta linha de pesquisa?")) return
     
     try {
-      await api.delete(`/api/linhas-pesquisa/${id}`)
+      await api.delete(`/linhas-pesquisa/${id}`)
       toast.success("Linha de pesquisa excluída com sucesso!")
       buscarLinhas()
     } catch (error) {
@@ -133,7 +132,7 @@ export default function LinhasPesquisas() {
 
   const toggleStatus = async (id, atualStatus) => {
     try {
-      await api.patch(`/api/linhas-pesquisa/${id}`, { ativo: !atualStatus })
+      await api.patch(`/linhas-pesquisa/${id}`, { ativo: !atualStatus })
       toast.success(`Linha de pesquisa ${!atualStatus ? 'ativada' : 'desativada'} com sucesso!`)
       buscarLinhas()
     } catch (error) {

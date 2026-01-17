@@ -56,53 +56,53 @@ export default function Membros() {
   })
 
   // Buscar todos os membros
-  const buscarMembros = useCallback(async () => {
-    try {
-      setLoading(true)
-      
-      const params = new URLSearchParams()
-      if (filtroStatus !== "todos") {
-        params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
-      }
-      if (filtroVinculo !== "todos") {
-        params.append("tipo_vinculo", filtroVinculo)
-      }
-      if (filtroTitulacao !== "todos") {
-        params.append("titulacao_maxima", filtroTitulacao)
-      }
-      
-      const query = params.toString()
-      const url = `/api/membros${query ? `?${query}` : ""}`
-      const data = await api.get(url)
-      setMembros(data || [])
-    } catch (error) {
-      console.error("❌ Erro ao carregar membros:", error)
-      toast.error(error.message || "Erro ao carregar membros")
-    } finally {
-      setLoading(false)
+  // Alterar todas as chamadas API
+const buscarMembros = useCallback(async () => {
+  try {
+    setLoading(true)
+    const params = new URLSearchParams()
+    if (filtroStatus !== "todos") {
+      params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
     }
-  }, [filtroStatus, filtroVinculo, filtroTitulacao])
-
-  // Buscar estatísticas
-  const buscarEstatisticas = async () => {
-    try {
-      const data = await api.get("/api/membros/quantidade")
-      setEstatisticas(data)
-    } catch (error) {
-      console.error("Erro ao buscar estatísticas:", error)
+    if (filtroVinculo !== "todos") {
+      params.append("tipo_vinculo", filtroVinculo)
     }
+    if (filtroTitulacao !== "todos") {
+      params.append("titulacao_maxima", filtroTitulacao)
+    }
+    
+    const query = params.toString()
+    const url = `/membros${query ? `?${query}` : ""}` // REMOVER /api
+    const data = await api.get(url)
+    setMembros(data || [])
+  } catch (error) {
+    console.error("❌ Erro ao carregar membros:", error)
+    toast.error(error.message || "Erro ao carregar membros")
+  } finally {
+    setLoading(false)
   }
+}, [filtroStatus, filtroVinculo, filtroTitulacao])
+
+const buscarEstatisticas = async () => {
+  try {
+    const data = await api.get("/membros/quantidade") // REMOVER /api
+    setEstatisticas(data)
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error)
+  }
+}
+
 
   // Buscar linhas de pesquisa para o select
   const [linhasPesquisa, setLinhasPesquisa] = useState([])
   const buscarLinhasPesquisa = async () => {
-    try {
-      const data = await api.get("/api/linhas-pesquisa")
-      setLinhasPesquisa(data || [])
-    } catch (error) {
-      console.error("Erro ao buscar linhas de pesquisa:", error)
-    }
+  try {
+    const data = await api.get("/linhas-pesquisa") // REMOVER /api
+    setLinhasPesquisa(data || [])
+  } catch (error) {
+    console.error("Erro ao buscar linhas de pesquisa:", error)
   }
+}
 
   useEffect(() => {
     buscarMembros()
@@ -125,10 +125,10 @@ export default function Membros() {
     e.preventDefault()
     try {
       if (editing) {
-        await api.put(`/api/membros/${editing.id}`, form)
+        await api.put(`/membros/${editing.id}`, form)
         toast.success("Membro atualizado com sucesso!")
       } else {
-        await api.post("/api/membros", form)
+        await api.post("/membros", form)
         toast.success("Membro criado com sucesso!")
       }
       
@@ -180,7 +180,7 @@ export default function Membros() {
     if (!confirm("Tem certeza que deseja excluir este membro?")) return
     
     try {
-      await api.delete(`/api/membros/${id}`)
+      await api.delete(`/membros/${id}`)
       toast.success("Membro excluído com sucesso!")
       buscarMembros()
       buscarEstatisticas()
@@ -191,7 +191,7 @@ export default function Membros() {
 
   const toggleStatus = async (id, atualStatus) => {
     try {
-      await api.patch(`/api/membros/${id}`, { ativo: !atualStatus })
+      await api.patch(`/membros/${id}`, { ativo: !atualStatus })
       toast.success(`Membro ${!atualStatus ? 'ativado' : 'desativado'} com sucesso!`)
       buscarMembros()
       buscarEstatisticas()

@@ -1,4 +1,3 @@
-// frontend/pages/admin/comunicados.jsx
 import { useState, useEffect, useCallback } from 'react'
 import AdminLayout from '../../layout/AdminLayout'
 import Button from '../../ui/Button'
@@ -13,7 +12,8 @@ import {
   FaRedo,
   FaPlus,
   FaFilter,
-  FaSpinner
+  FaSpinner,
+  FaSync
 } from 'react-icons/fa'
 import styles from '../../styles/adminPages/comunicados.module.css'
 import Modal from '../../ui/Modal'
@@ -30,6 +30,7 @@ export default function Comunicados() {
   const [statusSelecionado, setStatusSelecionado] = useState("rascunho")
   const [tipoSelecionado, setTipoSelecionado] = useState("todos")
   const [estatisticas, setEstatisticas] = useState(null)
+  const [atualizando, setAtualizando] = useState(false)
   
   // Modal de novo comunicado
   const [modalNovoOpen, setModalNovoOpen] = useState(false)
@@ -49,6 +50,8 @@ export default function Comunicados() {
   const buscarComunicados = useCallback(async () => {
     try {
       setLoading(true)
+      console.log("🔍 Buscando comunicados com filtros:", { statusSelecionado, tipoSelecionado })
+      
       const filtros = {}
       
       if (statusSelecionado !== 'todos') {
@@ -60,18 +63,32 @@ export default function Comunicados() {
       }
       
       const data = await comunicadosService.buscarTodos(filtros)
+      console.log("📦 Comunicados recebidos:", data)
       setComunicados(data.comunicados || [])
       
       // Buscar estatísticas separadamente
       const stats = await comunicadosService.buscarEstatisticas()
       setEstatisticas(stats)
     } catch (error) {
-      console.error('Erro ao buscar comunicados:', error)
+      console.error('❌ Erro ao buscar comunicados:', error)
       alert(`Erro ao carregar comunicados: ${error.message}`)
     } finally {
       setLoading(false)
     }
   }, [statusSelecionado, tipoSelecionado])
+
+  // Forçar atualização
+  const forcarAtualizacao = async () => {
+    try {
+      setAtualizando(true)
+      await buscarComunicados()
+      alert('Lista atualizada com sucesso!')
+    } catch (error) {
+      console.error('Erro ao atualizar:', error)
+    } finally {
+      setAtualizando(false)
+    }
+  }
 
   // Efeito inicial
   useEffect(() => {
@@ -82,7 +99,12 @@ export default function Comunicados() {
   const handleNovoChange = (e) => {
     const { name, value, files } = e.target
     if (name === 'imagem') {
-      setFormNovo(prev => ({ ...prev, imagem: files[0] }))
+      setFormNovo(prev => ({ 
+        ...prev, 
+        imagem: files[0],
+        _hasImage: !!files[0] 
+      }))
+      console.log("📸 Imagem selecionada:", files[0])
     } else {
       setFormNovo(prev => ({ ...prev, [name]: value }))
     }
@@ -96,6 +118,8 @@ export default function Comunicados() {
       }
       
       setEnviando(true)
+      console.log("📤 Criando novo comunicado:", formNovo)
+      
       await comunicadosService.criar(formNovo)
       
       alert('Comunicado criado com sucesso!')
@@ -105,12 +129,18 @@ export default function Comunicados() {
         titulo: "",
         descricao: "",
         tipo: "estudante",
-        imagem: null
+        imagem: null,
+        _hasImage: false
       })
       setModalNovoOpen(false)
-      buscarComunicados()
+      
+      // Pequeno delay para garantir que o backend processou
+      setTimeout(() => {
+        buscarComunicados()
+      }, 500)
+      
     } catch (error) {
-      console.error('Erro ao criar comunicado:', error)
+      console.error('❌ Erro ao criar comunicado:', error)
       alert(`Erro: ${error.message}`)
     } finally {
       setEnviando(false)
@@ -119,21 +149,32 @@ export default function Comunicados() {
 
   // Handlers para edição
   const abrirEdicao = (comunicado) => {
+    console.log("✏️ Abrindo edição para:", comunicado)
     setComunicadoSelecionado(comunicado)
     setModalEditOpen(true)
   }
 
   const salvarComunicado = async (formData) => {
     try {
-      await comunicadosService.atualizar(formData.id, formData)
+      console.log("💾 Salvando comunicado:", formData)
+      
+      const resultado = await comunicadosService.atualizar(formData.id, formData)
+      console.log("✅ Comunicado salvo:", resultado)
+      
       alert('Comunicado atualizado com sucesso!')
       
       // Fechar modal e atualizar lista
       setModalEditOpen(false)
-      buscarComunicados()
+      setComunicadoSelecionado(null)
+      
+      // Pequeno delay para garantir que o backend processou
+      setTimeout(() => {
+        buscarComunicados()
+      }, 500)
+      
       return true
     } catch (error) {
-      console.error('Erro ao salvar comunicado:', error)
+      console.error('❌ Erro ao salvar comunicado:', error)
       alert(`Erro: ${error.message}`)
       throw error
     }
@@ -146,9 +187,14 @@ export default function Comunicados() {
     try {
       await acao(id)
       alert('Ação realizada com sucesso!')
-      buscarComunicados()
+      
+      // Pequeno delay para garantir que o backend processou
+      setTimeout(() => {
+        buscarComunicados()
+      }, 300)
+      
     } catch (error) {
-      console.error('Erro:', error)
+      console.error('❌ Erro:', error)
       alert(`Erro: ${error.message}`)
     }
   }
@@ -193,6 +239,22 @@ export default function Comunicados() {
     return labels[tipo] || tipo
   }
 
+  // Helper para mostrar imagem
+  const getImagemPreview = (comunicado) => {
+    if (comunicado.imagem) {
+      return (
+        <div className={styles.imagemPreview} title="Tem imagem">
+          📷
+        </div>
+      )
+    }
+    return (
+      <div className={styles.imagemDefault} title="Imagem padrão">
+        🏷️
+      </div>
+    )
+  }
+
   return (
     <AdminLayout>
       {/* Header com estatísticas */}
@@ -200,23 +262,35 @@ export default function Comunicados() {
         <div>
           <h1 className={styles.tituloCom}>Comunicados</h1>
           <p className={styles.subtitulo}>
-            {estatisticas && (
+            {estatisticas ? (
               <>
                 Total: {estatisticas.total} | 
                 Ativos: {estatisticas.ativos} | 
                 Rascunhos: {estatisticas.rascunhos} | 
                 Arquivados: {estatisticas.arquivados}
               </>
-            )}
+            ) : 'Carregando estatísticas...'}
           </p>
         </div>
         
-        <Button 
-          onClick={() => setModalNovoOpen(true)}
-          className={styles.btnNovo}
-        >
-          <FaPlus /> Novo Comunicado
-        </Button>
+        <div className={styles.headerActions}>
+          <Button 
+            onClick={forcarAtualizacao}
+            variant="outline"
+            disabled={atualizando}
+            title="Atualizar lista"
+          >
+            <FaSync className={atualizando ? styles.spinning : ''} />
+            {atualizando ? ' Atualizando...' : ' Atualizar'}
+          </Button>
+          
+          <Button 
+            onClick={() => setModalNovoOpen(true)}
+            className={styles.btnNovo}
+          >
+            <FaPlus /> Novo Comunicado
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -283,6 +357,10 @@ export default function Comunicados() {
         ) : comunicadosFiltrados.length === 0 ? (
           <div className={styles.emptyState}>
             <p>Nenhum comunicado encontrado</p>
+            <p className={styles.emptySubtitle}>
+              {statusSelecionado !== 'todos' && `para o status "${statusSelecionado}"`}
+              {tipoSelecionado !== 'todos' && ` e tipo "${getTipoLabel(tipoSelecionado)}"`}
+            </p>
             <Button onClick={() => setModalNovoOpen(true)}>
               <FaPlus /> Criar primeiro comunicado
             </Button>
@@ -295,6 +373,7 @@ export default function Comunicados() {
                   <th>Título</th>
                   <th>Descrição</th>
                   <th>Tipo</th>
+                  <th>Imagem</th>
                   <th>Status</th>
                   <th>Criado em</th>
                   <th>Ações</th>
@@ -305,11 +384,6 @@ export default function Comunicados() {
                   <tr key={com.id}>
                     <td className={styles.colTitulo}>
                       <strong>{com.titulo}</strong>
-                      {com.imagem && (
-                        <div className={styles.imagemIndicator}>
-                          📷
-                        </div>
-                      )}
                     </td>
                     <td className={styles.colDescricao}>
                       {com.descricao?.substring(0, 100)}
@@ -318,11 +392,20 @@ export default function Comunicados() {
                     <td>
                       {getTipoLabel(com.tipo)}
                     </td>
+                    <td className={styles.colImagem}>
+                      {getImagemPreview(com)}
+                    </td>
                     <td>
                       {getStatusBadge(com.status)}
                     </td>
                     <td>
                       {new Date(com.criado_em).toLocaleDateString('pt-BR')}
+                      <div className={styles.dataHora}>
+                        {new Date(com.criado_em).toLocaleTimeString('pt-BR', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </div>
                     </td>
                     <td className={styles.colAcoes}>
                       {com.status === "rascunho" && (
@@ -453,8 +536,15 @@ export default function Comunicados() {
               disabled={enviando}
             />
             <small className={styles.helpText}>
-              Formatos: JPG, PNG, GIF, WebP (máx. 5MB)
+              Formatos: JPG, PNG, GIF, WebP (máx. 5MB). 
+              {!formNovo.imagem && " Se não selecionar, será usada a imagem padrão para o tipo escolhido."}
             </small>
+            {formNovo.imagem && (
+              <div className={styles.fileInfo}>
+                <strong>Arquivo selecionado:</strong> {formNovo.imagem.name} 
+                ({Math.round(formNovo.imagem.size / 1024)} KB)
+              </div>
+            )}
           </FormGroup>
 
           <div className={styles.modalActions}>
@@ -483,7 +573,10 @@ export default function Comunicados() {
       {/* Modal de edição */}
       <EditarComunicadoModal
         isOpen={modalEditOpen}
-        onClose={() => setModalEditOpen(false)}
+        onClose={() => {
+          setModalEditOpen(false)
+          setComunicadoSelecionado(null)
+        }}
         comunicado={comunicadoSelecionado}
         onSave={salvarComunicado}
       />

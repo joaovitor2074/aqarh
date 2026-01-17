@@ -8,6 +8,8 @@ import Pesquisas from './pages/Pesquisas'
 import Publicacoes from './pages/Publicacoes'
 import Equipe from './pages/Equipe'
 import Login from './pages/admin/Login'
+import { useState,useEffect } from 'react'
+import { setupInterceptor } from './utils/authInterceptor';
 
 //admin
 import Dashboard from './pages/admin/Dashboard'
@@ -26,6 +28,15 @@ import { Toaster } from "react-hot-toast"
 import ProtectedRoute from './components/ProtectedRoute'
 
 function AppContent() {
+   useEffect(() => {
+        setupInterceptor();
+        
+        // Verificar token em todas as requisições
+        const token = localStorage.getItem('token');
+        if (!token && window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
+    }, []);
   const location = useLocation()
 
   // Esconde header e footer na página de login

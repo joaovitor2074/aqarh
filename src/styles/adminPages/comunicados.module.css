@@ -199,3 +199,60 @@
   padding-top: 1rem;
   border-top: 1px solid #eee;
 }
+/* Adicione estas classes ao seu arquivo CSS existente */
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.headerActions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.emptySubtitle {
+  color: #6b7280;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.colImagem {
+  text-align: center;
+}
+
+.imagemPreview, .imagemDefault {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.imagemPreview {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.imagemDefault {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.dataHora {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.fileInfo {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f0f9ff;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #0369a1;
+}
