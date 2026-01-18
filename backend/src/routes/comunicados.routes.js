@@ -7,7 +7,9 @@ import {
   ArquivarComunicado, 
   ReativarComunicado,
   MostrarQuantidadeComunicados,
-  DeletarComunicado
+  DeletarComunicado,
+  atividadesRecentes
+
 } from "../controllers/comunicados.controller.js"
 import { upload } from "../middlewares/upload.js"
 
@@ -36,5 +38,8 @@ router.get("/quantidade", MostrarQuantidadeComunicados)
 
 // DELETE /comunicados/:id - Deletar comunicado
 router.delete("/:id", DeletarComunicado)
+
+router.get("/recentes",atividadesRecentes)
+
 
 export default router

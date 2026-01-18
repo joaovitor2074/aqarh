@@ -500,3 +500,20 @@ export async function DeletarComunicado(req, res) {
         })
     }
 }
+
+export async function atividadesRecentes(req, res) {
+  try {
+    const [rows] = await db.query(`
+      SELECT id, tipo, titulo, descricao, criado_em
+      FROM comunicados
+      WHERE status = 'ativo'
+      ORDER BY criado_em DESC
+      LIMIT 5
+    `)
+
+    res.json(rows)
+  } catch (err) {
+    res.status(500).json({ erro: "Erro ao buscar atividades" })
+  }
+}
+

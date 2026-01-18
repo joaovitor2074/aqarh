@@ -1,17 +1,12 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from "../../layout/AdminLayout";
 import '../../styles/adminPages/Config.css';
+import { useConfig } from "../../contexts/ConfigContext";
 
 export default function Config() {
-    // Estados para diferentes seções de configurações
-    const [configuracoesGerais, setConfiguracoesGerais] = useState({
-        nomeSistema: 'Sistema Administrativo',
-        descricao: 'Plataforma de gerenciamento',
-        modoManutencao: false,
-        idioma: 'pt-BR',
-        timezone: 'America/Sao_Paulo',
-        limiteSessoes: 5,
-    });
+    
+    
+    const { configuracoesGerais, setConfiguracoesGerais } = useConfig();
 
     const [funcionalidades, setFuncionalidades] = useState({
         moduloUsuarios: true,
@@ -112,6 +107,7 @@ export default function Config() {
             setMensagem({ tipo: 'sucesso', texto: `Configurações de ${secao} salvas com sucesso!` });
             setLoading(false);
         }, 1000);
+        
     };
 
     const handleScrapingAction = (acao) => {

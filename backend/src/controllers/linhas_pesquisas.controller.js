@@ -48,3 +48,23 @@ ORDER BY lp.nome ASC;
   }
 }
 
+
+export async function ultimasLinha(req, res) {
+  try {
+    const [rows] = await db.query(`
+      SELECT *
+      FROM linhas_pesquisa
+      ORDER BY created_at DESC
+      LIMIT 3
+    `);
+
+    return res.status(200).json(rows);
+  } catch (error) {
+    console.error("Erro ao buscar últimas linhas:", error);
+    return res.status(500).json({
+      message: "Erro ao buscar as últimas linhas de pesquisa"
+    });
+  }
+}
+
+

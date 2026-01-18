@@ -10,6 +10,7 @@ import Equipe from './pages/Equipe'
 import Login from './pages/admin/Login'
 import { useState,useEffect } from 'react'
 import { setupInterceptor } from './utils/authInterceptor';
+import { ConfigProvider } from "../src/contexts/ConfigContext"
 
 //admin
 import Dashboard from './pages/admin/Dashboard'
@@ -43,6 +44,8 @@ function AppContent() {
   const hideLayout = location.pathname === "/login" || location.pathname === "/admin/adelton" || location.pathname === "/admin/pesquisador" || location.pathname === "/admin/membros" || location.pathname === "/admin/projetos" || location.pathname === "/admin/linhaspesquisas" || location.pathname === "/admin/comunicados" || location.pathname === "/admin/config" || location.pathname === "/admin/dashboard" || location.pathname === "/admin/notificacoes"
 
   return (
+    <ConfigProvider>
+
     <div className="app-root">
       {!hideLayout && <Header />}
        <Toaster
@@ -70,7 +73,7 @@ function AppContent() {
                 <Dashboard />
               </ProtectedRoute>
             }
-          />
+            />
 
           <Route
             path="/admin/dashboard"
@@ -89,7 +92,7 @@ function AppContent() {
                 <div>Pesquisador Dashboard</div>
               </ProtectedRoute>
             }
-          />
+            />
           <Route
             path="/admin/membros"
             element={
@@ -97,7 +100,7 @@ function AppContent() {
                 <Membros />
               </ProtectedRoute>
             }
-          />
+            />
 
           <Route
             path="/admin/projetos"
@@ -106,7 +109,7 @@ function AppContent() {
                 <Admprojetos />
               </ProtectedRoute>
             }
-          />
+            />
 
           <Route
             path="/admin/linhaspesquisas"
@@ -124,7 +127,7 @@ function AppContent() {
                 <Comunicados />
               </ProtectedRoute>
             }
-          />
+            />
 
           <Route
           path='/admin/notificacoes'
@@ -147,7 +150,7 @@ function AppContent() {
                 <Config />
               </ProtectedRoute>
             }
-          />
+            />
 
 
 
@@ -164,6 +167,7 @@ function AppContent() {
 
       {!hideLayout && <Footer />}
     </div>
+</ConfigProvider>
   )
 }
 
