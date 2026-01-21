@@ -1,95 +1,170 @@
-//CONMFIGURACOES GERAIS
+/**
+ * =====================================================
+ * CONFIGURAÇÕES INICIAIS (ENV)
+ * =====================================================
+ * Carrega variáveis de ambiente do arquivo .env
+ */
 import dotenv from "dotenv";
 dotenv.config();
 
-//IMPORTS NORMAIS
+/**
+ * =====================================================
+ * IMPORTAÇÕES PRINCIPAIS
+ * =====================================================
+ */
 import express from "express";
 import cors from "cors";
-import path from "path"
-import { fileURLToPath } from "url"
-import fs from "fs"
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+/**
+ * =====================================================
+ * AJUSTE DE __dirname PARA ES MODULES
+ * =====================================================
+ * Necessário porque estamos usando "type": "module"
+ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Importações das rotas
+/**
+ * =====================================================
+ * IMPORTAÇÃO DAS ROTAS DA APLICAÇÃO
+ * =====================================================
+ */
 import authRoutes from "./routes/auth.routes.js";
 import membrosRoutes from "./routes/membros.routes.js";
 import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
+import comunicadosRoutes from "./routes/comunicados.routes.js";
 import adminjvRoutes from "./routes/adminjv.routes.js";
-import comunicadosRoutes from "./routes/comunicados.routes.js"
 
+// Rotas de e-mail compiladas pelo TypeScript (dist)
+import mailRoutes from "../dist/routes/mail.routes.js";
+
+/**
+ * =====================================================
+ * INICIALIZAÇÃO DO EXPRESS
+ * =====================================================
+ */
 const app = express();
 
-// Middlewares
+/**
+ * =====================================================
+ * MIDDLEWARES GLOBAIS
+ * =====================================================
+ */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Frontend (Vite)
     credentials: true,
   })
 );
-app.use(express.urlencoded({ extended: true }))
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ========== VERIFICAÇÃO DE PASTAS ==========
-const publicPath = path.join(__dirname, '..', 'public');
+/**
+ * =====================================================
+ * CONFIGURAÇÃO E VERIFICAÇÃO DA PASTA /public
+ * =====================================================
+ * Responsável por uploads e imagens públicas
+ */
+const publicPath = path.join(__dirname, "..", "public");
 
-// Verifica se a pasta public existe
+// Cria a pasta public se não existir
 if (!fs.existsSync(publicPath)) {
-  console.log('📁 Criando pasta public...');
   fs.mkdirSync(publicPath, { recursive: true });
+  console.log("📁 Pasta public criada");
 }
 
-// Cria subpastas necessárias
-const subfolders = [
-  'img/defaults',
-  'uploads'
-];
+// Subpastas necessárias
+const subfolders = ["img/defaults", "uploads"];
 
-subfolders.forEach(folder => {
-  const folderPath = path.join(publicPath, ...folder.split('/'));
+subfolders.forEach((folder) => {
+  const folderPath = path.join(publicPath, ...folder.split("/"));
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath, { recursive: true });
     console.log(`📁 Criada pasta: ${folderPath}`);
   }
 });
 
-// ========== ROTAS ESTÁTICAS - APENAS UMA CONFIGURAÇÃO ==========
-// Serve TODOS os arquivos estáticos da pasta public
-console.log('📁 Servindo arquivos estáticos de:', publicPath);
+/**
+ * =====================================================
+ * ARQUIVOS ESTÁTICOS
+ * =====================================================
+ * Permite acessar arquivos via URL
+ * Ex: /uploads/imagem.png
+ */
 app.use(express.static(publicPath));
 
-// ========== ROTAS DA API ==========
+/**
+ * =====================================================
+ * ROTAS DA API
+ * =====================================================
+ */
 app.use("/api", authRoutes);
 app.use("/api/membros", membrosRoutes);
 app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
-app.use('/api/comunicados', comunicadosRoutes);
+app.use("/api/comunicados", comunicadosRoutes);
+app.use("/api/mail", mailRoutes);
 app.use("/adminjv", adminjvRoutes);
 
-// ========== ROTAS DE DEBUG ==========
-app.get('/debug-public', (req, res) => {
+/**
+ * =====================================================
+ * ROTA DE DEBUG (APENAS DESENVOLVIMENTO)
+ * =====================================================
+ * Verifica arquivos disponíveis na pasta public
+ */
+app.get("/debug-public", (req, res) => {
   try {
     const files = {
-      defaults: fs.readdirSync(path.join(publicPath, 'img', 'defaults')),
-      uploads: fs.readdirSync(path.join(publicPath, 'uploads'))
+      defaults: fs.readdirSync(path.join(publicPath, "img", "defaults")),
+      uploads: fs.readdirSync(path.join(publicPath, "uploads")),
     };
-    
+
     res.json({
-      publicPath: publicPath,
-      files: files,
+      publicPath,
+      files,
       accessibleUrls: {
-        defaults: files.defaults.map(f => `http://localhost:${process.env.PORT}/img/defaults/${f}`),
-        uploads: files.uploads.map(f => `http://localhost:${process.env.PORT}/uploads/${f}`)
-      }
+        defaults: files.defaults.map(
+          (f) => `http://localhost:${process.env.PORT}/img/defaults/${f}`
+        ),
+        uploads: files.uploads.map(
+          (f) => `http://localhost:${process.env.PORT}/uploads/${f}`
+        ),
+      },
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+/**
+ * =====================================================
+ * INICIALIZAÇÃO DO SERVIDOR
+ * =====================================================
+ */
 app.listen(process.env.PORT, () => {
-  console.log("🚀 Servidor rodando na porta " + process.env.PORT);
+  console.log(`🚀 Servidor rodando na porta ${process.env.PORT}`);
   console.log("📁 Pasta public:", publicPath);
-  console.log("\n🌐 URLs para teste:");
-  console.log(`   Debug: http://localhost:${process.env.PORT}/debug-public`);
+  console.log(
+    `🌐 Debug: http://localhost:${process.env.PORT}/debug-public`
+  );
 });
+
+/**
+ * =====================================================
+ * TESTE DE CONEXÃO COM O BANCO DE DADOS
+ * =====================================================
+ * Executado apenas na inicialização do servidor
+ */
+import { db } from "./config/db.js";
+
+(async () => {
+  try {
+    await db.query("SELECT 1");
+    console.log("✅ Conectado ao MySQL com sucesso");
+  } catch (err) {
+    console.error("❌ Erro ao conectar no MySQL:", err.message);
+  }
+})();

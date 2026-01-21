@@ -34,12 +34,12 @@ export default function Membros() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [estatisticas, setEstatisticas] = useState(null)
-  
+
   // Filtros
   const [filtroStatus, setFiltroStatus] = useState("todos")
   const [filtroVinculo, setFiltroVinculo] = useState("todos")
   const [filtroTitulacao, setFiltroTitulacao] = useState("todos")
-  
+
   // Formulário
   const [form, setForm] = useState({
     nome: "",
@@ -57,52 +57,52 @@ export default function Membros() {
 
   // Buscar todos os membros
   // Alterar todas as chamadas API
-const buscarMembros = useCallback(async () => {
-  try {
-    setLoading(true)
-    const params = new URLSearchParams()
-    if (filtroStatus !== "todos") {
-      params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
-    }
-    if (filtroVinculo !== "todos") {
-      params.append("tipo_vinculo", filtroVinculo)
-    }
-    if (filtroTitulacao !== "todos") {
-      params.append("titulacao_maxima", filtroTitulacao)
-    }
-    
-    const query = params.toString()
-    const url = `/membros${query ? `?${query}` : ""}` // REMOVER /api
-    const data = await api.get(url)
-    setMembros(data || [])
-  } catch (error) {
-    console.error("❌ Erro ao carregar membros:", error)
-    toast.error(error.message || "Erro ao carregar membros")
-  } finally {
-    setLoading(false)
-  }
-}, [filtroStatus, filtroVinculo, filtroTitulacao])
+  const buscarMembros = useCallback(async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (filtroStatus !== "todos") {
+        params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
+      }
+      if (filtroVinculo !== "todos") {
+        params.append("tipo_vinculo", filtroVinculo)
+      }
+      if (filtroTitulacao !== "todos") {
+        params.append("titulacao_maxima", filtroTitulacao)
+      }
 
-const buscarEstatisticas = async () => {
-  try {
-    const data = await api.get("/membros/quantidade") // REMOVER /api
-    setEstatisticas(data)
-  } catch (error) {
-    console.error("Erro ao buscar estatísticas:", error)
+      const query = params.toString()
+      const url = `/membros${query ? `?${query}` : ""}` // REMOVER /api
+      const data = await api.get(url)
+      setMembros(data || [])
+    } catch (error) {
+      console.error("❌ Erro ao carregar membros:", error)
+      toast.error(error.message || "Erro ao carregar membros")
+    } finally {
+      setLoading(false)
+    }
+  }, [filtroStatus, filtroVinculo, filtroTitulacao])
+
+  const buscarEstatisticas = async () => {
+    try {
+      const data = await api.get("/membros/quantidade") // REMOVER /api
+      setEstatisticas(data)
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas:", error)
+    }
   }
-}
 
 
   // Buscar linhas de pesquisa para o select
   const [linhasPesquisa, setLinhasPesquisa] = useState([])
   const buscarLinhasPesquisa = async () => {
-  try {
-    const data = await api.get("/linhas-pesquisa") // REMOVER /api
-    setLinhasPesquisa(data || [])
-  } catch (error) {
-    console.error("Erro ao buscar linhas de pesquisa:", error)
+    try {
+      const data = await api.get("/linhas-pesquisa") // REMOVER /api
+      setLinhasPesquisa(data || [])
+    } catch (error) {
+      console.error("Erro ao buscar linhas de pesquisa:", error)
+    }
   }
-}
 
   useEffect(() => {
     buscarMembros()
@@ -131,7 +131,7 @@ const buscarEstatisticas = async () => {
         await api.post("/membros", form)
         toast.success("Membro criado com sucesso!")
       }
-      
+
       setModalOpen(false)
       setEditing(null)
       resetForm()
@@ -178,7 +178,7 @@ const buscarEstatisticas = async () => {
 
   const handleDelete = async (id) => {
     if (!confirm("Tem certeza que deseja excluir este membro?")) return
-    
+
     try {
       await api.delete(`/membros/${id}`)
       toast.success("Membro excluído com sucesso!")
@@ -210,16 +210,16 @@ const buscarEstatisticas = async () => {
             <p className={styles.subtitle}>
               {estatisticas && (
                 <>
-                  Total: {estatisticas.total} | 
-                  Ativos: {estatisticas.ativos} | 
-                  Pesquisadores: {estatisticas.pesquisadores} | 
+                  Total: {estatisticas.total} |
+                  Ativos: {estatisticas.ativos} |
+                  Pesquisadores: {estatisticas.pesquisadores} |
                   Estudantes: {estatisticas.estudantes}
                 </>
               )}
             </p>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => setModalOpen(true)}
             className={styles.btnNovo}
           >
@@ -233,24 +233,24 @@ const buscarEstatisticas = async () => {
             <FaFilter />
             <h3>Filtros</h3>
           </div>
-          
+
           <div className={styles.filtrosGrid}>
             <div className={styles.filtroGroup}>
               <label>Status</label>
               <div className={styles.filtroBotoes}>
-                <Button 
+                <Button
                   onClick={() => setFiltroStatus("todos")}
                   variant={filtroStatus === "todos" ? "primary" : "outline"}
                 >
                   Todos
                 </Button>
-                <Button 
+                <Button
                   onClick={() => setFiltroStatus("ativo")}
                   variant={filtroStatus === "ativo" ? "primary" : "outline"}
                 >
                   <FaCheckCircle /> Ativos
                 </Button>
-                <Button 
+                <Button
                   onClick={() => setFiltroStatus("inativo")}
                   variant={filtroStatus === "inativo" ? "primary" : "outline"}
                 >
@@ -258,7 +258,7 @@ const buscarEstatisticas = async () => {
                 </Button>
               </div>
             </div>
-            
+
             <div className={styles.filtroGroup}>
               <label>Tipo de Vínculo</label>
               <Select
@@ -272,7 +272,7 @@ const buscarEstatisticas = async () => {
                 ]}
               />
             </div>
-            
+
             <div className={styles.filtroGroup}>
               <label>Titulação</label>
               <Select
@@ -341,7 +341,7 @@ const buscarEstatisticas = async () => {
                           )}
                         </div>
                       </td>
-                      
+
                       <td>
                         <div className={styles.contato}>
                           {membro.email && (
@@ -361,7 +361,7 @@ const buscarEstatisticas = async () => {
                           )}
                         </div>
                       </td>
-                      
+
                       <td>
                         <div className={styles.titulacao}>
                           <FaGraduationCap />
@@ -374,24 +374,24 @@ const buscarEstatisticas = async () => {
                           </div>
                         )}
                       </td>
-                      
+
                       <td>
                         <span className={`${styles.vinculo} ${styles[membro.tipo_vinculo]}`}>
-                          {membro.tipo_vinculo === "pesquisador" ? "Pesquisador" : 
-                           membro.tipo_vinculo === "estudante" ? "Estudante" : 
-                           membro.tipo_vinculo === "colaborador" ? "Colaborador" : 
-                           membro.tipo_vinculo}
+                          {membro.tipo_vinculo === "pesquisador" ? "Pesquisador" :
+                            membro.tipo_vinculo === "estudante" ? "Estudante" :
+                              membro.tipo_vinculo === "colaborador" ? "Colaborador" :
+                                membro.tipo_vinculo}
                         </span>
                       </td>
-                      
+
                       <td>
                         <span className={`${styles.status} ${membro.ativo ? styles.ativo : styles.inativo}`}>
                           {membro.ativo ? "Ativo" : "Inativo"}
                         </span>
                       </td>
-                      
+
                       <td className={styles.colAcoes}>
-                        <Button 
+                        <Button
                           onClick={() => handleEdit(membro)}
                           variant="outline"
                           size="sm"
@@ -399,8 +399,8 @@ const buscarEstatisticas = async () => {
                         >
                           <FaEdit />
                         </Button>
-                        
-                        <Button 
+
+                        <Button
                           onClick={() => toggleStatus(membro.id, membro.ativo)}
                           variant={membro.ativo ? "warning" : "success"}
                           size="sm"
@@ -408,8 +408,18 @@ const buscarEstatisticas = async () => {
                         >
                           {membro.ativo ? <FaTimesCircle /> : <FaCheckCircle />}
                         </Button>
-                        
-                        <Button 
+
+                        {/* NOVO BOTÃO — ENVIAR EMAIL */}
+                        <Button
+                          onClick={() => handleSendEmail(membro)}
+                          variant="info"
+                          size="sm"
+                          title="Enviar e-mail"
+                        >
+                          <FaEnvelope />
+                        </Button>
+
+                        <Button
                           onClick={() => handleDelete(membro.id)}
                           variant="danger"
                           size="sm"
@@ -418,6 +428,7 @@ const buscarEstatisticas = async () => {
                           <FaTrash />
                         </Button>
                       </td>
+
                     </tr>
                   ))}
                 </tbody>
@@ -448,7 +459,7 @@ const buscarEstatisticas = async () => {
                   required
                 />
               </FormGroup>
-              
+
               <FormGroup label="Email" className={styles.formGroup}>
                 <Input
                   name="email"
@@ -459,7 +470,7 @@ const buscarEstatisticas = async () => {
                 />
               </FormGroup>
             </div>
-            
+
             <div className={styles.formRow}>
               <FormGroup label="Tipo de Vínculo *" className={styles.formGroup}>
                 <Select
@@ -474,7 +485,7 @@ const buscarEstatisticas = async () => {
                   required
                 />
               </FormGroup>
-              
+
               <FormGroup label="Titulação Máxima" className={styles.formGroup}>
                 <Input
                   name="titulacao_maxima"
@@ -484,7 +495,7 @@ const buscarEstatisticas = async () => {
                 />
               </FormGroup>
             </div>
-            
+
             <div className={styles.formRow}>
               <FormGroup label="Data de Inclusão" className={styles.formGroup}>
                 <Input
@@ -494,7 +505,7 @@ const buscarEstatisticas = async () => {
                   onChange={handleChange}
                 />
               </FormGroup>
-              
+
               <FormGroup label="Linha de Pesquisa" className={styles.formGroup}>
                 <Select
                   name="linha_pesquisa_id"
@@ -510,7 +521,7 @@ const buscarEstatisticas = async () => {
                 />
               </FormGroup>
             </div>
-            
+
             <div className={styles.formRow}>
               <FormGroup label="Instituição" className={styles.formGroup}>
                 <Input
@@ -520,7 +531,7 @@ const buscarEstatisticas = async () => {
                   placeholder="Instituição de origem"
                 />
               </FormGroup>
-              
+
               <FormGroup label="Cargo/Função" className={styles.formGroup}>
                 <Input
                   name="cargo"
@@ -530,7 +541,7 @@ const buscarEstatisticas = async () => {
                 />
               </FormGroup>
             </div>
-            
+
             <div className={styles.formRow}>
               <FormGroup label="URL Lattes" className={styles.formGroup}>
                 <Input
@@ -540,7 +551,7 @@ const buscarEstatisticas = async () => {
                   placeholder="https://lattes.cnpq.br/..."
                 />
               </FormGroup>
-              
+
               <FormGroup label="ORCID" className={styles.formGroup}>
                 <Input
                   name="orcid"
@@ -550,7 +561,7 @@ const buscarEstatisticas = async () => {
                 />
               </FormGroup>
             </div>
-            
+
             <FormGroup>
               <label className={styles.checkboxLabel}>
                 <input
@@ -562,10 +573,10 @@ const buscarEstatisticas = async () => {
                 <span>Membro ativo</span>
               </label>
             </FormGroup>
-            
+
             <div className={styles.modalActions}>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setModalOpen(false)
                   setEditing(null)
