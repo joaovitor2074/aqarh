@@ -73,7 +73,6 @@ export default function Header() {
               to="/publicacoes"
               className={styles.ctaButton}
             >
-              <span className={styles.ctaIcon}>📚</span>
               <span className={styles.ctaText}>Publicações</span>
             </Link>
           </div>
@@ -132,7 +131,7 @@ export default function Header() {
                 { path: "/", label: "Início", icon: "🏠" },
                 { path: "/pesquisas", label: "Pesquisas", icon: "🔬" },
                 { path: "/projetos", label: "Projetos", icon: "📋" },
-                { path: "/publicacoes", label: "Publicações", icon: "📚" },
+                { path: "/publicacoes", label: "Publicações",  },
                 { path: "/equipe", label: "Equipe", icon: "👥" },
               ].map((item, index) => (
                 <li key={index} className={styles.mobileItem}>
