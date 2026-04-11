@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <ComunicadosModal />
-      
+
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-background">
@@ -16,7 +16,7 @@ export default function Home() {
           </video>
           <div className="hero-overlay"></div>
         </div>
-        
+
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
@@ -34,7 +34,7 @@ export default function Home() {
               </a>
             </div>
           </div>
-          
+
           <div className="hero-stats">
             <div className="stat-card">
               <FaUsers className="stat-icon" />
@@ -66,7 +66,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
         <div className="hero-scroll">
           <div className="scroll-indicator"></div>
         </div>
@@ -75,27 +75,24 @@ export default function Home() {
       {/* Sobre o GIEPI */}
       <section id="sobre" className="section sobre-section">
         <div className="container">
+            <span className="section-tag sobre">Sobre Nós</span>
           <div className="section-header">
-            <span className="section-tag">Sobre Nós</span>
             <h2 className="section-title">O Grupo <span className="highlight">GIEPI</span></h2>
             <p className="section-subtitle">
               Excelência em pesquisa interdisciplinar e inovação tecnológica
             </p>
           </div>
-          
+
           <div className="sobre-content">
             <div className="sobre-text">
-              <h3>Transformando ideias em realidade</h3>
+              <h3>Inovação aplicada que gera resultados</h3>
               <p>
-                O <strong>Grupo de Pesquisa em Inovação e Excelência em Pesquisa Interdisciplinar (GIEPI)</strong> 
-                é referência nacional no desenvolvimento de soluções tecnológicas avançadas nas áreas 
-                de engenharia, computação e ciências aplicadas.
+                O <strong>GIEPI</strong> atua no desenvolvimento de soluções tecnológicas nas áreas de engenharia, computação e ciências aplicadas.
               </p>
               <p>
-                Nossa missão é integrar pesquisa de ponta, formação de excelência e impacto social, 
-                contribuindo para o avanço científico e tecnológico do Brasil.
+                Nosso foco é unir pesquisa, inovação e impacto social, formando profissionais e gerando resultados reais para a sociedade.
               </p>
-              
+
               <div className="features-grid">
                 <div className="feature">
                   <div className="feature-icon">
@@ -106,7 +103,7 @@ export default function Home() {
                     <p>Desenvolvimento de tecnologias disruptivas e soluções inovadoras</p>
                   </div>
                 </div>
-                
+
                 <div className="feature">
                   <div className="feature-icon">
                     <FaGraduationCap />
@@ -116,7 +113,7 @@ export default function Home() {
                     <p>Capacitação de pesquisadores e profissionais altamente qualificados</p>
                   </div>
                 </div>
-                
+
                 <div className="feature">
                   <div className="feature-icon">
                     <FaChartLine />
@@ -126,7 +123,7 @@ export default function Home() {
                     <p>Soluções com aplicação prática e benefícios para a sociedade</p>
                   </div>
                 </div>
-                
+
                 <div className="feature">
                   <div className="feature-icon">
                     <FaHandshake />
@@ -138,7 +135,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            
+
             <div className="sobre-image">
               <div className="image-frame">
                 <img src="/images/laboratorio-giepi.jpg" alt="Laboratório GIEPI" />
@@ -162,7 +159,7 @@ export default function Home() {
               Focos principais de atuação e desenvolvimento
             </p>
           </div>
-          
+
           <div className="linhas-grid">
             <div className="linha-card">
               <div className="linha-header">
@@ -173,7 +170,7 @@ export default function Home() {
               </div>
               <h3>Sistemas Inteligentes e Machine Learning</h3>
               <p>
-                Desenvolvimento de algoritmos avançados de IA, deep learning e processamento 
+                Desenvolvimento de algoritmos avançados de IA, deep learning e processamento
                 de linguagem natural para soluções inovadoras.
               </p>
               <ul className="linha-topics">
@@ -183,7 +180,7 @@ export default function Home() {
                 <li>Sistemas de Recomendação</li>
               </ul>
             </div>
-            
+
             <div className="linha-card">
               <div className="linha-header">
                 <div className="linha-icon">
@@ -193,7 +190,7 @@ export default function Home() {
               </div>
               <h3>Internet das Coisas e Automação</h3>
               <p>
-                Pesquisa em sistemas embarcados, robótica autônoma e redes de sensores 
+                Pesquisa em sistemas embarcados, robótica autônoma e redes de sensores
                 para automação industrial e residencial.
               </p>
               <ul className="linha-topics">
@@ -203,7 +200,7 @@ export default function Home() {
                 <li>Automação Industrial 4.0</li>
               </ul>
             </div>
-            
+
             <div className="linha-card">
               <div className="linha-header">
                 <div className="linha-icon">
@@ -213,7 +210,7 @@ export default function Home() {
               </div>
               <h3>Big Data e Analytics</h3>
               <p>
-                Análise de grandes volumes de dados, mineração de dados e business intelligence 
+                Análise de grandes volumes de dados, mineração de dados e business intelligence
                 para suporte à tomada de decisão.
               </p>
               <ul className="linha-topics">
@@ -237,7 +234,7 @@ export default function Home() {
               Conheça alguns dos nossos principais desenvolvimentos
             </p>
           </div>
-          
+
           <div className="projetos-grid">
             <div className="projeto-card">
               <div className="projeto-image">
@@ -247,7 +244,7 @@ export default function Home() {
               <div className="projeto-content">
                 <h3>Sistema de Diagnóstico Médico com IA</h3>
                 <p>
-                  Desenvolvimento de sistema de auxílio ao diagnóstico médico utilizando 
+                  Desenvolvimento de sistema de auxílio ao diagnóstico médico utilizando
                   redes neurais convolucionais para análise de imagens médicas.
                 </p>
                 <div className="projeto-meta">
@@ -260,7 +257,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            
+
             <div className="projeto-card">
               <div className="projeto-image">
                 <img src="/images/projeto-agricultura.jpg" alt="Agricultura de Precisão" />
@@ -269,7 +266,7 @@ export default function Home() {
               <div className="projeto-content">
                 <h3>Agricultura de Precisão com Drones</h3>
                 <p>
-                  Sistema integrado de monitoramento agrícola utilizando drones e sensores 
+                  Sistema integrado de monitoramento agrícola utilizando drones e sensores
                   IoT para otimização do uso de recursos e aumento da produtividade.
                 </p>
                 <div className="projeto-meta">
@@ -282,7 +279,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            
+
             <div className="projeto-card">
               <div className="projeto-image">
                 <img src="/images/projeto-monitoramento.jpg" alt="Monitoramento Ambiental" />
@@ -291,7 +288,7 @@ export default function Home() {
               <div className="projeto-content">
                 <h3>Rede de Monitoramento Ambiental</h3>
                 <p>
-                  Rede de sensores distribuídos para monitoramento em tempo real da 
+                  Rede de sensores distribuídos para monitoramento em tempo real da
                   qualidade do ar e água em áreas urbanas e industriais.
                 </p>
                 <div className="projeto-meta">
@@ -305,7 +302,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           <div className="section-cta">
             <a href="/projetos" className="btn btn-secondary">
               <FaProjectDiagram /> Ver Todos os Projetos
@@ -320,7 +317,7 @@ export default function Home() {
           <div className="cta-content">
             <h2>Pronto para fazer parte da <span className="highlight">inovação</span>?</h2>
             <p>
-              Junte-se ao GIEPI e contribua para o avanço da ciência e tecnologia. 
+              Junte-se ao GIEPI e contribua para o avanço da ciência e tecnologia.
               Temos oportunidades para pesquisadores, estudantes e parceiros.
             </p>
             <div className="cta-buttons">
@@ -349,7 +346,7 @@ export default function Home() {
                 <a href="#" className="social-link">YouTube</a>
               </div>
             </div>
-            
+
             <div className="footer-links">
               <div className="link-group">
                 <h4>Navegação</h4>
@@ -358,7 +355,7 @@ export default function Home() {
                 <a href="/equipe">Equipe</a>
                 <a href="/publicacoes">Publicações</a>
               </div>
-              
+
               <div className="link-group">
                 <h4>Recursos</h4>
                 <a href="/blog">Blog</a>
@@ -366,7 +363,7 @@ export default function Home() {
                 <a href="/eventos">Eventos</a>
                 <a href="/oportunidades">Oportunidades</a>
               </div>
-              
+
               <div className="link-group">
                 <h4>Contato</h4>
                 <p>contato@giepi.org</p>
@@ -375,7 +372,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           <div className="footer-bottom">
             <p>&copy; 2026 GIEPI - Todos os direitos reservados</p>
             <p>Desenvolvido com ❤️ pela equipe GIEPI</p>
