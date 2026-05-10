@@ -82,6 +82,8 @@ async function safeWrite(data) {
   }
 }
 
+
+
 /* =========================
    FUNÇÃO AUXILIAR: LIMPAR NAVEGADOR
 ========================= */
@@ -218,6 +220,12 @@ async function extractDataFromPopup(popupPage, studentName) {
 
     // Extrai dados
     const linhas_pesquisa = await popupPage.evaluate((selectors) => {
+      function limparTexto(texto) {
+  return texto
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .trim();
+}
       // Tenta vários selectors
       const selectorsToTry = [
         selectors.popupTable,
@@ -241,8 +249,8 @@ async function extractDataFromPopup(popupPage, studentName) {
       trs.forEach(tr => {
         const cells = tr.querySelectorAll('td');
         if (cells.length >= 2) {
-          const linha = cells[0]?.textContent?.trim() || '';
-          const grupo = cells[1]?.textContent?.trim() || '';
+          const linha = limparTexto(cells[0]?.textContent || '');
+          const grupo = limparTexto(cells[1]?.textContent || '');
 
           // Filtra linhas válidas
           if (linha && grupo &&

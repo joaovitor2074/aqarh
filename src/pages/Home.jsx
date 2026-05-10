@@ -138,9 +138,9 @@ export default function Home() {
 
             <div className="sobre-image">
               <div className="image-frame">
-                <img src="/images/laboratorio-giepi.jpg" alt="Laboratório GIEPI" />
+                <img src="public\img\microscopiopaisagem1.jpeg" />
                 <div className="image-badge">
-                  <span>Desde 2010</span>
+                  <span>Desde 2023</span>
                   <strong>Excelência em Pesquisa</strong>
                 </div>
               </div>
