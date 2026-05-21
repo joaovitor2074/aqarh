@@ -82,7 +82,7 @@ export default function ComunicadosModal() {
         }
       } catch (error) {
         console.error('❌ Erro ao carregar comunicados:', error)
-        setError('Não foi possível carregar os comunicados.')
+        // setError('Não foi possível carregar os comunicados.')
       } finally {
         setLoading(false)
       }

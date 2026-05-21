@@ -79,10 +79,13 @@ function AppContent() {
   useEffect(() => {
     setupInterceptor();
 
-    const token = localStorage.getItem("token");
-    if (!token && location.pathname !== "/login") {
-      window.location.href = "/login";
-    }
+    // const IS_DEV = true;
+
+    // const token = localStorage.getItem("token");
+
+    // if (!token && location.pathname !== "/login" && !IS_DEV) {
+    //   window.location.href = "/login";
+    // }
   }, [location.pathname]);
 
   /**
@@ -92,8 +95,7 @@ function AppContent() {
    * Oculta Header e Footer nas rotas administrativas
    */
   const hideLayout =
-    location.pathname === "/login" ||
-    location.pathname.startsWith("/admin");
+    location.pathname === "/login" || location.pathname.startsWith("/admin");
 
   return (
     <ConfigProvider>
