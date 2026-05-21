@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aviso Importante</title>
+</head>
+<body style="font-family: Arial, sans-serif; background:#fff3cd; padding:20px;">
+  <table width="100%">
+    <tr>
+      <td align="center">
+        <table width="600" style="background:#ffffff; padding:20px; border-left:6px solid #ffc107;">
+          <tr>
+            <td>
+              <h3 style="color:#856404;">⚠️ Aviso Importante</h3>
+
+              <p>{{mensagem}}</p>
+
+              {{#if prazo}}
+              <p><strong>Prazo:</strong> {{prazo}}</p>
+              {{/if}}
+
+              {{#if responsavel}}
+              <p><strong>Responsável:</strong> {{responsavel}}</p>
+              {{/if}}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

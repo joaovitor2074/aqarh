@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Imagens</title>
+</head>
+<body>
+    <h1>Teste de Acesso às Imagens</h1>
+    
+    <h2>Imagens Defaults:</h2>
+    <div>
+        <p>Estudante:</p>
+        <img src="http://localhost:3000/img/defaults/comunicado-estudante.png" 
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/3B82F6/FFFFFF?text=ERRO+Estudante'">
+        <p>Pesquisador:</p>
+        <img src="http://localhost:3000/img/defaults/comunicado-pesquisador.png"
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/10B981/FFFFFF?text=ERRO+Pesquisador'">
+        <p>Linha:</p>
+        <img src="http://localhost:3000/img/defaults/comunicado-linha.png"
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/8B5CF6/FFFFFF?text=ERRO+Linha'">
+    </div>
+    
+    <h2>Imagem de Upload:</h2>
+    <div>
+        <img src="http://localhost:3000/uploads/1768587718463-1jub1arlxmh.png"
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/EF4444/FFFFFF?text=ERRO+Upload'">
+    </div>
+    
+    <script>
+        // Testa todas as imagens
+        document.querySelectorAll('img').forEach(img => {
+            img.onload = function() {
+                console.log('✅ Carregada:', img.src);
+            };
+            img.onerror = function() {
+                console.log('❌ Erro ao carregar:', img.src);
+            };
+        });
+    </script>
+</body>
+</html>

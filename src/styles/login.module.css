@@ -1,0 +1,80 @@
+/* Container geral */
+.loginContainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #006A4E; /* Verde IFMA */
+}
+
+/* Caixa branca */
+.loginBox {
+  width: 380px;
+  background: white;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.loginTitle {
+  font-size: 2rem;
+  color: #006A4E;
+  font-weight: bold;
+}
+
+.loginSubtitle {
+  margin-top: -10px;
+  margin-bottom: 25px;
+  color: #555;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loginForm label {
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+}
+
+.loginForm input {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.2s;
+}
+
+.loginForm input:focus {
+  border-color: #006A4E;
+}
+
+/* Botão */
+.loginButton {
+  margin-top: 10px;
+  padding: 12px;
+  background: #006A4E;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.loginButton:hover {
+  background: #00996E;
+}
+
+/* Responsividade */
+@media (max-width: 420px) {
+  .loginBox {
+    width: 90%;
+    padding: 25px;
+  }
+}

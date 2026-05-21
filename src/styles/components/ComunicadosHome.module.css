@@ -1,0 +1,245 @@
+.comunicadosContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  padding: 0 1rem;
+}
+
+.comunicadosHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #3B82F6;
+}
+
+.bellIcon {
+  font-size: 2rem;
+  color: #3B82F6;
+  animation: ring 2s ease-in-out infinite;
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+  20%, 40%, 60%, 80% { transform: rotate(10deg); }
+}
+
+.comunicadosHeader h2 {
+  margin: 0;
+  color: #1F2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.comunicadosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.comunicadoCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #E5E7EB;
+}
+
+.comunicadoCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.comunicadoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  color: white;
+}
+
+.tipoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.estudanteIcon {
+  font-size: 1.2rem;
+  color: #60A5FA;
+}
+
+.pesquisadorIcon {
+  font-size: 1.2rem;
+  color: #34D399;
+}
+
+.linhaIcon {
+  font-size: 1.2rem;
+  color: #A78BFA;
+}
+
+.defaultIcon {
+  font-size: 1.2rem;
+  color: #FBBF24;
+}
+
+.tipoLabel {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.comunicadoContent {
+  padding: 1.5rem;
+}
+
+.imagemContainer {
+  width: 100%;
+  height: 180px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comunicadoImagem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.comunicadoCard:hover .comunicadoImagem {
+  transform: scale(1.05);
+}
+
+.titulo {
+  margin: 0 0 0.75rem 0;
+  color: #1F2937;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.descricao {
+  margin: 0;
+  color: #6B7280;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.comunicadoFooter {
+  padding: 0.75rem 1.5rem;
+  background-color: #F9FAFB;
+  border-top: 1px solid #E5E7EB;
+}
+
+.statusAtivo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #10B981;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background-color: #D1FAE5;
+  border-radius: 20px;
+}
+
+.statusAtivo:before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: #10B981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.comunicadosInfo {
+  padding: 1rem;
+  background-color: #EFF6FF;
+  border-radius: 8px;
+  border-left: 4px solid #3B82F6;
+}
+
+.comunicadosInfo p {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: #1E40AF;
+  font-size: 0.95rem;
+}
+
+.infoIcon {
+  font-size: 1.2rem;
+  color: #3B82F6;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  color: #6B7280;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E5E7EB;
+  border-top-color: #3B82F6;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  color: #DC2626;
+  background-color: #FEF2F2;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #FCA5A5;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .comunicadosGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .comunicadosHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .comunicadosHeader h2 {
+    font-size: 1.5rem;
+  }
+  
+  .comunicadoHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}

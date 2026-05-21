@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{nomeProjeto}}</title>
+</head>
+<body style="font-family: Arial, sans-serif; background:#eef2f5; padding:20px;">
+  <table width="100%">
+    <tr>
+      <td align="center">
+        <table width="600" style="background:#ffffff; padding:24px; border-radius:10px;">
+          <tr>
+            <td>
+              <h2 style="color:#1a73e8;">Projeto: {{nomeProjeto}}</h2>
+
+              <p><strong>Descrição:</strong></p>
+              <p>{{descricao}}</p>
+
+              {{#if coordenador}}
+              <p><strong>Coordenador:</strong> {{coordenador}}</p>
+              {{/if}}
+
+              {{#if status}}
+              <p><strong>Status:</strong> {{status}}</p>
+              {{/if}}
+
+              {{#if link}}
+              <p>
+                <a href="{{link}}" target="_blank">
+                  Ver mais detalhes
+                </a>
+              </p>
+              {{/if}}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
