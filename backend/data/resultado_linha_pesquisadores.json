@@ -544,12 +544,12 @@
         "grupo": "GRUPO DE PESQUISA EM DESENVOLVIMENTO RURAL, AMBIENTAL E SOCIAL - GDAS"
       },
       {
-        "linha_pesquisa": "Agronomia/Ciencias Agrárias, Experimentação Agrícola e Florestal, Tecnologia de alimentos",
-        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
-      },
-      {
         "linha_pesquisa": "Hidrologia, Recursos Hídricos e Meio Ambiente",
         "grupo": "Grupo de Pesquisa e Extensão em Manejo de Solo e Água (GPEMSA)"
+      },
+      {
+        "linha_pesquisa": "Agronomia/Ciencias Agrárias, Experimentação Agrícola e Florestal, Tecnologia de alimentos",
+        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
       },
       {
         "linha_pesquisa": "AGRONEGÓCIO",

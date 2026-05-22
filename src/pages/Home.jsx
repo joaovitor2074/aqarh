@@ -1,7 +1,7 @@
 import React from 'react'
 import ComunicadosModal from '../components/ComunicadosModal'
 import { FaUsers, FaFlask, FaProjectDiagram, FaGraduationCap, FaLightbulb, FaChartLine, FaBookOpen, FaHandshake } from 'react-icons/fa'
-import '../styles/Home.css' // Vamos criar este CSS
+import '../styles/Home.css'
 
 export default function Home() {
   return (
@@ -75,7 +75,7 @@ export default function Home() {
       {/* Sobre o GIEPI */}
       <section id="sobre" className="section sobre-section">
         <div className="container">
-            <span className="section-tag sobre">Sobre Nós</span>
+          <span className="section-tag sobre">Sobre Nós</span>
           <div className="section-header">
             <h2 className="section-title">O Grupo <span className="highlight">GIEPI</span></h2>
             <p className="section-subtitle">
@@ -110,7 +110,11 @@ export default function Home() {
                   </div>
                   <div className="feature-content">
                     <h4>Formação de Excelência</h4>
-                    <p>Capacitação de pesquisadores e profissionais altamente qualificados</p>
+                    <p>
+                      Capacitação de pesquisadores
+                      e profissionais altamente
+                      qualificados
+                    </p>
                   </div>
                 </div>
 
