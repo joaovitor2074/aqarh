@@ -54,11 +54,17 @@ export async function apiRequest(endpoint, options = {}) {
      * TRATAMENTO DE TOKEN EXPIRADO
      * =====================================================
      */
+    const IS_DEV = true;
+
     if (response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-      throw new Error("Sessão expirada. Faça login novamente.");
+
+      if (!IS_DEV) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
+
+      throw new Error("Erro 401");
     }
 
     /**

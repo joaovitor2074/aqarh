@@ -75,7 +75,12 @@ export default function Home() {
       {/* Sobre o GIEPI */}
       <section id="sobre" className="section sobre-section">
         <div className="container">
+<<<<<<< HEAD
           <span className="section-tag sobre">Sobre Nós</span>
+=======
+            <span className="section-tag sobre">Sobre Nós</span>
+            {/* <img src="public\img\equipepaisagem.jpeg" alt="" /> */}
+>>>>>>> b278f4d44a0e8d4f8a21643600ee9be20e23f06e
           <div className="section-header">
             <h2 className="section-title">O Grupo <span className="highlight">GIEPI</span></h2>
             <p className="section-subtitle">
