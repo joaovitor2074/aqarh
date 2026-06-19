@@ -5,9 +5,9 @@ async function testarImagens() {
     
     // 1. Testar acesso às imagens defaults
     const defaults = [
-        'http://localhost:3000/img/defaults/comunicado-estudante.png',
-        'http://localhost:3000/img/defaults/comunicado-pesquisador.png',
-        'http://localhost:3000/img/defaults/comunicado-linha.png'
+        'http://localhost:3001/img/defaults/comunicado-estudante.png',
+        'http://localhost:3001/img/defaults/comunicado-pesquisador.png',
+        'http://localhost:3001/img/defaults/comunicado-linha.png'
     ];
     
     for (const url of defaults) {

@@ -48,11 +48,11 @@ export default function Dashboard() {
           ultimasLinhasRes,
           atividadesres
         ] = await Promise.allSettled([
-          fetch("http://localhost:3000/api/membros/quantidade"),
-          fetch("http://localhost:3000/api/linhas-pesquisa/quantidade"),
-          fetch("http://localhost:3000/api/comunicados/quantidade"),
-          fetch("http://localhost:3000/api/linhas-pesquisa/ultimas"),
-          fetch("http://localhost:3000/api/comunicados/recentes")
+          fetch("http://localhost:3001/api/membros/quantidade"),
+          fetch("http://localhost:3001/api/linhas-pesquisa/quantidade"),
+          fetch("http://localhost:3001/api/comunicados/quantidade"),
+          fetch("http://localhost:3001/api/linhas-pesquisa/ultimas"),
+          fetch("http://localhost:3001/api/comunicados/recentes")
 
         ])
 
@@ -115,7 +115,7 @@ export default function Dashboard() {
       toast.loading("Executando scraping...", { id: "scrape", duration: 5000 })
 
       const res = await fetch(
-        "http://localhost:3000/adminjv/scrape/run",
+        "http://localhost:3001/adminjv/scrape/run",
         { method: "POST" }
       )
 

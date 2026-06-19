@@ -12,7 +12,7 @@ export default function Notificacoes() {
     async function carregarNotificacoes() {
       try {
         const res = await fetch(
-          "http://localhost:3000/adminjv/scrape/notificacoes"
+          "http://localhost:3001/adminjv/scrape/notificacoes"
         )
 
         if (!res.ok) throw new Error("Erro ao buscar notificações")
@@ -32,7 +32,7 @@ export default function Notificacoes() {
   const handleAprovar = async (id) => {
     try {
       const res = await fetch(
-        `http://localhost:3000/adminjv/scrape/notificacao/aprovar/${id}`,
+        `http://localhost:3001/adminjv/scrape/notificacao/aprovar/${id}`,
         { method: "POST" }
       )
 
@@ -49,7 +49,7 @@ export default function Notificacoes() {
     try {
       for (const n of notificacoes) {
         const res = await fetch(
-          `http://localhost:3000/adminjv/scrape/notificacao/aprovar/${n.id}`,
+          `http://localhost:3001/adminjv/scrape/notificacao/aprovar/${n.id}`,
           { method: "POST" }
         )
         if (!res.ok) throw new Error("Erro ao aprovar notificações")
