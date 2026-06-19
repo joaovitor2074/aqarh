@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import AdminLayout from "../../layout/AdminLayout"
 import toast, { Toaster } from "react-hot-toast"
+import { apiRequest } from "../../utils/api"
 import "../../styles/adminPages/notificacao.css"
 
 export default function Notificacoes() {

@@ -6,7 +6,7 @@
  * - Usa variável de ambiente (Vite)
  * - Fallback para localhost em desenvolvimento
  */
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 /**
  * =====================================================
@@ -44,7 +44,11 @@ export async function apiRequest(endpoint, options = {}) {
      * EXECUÇÃO DA REQUISIÇÃO
      * =====================================================
      */
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const requestUrl = endpoint.startsWith("http")
+      ? endpoint
+      : `${API_URL}${endpoint}`;
+
+    const response = await fetch(requestUrl, {
       ...options,
       headers,
     });
