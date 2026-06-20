@@ -1,14 +1,70 @@
-import React from 'react'
-import ComunicadosModal from '../components/ComunicadosModal'
-import { FaUsers, FaFlask, FaProjectDiagram, FaGraduationCap, FaLightbulb, FaChartLine, FaBookOpen, FaHandshake } from 'react-icons/fa'
-import '../styles/Home.css'
+import React from "react";
+import {
+  FaBookOpen,
+  FaChartLine,
+  FaFlask,
+  FaGraduationCap,
+  FaHandshake,
+  FaLightbulb,
+  FaProjectDiagram,
+  FaUsers,
+} from "react-icons/fa";
+import ComunicadosModal from "../components/ComunicadosModal";
+import "../styles/Home.css";
+
+const linhasPesquisa = [
+  {
+    icon: <FaFlask />,
+    category: "Ensino e pesquisa",
+    title: "Educação, ciência e tecnologia",
+    text: "Estudos voltados à formação científica, práticas de ensino e produção de conhecimento aplicado.",
+    topics: ["Formação docente", "Metodologias de ensino", "Pesquisa aplicada"],
+  },
+  {
+    icon: <FaProjectDiagram />,
+    category: "Inovação",
+    title: "Soluções para problemas reais",
+    text: "Projetos desenvolvidos em diálogo com o território, instituições parceiras e demandas sociais.",
+    topics: ["Extensão", "Tecnologia social", "Parcerias"],
+  },
+  {
+    icon: <FaChartLine />,
+    category: "Gestão do conhecimento",
+    title: "Indicadores e produção científica",
+    text: "Organização de dados, publicações e resultados para apoiar decisões acadêmicas e institucionais.",
+    topics: ["Publicações", "Indicadores", "Comunicação científica"],
+  },
+];
+
+const projetosDestaque = [
+  {
+    image: "/img/laboratoriopaisagem1.jpeg",
+    status: "Em andamento",
+    title: "Pesquisa aplicada no IFMA Campus Codó",
+    text: "Ações integradas de ensino, pesquisa e inovação com participação de docentes, estudantes e colaboradores.",
+    tags: ["Pesquisa", "Formação", "IFMA"],
+  },
+  {
+    image: "/img/equipamentospaisagem1.jpeg",
+    status: "Institucional",
+    title: "Laboratórios e infraestrutura",
+    text: "Uso de equipamentos e ambientes de pesquisa para fortalecer projetos acadêmicos e tecnológicos.",
+    tags: ["Laboratório", "Tecnologia", "Ensino"],
+  },
+  {
+    image: "/img/orgaospaisagem.jpeg",
+    status: "Parcerias",
+    title: "Integração com instituições e comunidade",
+    text: "Projetos construídos com foco em impacto regional, cooperação técnica e desenvolvimento social.",
+    tags: ["Extensão", "Comunidade", "Cooperação"],
+  },
+];
 
 export default function Home() {
   return (
     <>
       <ComunicadosModal />
 
-      {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-background">
           <video autoPlay loop muted playsInline className="hero-video">
@@ -19,23 +75,23 @@ export default function Home() {
 
         <div className="hero-content">
           <div className="hero-text">
-            <h1 className="hero-title">
-              <span className="gradient-text">Inovação</span> e <span className="gradient-text">Pesquisa</span> que Transformam
-            </h1>
+            <span className="hero-kicker">IFMA Campus Codó</span>
+            <h1 className="hero-title">Grupo Interdisciplinar em Ensino, Pesquisa e Inovação</h1>
             <p className="hero-subtitle">
-              Desenvolvendo soluções tecnológicas de ponta e formando os pesquisadores do futuro
+              Pesquisa aplicada, formação científica e projetos de inovação voltados ao
+              desenvolvimento regional.
             </p>
             <div className="hero-buttons">
               <a href="#sobre" className="btn btn-primary">
-                <FaFlask /> Conheça o GIEPI
+                <FaFlask /> Conhecer o GIEPI
               </a>
-              <a href="#projetos" className="btn btn-outline">
-                <FaProjectDiagram /> Nossos Projetos
+              <a href="/projetos" className="btn btn-outline">
+                <FaProjectDiagram /> Ver projetos
               </a>
             </div>
           </div>
 
-          <div className="hero-stats">
+          <div className="hero-stats" aria-label="Indicadores do grupo">
             <div className="stat-card">
               <FaUsers className="stat-icon" />
               <div className="stat-content">
@@ -47,7 +103,7 @@ export default function Home() {
               <FaProjectDiagram className="stat-icon" />
               <div className="stat-content">
                 <h3>30+</h3>
-                <p>Projetos Ativos</p>
+                <p>Projetos</p>
               </div>
             </div>
             <div className="stat-card">
@@ -61,38 +117,34 @@ export default function Home() {
               <FaGraduationCap className="stat-icon" />
               <div className="stat-content">
                 <h3>200+</h3>
-                <p>Alunos Formados</p>
+                <p>Estudantes</p>
               </div>
             </div>
           </div>
         </div>
-
-        <div className="hero-scroll">
-          <div className="scroll-indicator"></div>
-        </div>
       </section>
 
-      {/* Sobre o GIEPI */}
       <section id="sobre" className="section sobre-section">
         <div className="container">
-          <span className="section-tag sobre">Sobre Nós</span>
-            <span className="section-tag sobre">Sobre Nós</span>
-            {/* <img src="public\img\equipepaisagem.jpeg" alt="" /> */}
+          <span className="section-tag sobre">Sobre o grupo</span>
           <div className="section-header">
-            <h2 className="section-title">O Grupo <span className="highlight">GIEPI</span></h2>
+            <h2 className="section-title">Pesquisa com compromisso institucional</h2>
             <p className="section-subtitle">
-              Excelência em pesquisa interdisciplinar e inovação tecnológica
+              O GIEPI articula ensino, pesquisa, inovação e extensão para produzir
+              conhecimento útil ao território.
             </p>
           </div>
 
           <div className="sobre-content">
             <div className="sobre-text">
-              <h3>Inovação aplicada que gera resultados</h3>
+              <h3>Atuação integrada no IFMA Campus Codó</h3>
               <p>
-                O <strong>GIEPI</strong> atua no desenvolvimento de soluções tecnológicas nas áreas de engenharia, computação e ciências aplicadas.
+                O grupo reúne docentes, estudantes e colaboradores em projetos que
+                aproximam ciência, tecnologia e demandas sociais.
               </p>
               <p>
-                Nosso foco é unir pesquisa, inovação e impacto social, formando profissionais e gerando resultados reais para a sociedade.
+                A produção do GIEPI busca fortalecer a formação acadêmica, apoiar
+                iniciativas institucionais e ampliar o impacto da pesquisa no Maranhão.
               </p>
 
               <div className="features-grid">
@@ -101,8 +153,8 @@ export default function Home() {
                     <FaLightbulb />
                   </div>
                   <div className="feature-content">
-                    <h4>Inovação Contínua</h4>
-                    <p>Desenvolvimento de tecnologias disruptivas e soluções inovadoras</p>
+                    <h4>Inovação aplicada</h4>
+                    <p>Soluções construídas a partir de necessidades reais de ensino e pesquisa.</p>
                   </div>
                 </div>
 
@@ -111,12 +163,8 @@ export default function Home() {
                     <FaGraduationCap />
                   </div>
                   <div className="feature-content">
-                    <h4>Formação de Excelência</h4>
-                    <p>
-                      Capacitação de pesquisadores
-                      e profissionais altamente
-                      qualificados
-                    </p>
+                    <h4>Formação científica</h4>
+                    <p>Participação de estudantes em práticas de investigação e produção acadêmica.</p>
                   </div>
                 </div>
 
@@ -125,8 +173,8 @@ export default function Home() {
                     <FaChartLine />
                   </div>
                   <div className="feature-content">
-                    <h4>Impacto Social</h4>
-                    <p>Soluções com aplicação prática e benefícios para a sociedade</p>
+                    <h4>Resultados mensuráveis</h4>
+                    <p>Organização de projetos, indicadores e publicações do grupo.</p>
                   </div>
                 </div>
 
@@ -135,8 +183,8 @@ export default function Home() {
                     <FaHandshake />
                   </div>
                   <div className="feature-content">
-                    <h4>Parcerias Estratégicas</h4>
-                    <p>Colaboração com empresas, instituições e comunidade</p>
+                    <h4>Cooperação</h4>
+                    <p>Atuação conjunta com instituições, comunidade acadêmica e parceiros.</p>
                   </div>
                 </div>
               </div>
@@ -144,10 +192,10 @@ export default function Home() {
 
             <div className="sobre-image">
               <div className="image-frame">
-                <img src="public\img\microscopiopaisagem1.jpeg" />
+                <img src="/img/microscopiopaisagem1.jpeg" alt="Laboratório de pesquisa do IFMA" />
                 <div className="image-badge">
-                  <span>Desde 2023</span>
-                  <strong>Excelência em Pesquisa</strong>
+                  <span>GIEPI</span>
+                  <strong>Ensino, pesquisa e inovação</strong>
                 </div>
               </div>
             </div>
@@ -155,236 +203,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Linhas de Pesquisa */}
       <section className="section linhas-section">
         <div className="container">
           <div className="section-header">
-            <span className="section-tag">Nossa Especialidade</span>
-            <h2 className="section-title">Linhas de <span className="highlight">Pesquisa</span></h2>
+            <span className="section-tag">Atuação</span>
+            <h2 className="section-title">Linhas de pesquisa</h2>
             <p className="section-subtitle">
-              Focos principais de atuação e desenvolvimento
+              Eixos que organizam os projetos e a produção acadêmica do grupo.
             </p>
           </div>
 
           <div className="linhas-grid">
-            <div className="linha-card">
-              <div className="linha-header">
-                <div className="linha-icon">
-                  <FaFlask />
+            {linhasPesquisa.map((linha) => (
+              <article className="linha-card" key={linha.title}>
+                <div className="linha-header">
+                  <div className="linha-icon">{linha.icon}</div>
+                  <span className="linha-category">{linha.category}</span>
                 </div>
-                <span className="linha-category">Inteligência Artificial</span>
-              </div>
-              <h3>Sistemas Inteligentes e Machine Learning</h3>
-              <p>
-                Desenvolvimento de algoritmos avançados de IA, deep learning e processamento
-                de linguagem natural para soluções inovadoras.
-              </p>
-              <ul className="linha-topics">
-                <li>Redes Neurais Profundas</li>
-                <li>Visão Computacional</li>
-                <li>Processamento de Linguagem Natural</li>
-                <li>Sistemas de Recomendação</li>
-              </ul>
-            </div>
-
-            <div className="linha-card">
-              <div className="linha-header">
-                <div className="linha-icon">
-                  <FaProjectDiagram />
-                </div>
-                <span className="linha-category">IoT & Robótica</span>
-              </div>
-              <h3>Internet das Coisas e Automação</h3>
-              <p>
-                Pesquisa em sistemas embarcados, robótica autônoma e redes de sensores
-                para automação industrial e residencial.
-              </p>
-              <ul className="linha-topics">
-                <li>Sistemas Embarcados</li>
-                <li>Robótica Colaborativa</li>
-                <li>Redes de Sensores Sem Fio</li>
-                <li>Automação Industrial 4.0</li>
-              </ul>
-            </div>
-
-            <div className="linha-card">
-              <div className="linha-header">
-                <div className="linha-icon">
-                  <FaChartLine />
-                </div>
-                <span className="linha-category">Ciência de Dados</span>
-              </div>
-              <h3>Big Data e Analytics</h3>
-              <p>
-                Análise de grandes volumes de dados, mineração de dados e business intelligence
-                para suporte à tomada de decisão.
-              </p>
-              <ul className="linha-topics">
-                <li>Big Data Analytics</li>
-                <li>Visualização de Dados</li>
-                <li>Data Mining</li>
-                <li>Business Intelligence</li>
-              </ul>
-            </div>
+                <h3>{linha.title}</h3>
+                <p>{linha.text}</p>
+                <ul className="linha-topics">
+                  {linha.topics.map((topic) => (
+                    <li key={topic}>{topic}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Projetos em Destaque */}
       <section id="projetos" className="section projetos-section">
         <div className="container">
           <div className="section-header">
-            <span className="section-tag">Nossos Trabalhos</span>
-            <h2 className="section-title">Projetos em <span className="highlight">Destaque</span></h2>
+            <span className="section-tag">Projetos</span>
+            <h2 className="section-title">Projetos em destaque</h2>
             <p className="section-subtitle">
-              Conheça alguns dos nossos principais desenvolvimentos
+              Uma visão objetiva das frentes de trabalho do GIEPI.
             </p>
           </div>
 
           <div className="projetos-grid">
-            <div className="projeto-card">
-              <div className="projeto-image">
-                <img src="/images/projeto-ia-saude.jpg" alt="IA na Saúde" />
-                <div className="projeto-badge">Em Andamento</div>
-              </div>
-              <div className="projeto-content">
-                <h3>Sistema de Diagnóstico Médico com IA</h3>
-                <p>
-                  Desenvolvimento de sistema de auxílio ao diagnóstico médico utilizando
-                  redes neurais convolucionais para análise de imagens médicas.
-                </p>
-                <div className="projeto-meta">
-                  <span className="projeto-tag">Inteligência Artificial</span>
-                  <span className="projeto-tag">Saúde Digital</span>
-                  <span className="projeto-tag">Deep Learning</span>
+            {projetosDestaque.map((projeto) => (
+              <article className="projeto-card" key={projeto.title}>
+                <div className="projeto-image">
+                  <img src={projeto.image} alt={projeto.title} />
+                  <div className="projeto-badge">{projeto.status}</div>
                 </div>
-                <a href="/projetos/ia-saude" className="projeto-link">
-                  Ver Detalhes →
-                </a>
-              </div>
-            </div>
-
-            <div className="projeto-card">
-              <div className="projeto-image">
-                <img src="/images/projeto-agricultura.jpg" alt="Agricultura de Precisão" />
-                <div className="projeto-badge">Concluído</div>
-              </div>
-              <div className="projeto-content">
-                <h3>Agricultura de Precisão com Drones</h3>
-                <p>
-                  Sistema integrado de monitoramento agrícola utilizando drones e sensores
-                  IoT para otimização do uso de recursos e aumento da produtividade.
-                </p>
-                <div className="projeto-meta">
-                  <span className="projeto-tag">IoT</span>
-                  <span className="projeto-tag">Agricultura</span>
-                  <span className="projeto-tag">Drones</span>
+                <div className="projeto-content">
+                  <h3>{projeto.title}</h3>
+                  <p>{projeto.text}</p>
+                  <div className="projeto-meta">
+                    {projeto.tags.map((tag) => (
+                      <span className="projeto-tag" key={tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <a href="/projetos" className="projeto-link">
+                    Ver detalhes
+                  </a>
                 </div>
-                <a href="/projetos/agricultura" className="projeto-link">
-                  Ver Detalhes →
-                </a>
-              </div>
-            </div>
-
-            <div className="projeto-card">
-              <div className="projeto-image">
-                <img src="/images/projeto-monitoramento.jpg" alt="Monitoramento Ambiental" />
-                <div className="projeto-badge">Em Andamento</div>
-              </div>
-              <div className="projeto-content">
-                <h3>Rede de Monitoramento Ambiental</h3>
-                <p>
-                  Rede de sensores distribuídos para monitoramento em tempo real da
-                  qualidade do ar e água em áreas urbanas e industriais.
-                </p>
-                <div className="projeto-meta">
-                  <span className="projeto-tag">IoT</span>
-                  <span className="projeto-tag">Sustentabilidade</span>
-                  <span className="projeto-tag">Monitoramento</span>
-                </div>
-                <a href="/projetos/monitoramento" className="projeto-link">
-                  Ver Detalhes →
-                </a>
-              </div>
-            </div>
+              </article>
+            ))}
           </div>
 
           <div className="section-cta">
             <a href="/projetos" className="btn btn-secondary">
-              <FaProjectDiagram /> Ver Todos os Projetos
+              <FaProjectDiagram /> Ver todos os projetos
             </a>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
           <div className="cta-content">
-            <h2>Pronto para fazer parte da <span className="highlight">inovação</span>?</h2>
+            <h2>Conheça a equipe e a produção do grupo</h2>
             <p>
-              Junte-se ao GIEPI e contribua para o avanço da ciência e tecnologia.
-              Temos oportunidades para pesquisadores, estudantes e parceiros.
+              Acompanhe projetos, linhas de pesquisa e publicações desenvolvidas no
+              âmbito do GIEPI.
             </p>
             <div className="cta-buttons">
-              <a href="/participar" className="btn btn-primary btn-large">
-                <FaUsers /> Tornar-se Membro
+              <a href="/equipe" className="btn btn-primary btn-large">
+                <FaUsers /> Equipe
               </a>
-              <a href="/contato" className="btn btn-outline btn-large">
-                <FaHandshake /> Parcerias
+              <a href="/publicacoes" className="btn btn-outline btn-large">
+                <FaBookOpen /> Publicações
               </a>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-content">
-            <div className="footer-info">
-              <h3>GIEPI</h3>
-              <p>Grupo de Pesquisa em Inovação e Excelência em Pesquisa Interdisciplinar</p>
-              <div className="footer-social">
-                <a href="#" className="social-link">Facebook</a>
-                <a href="#" className="social-link">Instagram</a>
-                <a href="#" className="social-link">LinkedIn</a>
-                <a href="#" className="social-link">YouTube</a>
-              </div>
-            </div>
-
-            <div className="footer-links">
-              <div className="link-group">
-                <h4>Navegação</h4>
-                <a href="#sobre">Sobre o GIEPI</a>
-                <a href="#projetos">Projetos</a>
-                <a href="/equipe">Equipe</a>
-                <a href="/publicacoes">Publicações</a>
-              </div>
-
-              <div className="link-group">
-                <h4>Recursos</h4>
-                <a href="/blog">Blog</a>
-                <a href="/noticias">Notícias</a>
-                <a href="/eventos">Eventos</a>
-                <a href="/oportunidades">Oportunidades</a>
-              </div>
-
-              <div className="link-group">
-                <h4>Contato</h4>
-                <p>contato@giepi.org</p>
-                <p>+55 (98) 3214-5678</p>
-                <p>Campus do IFMA, São Luís - MA</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="footer-bottom">
-            <p>&copy; 2026 GIEPI - Todos os direitos reservados</p>
-            <p>Desenvolvido com ❤️ pela equipe GIEPI</p>
-          </div>
-        </div>
-      </footer>
     </>
-  )
+  );
 }

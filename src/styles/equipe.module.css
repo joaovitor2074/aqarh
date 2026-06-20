@@ -799,3 +799,295 @@
     padding: 0 1rem;
   }
 }
+
+/* ================================
+   CAMADA INSTITUCIONAL RESPONSIVA
+================================ */
+.equipeContainer {
+  background: #f5f7fa;
+  color: #1f2d3a;
+}
+
+.container {
+  width: min(100% - 2rem, 1180px);
+  max-width: none;
+  padding: 0;
+}
+
+.heroSection {
+  padding: 7.5rem 0 3rem;
+  background: linear-gradient(90deg, #004d3a, #123b5a);
+}
+
+.heroSection::before {
+  display: none;
+}
+
+.heroTitle {
+  max-width: 780px;
+  margin-inline: auto;
+  color: #ffffff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0;
+}
+
+.highlight,
+.heroTitle .highlight {
+  color: #f0c35a;
+}
+
+.highlight::after {
+  display: none;
+}
+
+.heroDescription,
+.sectionSubtitle {
+  color: #dfe9ef;
+}
+
+.heroStats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.statItem,
+.areaCard,
+.infoCard {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.statItem {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.heroStats .statNumber {
+  color: #ffffff;
+}
+
+.heroStats .statLabel {
+  color: #dfe9ef;
+}
+
+.areasSection,
+.infoSection {
+  background: #ffffff;
+}
+
+.sectionTitle,
+.areaTitle,
+.infoCard h3 {
+  color: #123b5a;
+}
+
+.sectionSubtitle,
+.areaDescription,
+.infoCard p {
+  color: #667987;
+}
+
+.areasGrid,
+.infoGrid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.areaCard,
+.infoCard {
+  border: 1px solid #d9e2e8;
+  background: #ffffff;
+  color: #1f2d3a;
+}
+
+.areaIcon {
+  background: #edf7f3;
+  color: #006a4e;
+}
+
+.filtersSection {
+  position: static;
+  padding: 1.25rem 0;
+  background: #f5f7fa;
+  border-bottom: 1px solid #d9e2e8;
+}
+
+.searchInput {
+  border: 1px solid #cfdbe2;
+  background: #ffffff;
+  color: #1f2d3a;
+}
+
+.filterButtons {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+  scrollbar-width: thin;
+}
+
+.filterButton {
+  flex: 0 0 auto;
+  border: 1px solid #cfdbe2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344b5c;
+}
+
+.filterButton.active {
+  background: #edf7f3;
+  color: #006a4e;
+}
+
+.membersSection {
+  padding: 2.5rem 0 4rem;
+  background: #f5f7fa;
+}
+
+.membersGrid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.memberCard {
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
+.memberCard:hover,
+.memberCard.active,
+.areaCard:hover,
+.infoCard:hover {
+  transform: none;
+  border-color: #b9cbd6;
+  background: #ffffff;
+}
+
+.memberName,
+.detailItem strong,
+.areasList strong,
+.noResults h3 {
+  color: #1f2d3a;
+}
+
+.memberRole,
+.areaBadge,
+.readMore,
+.contactLink:hover {
+  color: #006a4e;
+}
+
+.memberStats,
+.contactLink,
+.tag {
+  background: #f1f5f8;
+  color: #526879;
+}
+
+.bioText,
+.detailItem,
+.statLabel {
+  color: #667987;
+}
+
+.memberDetails,
+.memberContact {
+  border-top-color: #e1e8ee;
+}
+
+.memberContact {
+  flex-wrap: wrap;
+}
+
+.contactLink {
+  border-radius: 8px;
+}
+
+.ctaSection {
+  background: #123b5a;
+}
+
+.ctaButtonPrimary,
+.ctaButtonSecondary {
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .container {
+    width: min(100% - 1.25rem, 1180px);
+  }
+
+  .heroSection {
+    padding: 6rem 0 2.25rem;
+  }
+
+  .heroText {
+    text-align: left;
+  }
+
+  .heroTitle {
+    margin-inline: 0;
+    font-size: 2.15rem;
+  }
+
+  .heroDescription {
+    margin-inline: 0;
+    font-size: 1rem;
+  }
+
+  .heroStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statItem {
+    padding: 0.9rem;
+  }
+
+  .areasSection,
+  .membersSection,
+  .ctaSection,
+  .infoSection {
+    padding-block: 2.5rem;
+  }
+
+  .sectionHeader {
+    text-align: left;
+    margin-bottom: 1.5rem;
+  }
+
+  .membersGrid,
+  .areasGrid,
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterButtons {
+    margin-inline: -0.625rem;
+    padding-inline: 0.625rem;
+  }
+
+  .filterButton {
+    min-height: 2.7rem;
+  }
+
+  .memberImage {
+    height: 180px;
+  }
+}
+
+@media (max-width: 430px) {
+  .heroStats {
+    grid-template-columns: 1fr;
+  }
+
+  .memberInfo,
+  .areaCard,
+  .infoCard {
+    padding: 1rem;
+  }
+}

@@ -6,7 +6,12 @@ export function normalizarPesquisadores(brutos) {
     .map(p => ({
       nome: p.nome.trim().toUpperCase(),
       titulacao_max: p.titulacao_MAX?.trim() || null,
-      data_inclusao: p.data_inclusao || null
+      data_inclusao: p.data_inclusao || null,
+      email: p.email || null,
+      espelho_url: p.espelho_url || p.espelhoUrl || null,
+      lattes_url: p.lattes_url || p.lattesUrl || null,
+      id_lattes: p.id_lattes || null,
+      ultima_atualizacao_lattes: p.ultima_atualizacao_lattes || null
     }));
 }
 

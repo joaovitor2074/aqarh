@@ -228,15 +228,53 @@ export default function Dashboard() {
     }
   }
 
+  const chartSeries = useMemo(() => {
+    const series = [
+      { label: "Membros", value: stats.totalMembros, color: "#006a4e" },
+      { label: "Projetos", value: stats.totalProjetos, color: "#2563eb" },
+      { label: "Linhas", value: stats.totalLinhas, color: "#d97706" },
+      { label: "Comunicados", value: stats.totalComunicados, color: "#0891b2" },
+    ]
+    const maxValue = Math.max(...series.map((item) => Number(item.value) || 0), 1)
+
+    return series.map((item) => ({
+      ...item,
+      percent: Math.max(((Number(item.value) || 0) / maxValue) * 100, item.value > 0 ? 8 : 0),
+    }))
+  }, [stats])
+
+  const totalCatalogo =
+    stats.totalMembros + stats.totalProjetos + stats.totalLinhas + stats.totalComunicados
+  const comunicadosRegistrados = stats.comunicadosAtivos + stats.comunicadosRascunhos
+  const comunicadosTotal = Math.max(comunicadosRegistrados, 1)
+  const comunicadosAtivosPct = comunicadosRegistrados
+    ? Math.round((stats.comunicadosAtivos / comunicadosTotal) * 100)
+    : 0
+  const scrapingHealth = scrapeRunning ? 68 : displayStatus === "sucesso" ? 100 : displayStatus === "erro" ? 32 : 46
+
+  const donutStyle = {
+    background: comunicadosRegistrados
+      ? `conic-gradient(#006a4e 0 ${comunicadosAtivosPct}%, #d97706 ${comunicadosAtivosPct}% 100%)`
+      : "#e3ece8",
+  }
+
   return (
     <AdminLayout>
       <div className={styles.dashboardContainer}>
         <div className={styles.header}>
-          <div>
-            <h1 className={styles.title}>Dashboard</h1>
+          <div className={styles.headerContent}>
+            <span className={styles.kicker}>Gestao academica</span>
+            <h1 className={styles.title}>Painel de acompanhamento institucional</h1>
             <p className={styles.subtitle}>
-              Visao geral do sistema GIEPI e das atualizacoes do scraping
+              Indicadores consolidados de membros, pesquisa, comunicados e atualizacoes
+              automatizadas do GIEPI.
             </p>
+
+            <div className={styles.headerMeta}>
+              <span>{totalCatalogo} registros monitorados</span>
+              <span>{notificacoesPendentes} pendencias de revisao</span>
+              <span>{getStatusLabel(displayStatus)}</span>
+            </div>
           </div>
 
           <div className={styles.headerActions}>
@@ -297,6 +335,100 @@ export default function Dashboard() {
             subtitle={`${stats.comunicadosRascunhos} rascunhos`}
             loading={loading}
           />
+        </div>
+
+        <div className={styles.insightsGrid}>
+          <Card className={styles.chartCard}>
+            <div className={styles.cardHeader}>
+              <FaProjectDiagram className={styles.cardIcon} />
+              <div>
+                <h3>Distribuicao do acervo</h3>
+                <p>Comparativo entre os principais registros do sistema.</p>
+              </div>
+            </div>
+
+            <div className={styles.barChart}>
+              {chartSeries.map((item) => (
+                <div className={styles.barRow} key={item.label}>
+                  <div className={styles.barLabel}>
+                    <span>{item.label}</span>
+                    <strong>{loading ? "..." : item.value}</strong>
+                  </div>
+                  <div className={styles.barTrack} aria-hidden="true">
+                    <span
+                      className={styles.barFill}
+                      style={{ width: `${loading ? 14 : item.percent}%`, backgroundColor: item.color }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className={styles.donutCard}>
+            <div className={styles.cardHeader}>
+              <FaBullhorn className={styles.cardIcon} />
+              <div>
+                <h3>Comunicados</h3>
+                <p>Status editorial dos informes publicados.</p>
+              </div>
+            </div>
+
+            <div className={styles.donutWrap}>
+              <div className={styles.donut} style={donutStyle}>
+                <div>
+                  <strong>{loading ? "..." : `${comunicadosAtivosPct}%`}</strong>
+                  <span>ativos</span>
+                </div>
+              </div>
+
+              <div className={styles.legendList}>
+                <span>
+                  <i className={styles.legendActive} />
+                  {stats.comunicadosAtivos} ativos
+                </span>
+                <span>
+                  <i className={styles.legendDraft} />
+                  {stats.comunicadosRascunhos} rascunhos
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          <Card className={styles.healthCard}>
+            <div className={styles.cardHeader}>
+              <FaSync className={styles.cardIcon} />
+              <div>
+                <h3>Operacao de dados</h3>
+                <p>Estado atual da coleta e revisao administrativa.</p>
+              </div>
+            </div>
+
+            <div className={styles.healthMeter}>
+              <div className={styles.healthTrack}>
+                <span style={{ width: `${scrapingHealth}%` }} />
+              </div>
+              <div className={styles.healthLabels}>
+                <strong>{getStatusLabel(displayStatus)}</strong>
+                <span>{scrapeConnection === "online" ? "conexao ativa" : "reconectando"}</span>
+              </div>
+            </div>
+
+            <div className={styles.compactMetrics}>
+              <div>
+                <span>Pendencias</span>
+                <strong>{notificacoesPendentes}</strong>
+              </div>
+              <div>
+                <span>Linhas recentes</span>
+                <strong>{ultimasLinhas.length}</strong>
+              </div>
+              <div>
+                <span>Atividades</span>
+                <strong>{atividades.length}</strong>
+              </div>
+            </div>
+          </Card>
         </div>
 
         <Card className={styles.scrapeCard}>

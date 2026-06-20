@@ -390,3 +390,172 @@
   z-index: 9998;
   font-size: 12px;
 }
+
+/* ================================
+   REFINO INSTITUCIONAL MOBILE
+================================ */
+.modalOverlay {
+  padding: 1rem;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.modal {
+  width: min(100%, 520px);
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+}
+
+.modalHeader {
+  padding: 0.9rem 1rem;
+  background: #006a4e;
+}
+
+.tipoContainer {
+  gap: 0.65rem;
+  font-size: 1rem;
+}
+
+.tipoContainer svg {
+  font-size: 1.1rem;
+}
+
+.tipoLabel {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+}
+
+.badgeInfo {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.closeButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 8px;
+}
+
+.closeButton:hover {
+  transform: none;
+}
+
+.modalContent {
+  padding: 1rem;
+  max-height: min(62vh, 520px);
+}
+
+.imagemContainer {
+  height: 150px;
+  border-radius: 8px;
+  background: #f1f5f8;
+}
+
+.imagem:hover {
+  transform: none;
+}
+
+.titulo {
+  color: #1f2d3a;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.descricao {
+  color: #526879;
+  font-size: 0.96rem;
+}
+
+.metaInfo {
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: #667987;
+}
+
+.data::before {
+  content: none;
+}
+
+.statusBadge {
+  border-radius: 8px;
+  background: #edf7f3;
+  color: #006a4e;
+}
+
+.modalFooter {
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.navButton,
+.dismissButton,
+.closeButtonLarge {
+  border-radius: 8px;
+}
+
+.navButton {
+  border-color: #006a4e;
+  color: #006a4e;
+}
+
+.nextButton:hover,
+.closeButtonLarge {
+  background: #006a4e;
+}
+
+.dismissButton {
+  background: #526879;
+}
+
+.activeDot {
+  background: #006a4e;
+}
+
+@media (max-width: 520px) {
+  .modalOverlay {
+    align-items: flex-start;
+    padding: 0.75rem;
+    padding-top: 5.25rem;
+  }
+
+  .modal {
+    max-height: calc(100vh - 6rem);
+  }
+
+  .modalHeader {
+    gap: 0.75rem;
+  }
+
+  .tipoLabel {
+    line-height: 1.2;
+  }
+
+  .headerActions {
+    gap: 0.5rem;
+  }
+
+  .imagemContainer {
+    display: none;
+  }
+
+  .titulo {
+    font-size: 1.12rem;
+  }
+
+  .descricao {
+    font-size: 0.92rem;
+  }
+
+  .metaInfo,
+  .singleActions,
+  .footerActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .modalFooter {
+    align-items: stretch;
+  }
+}

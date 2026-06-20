@@ -12,7 +12,7 @@ export default function Publicacoes() {
       id: 1,
       title: "Qualidade da água em comunidades rurais do Maranhão: estudo de caso em Codó",
       category: "Artigo Científico",
-      image: "/images/publicacoes/agua-comunidades.jpg",
+      image: "/img/laboratoriopaisagem1.jpeg",
       excerpt: "Análise de parâmetros físico-químicos e microbiológicos da água em povoados rurais.",
       authors: ["Silva, C.", "Santos, M.", "Oliveira, R."],
       journal: "Revista Brasileira de Recursos Hídricos",
@@ -28,7 +28,7 @@ export default function Publicacoes() {
       id: 2,
       title: "Potencial nutricional de frutas nativas do Maranhão",
       category: "Artigo Científico",
-      image: "/images/publicacoes/frutas-nativas.jpg",
+      image: "/img/equipamentospaisagem2.jpeg",
       excerpt: "Avaliação da composição nutricional e propriedades funcionais de frutas da região.",
       authors: ["Mendes, A.", "Lima, R.", "Costa, F."],
       journal: "Ciência e Tecnologia de Alimentos",
@@ -44,7 +44,7 @@ export default function Publicacoes() {
       id: 3,
       title: "Relatório Técnico: Feira de Ciências IFMA 2023",
       category: "Relatório Técnico",
-      image: "/images/publicacoes/relatorio-feira.jpg",
+      image: "/img/equipepaisagem.jpeg",
       excerpt: "Documentação completa dos projetos apresentados na Feira de Ciências do IFMA Campus Codó.",
       authors: ["GIEPI"],
       journal: "IFMA",
@@ -60,7 +60,7 @@ export default function Publicacoes() {
       id: 4,
       title: "Sistemas agroflorestais como alternativa sustentável para agricultura familiar",
       category: "Artigo de Revisão",
-      image: "/images/publicacoes/agroflorestas.jpg",
+      image: "/img/orgaospaisagem2.jpeg",
       excerpt: "Revisão sistemática sobre a implementação de sistemas agroflorestais no bioma maranhense.",
       authors: ["Almeida, J.", "Santos, M.", "Silva, C."],
       journal: "Agroecossistemas",
@@ -76,7 +76,7 @@ export default function Publicacoes() {
       id: 5,
       title: "Métodos analíticos para detecção de contaminantes em alimentos",
       category: "Capítulo de Livro",
-      image: "/images/publicacoes/metodos-analiticos.jpg",
+      image: "/img/microscopiopaisagem1.jpeg",
       excerpt: "Capítulo sobre técnicas modernas de análise de contaminantes em matrizes alimentícias.",
       authors: ["Costa, F.", "Mendes, A."],
       journal: "Técnicas Analíticas em Ciência de Alimentos",
@@ -92,7 +92,7 @@ export default function Publicacoes() {
       id: 6,
       title: "Monitoramento ambiental de bacias hidrográficas: metodologia e resultados preliminares",
       category: "Artigo Científico",
-      image: "/images/publicacoes/monitoramento-bacias.jpg",
+      image: "/img/laboratoriopaisagem2.jpeg",
       excerpt: "Desenvolvimento de sistema de monitoramento e primeiros resultados em bacias do Maranhão.",
       authors: ["Lima, R.", "Silva, C.", "Oliveira, P."],
       journal: "Engenharia Sanitária e Ambiental",
@@ -222,7 +222,7 @@ export default function Publicacoes() {
                       alt={pub.title}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `/images/placeholder-publication.jpg`;
+                        e.target.src = `/img/laboratoriopaisagem1.jpeg`;
                       }}
                     />
                   </div>
@@ -328,11 +328,11 @@ export default function Publicacoes() {
               Entre em contato se precisar de versões específicas ou informações adicionais.
             </p>
             <div className={styles.ctaButtons}>
-              <a href="/biblioteca" className={styles.ctaButtonPrimary}>
-                Acessar Biblioteca
+              <a href="/pesquisas" className={styles.ctaButtonPrimary}>
+                Ver pesquisas
               </a>
-              <a href="/normas-citacao" className={styles.ctaButtonSecondary}>
-                Normas de Citação
+              <a href="/projetos" className={styles.ctaButtonSecondary}>
+                Ver projetos
               </a>
             </div>
           </div>

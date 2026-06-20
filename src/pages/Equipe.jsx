@@ -16,7 +16,7 @@ export default function Equipe() {
       cargo: "Coordenador Geral",
       categoria: "professor",
       area: "Química de Alimentos",
-      imagem: "/images/equipe/professor1.jpg",
+      imagem: "/img/equiperetrato.jpeg",
       email: "carlos.silva@ifma.edu.br",
       lattes: "http://lattes.cnpq.br/123456789",
       linkedin: "https://linkedin.com/in/carlossilva",
@@ -33,7 +33,7 @@ export default function Equipe() {
       cargo: "Pesquisadora Principal",
       categoria: "professor",
       area: "Agronomia",
-      imagem: "/images/equipe/professora1.jpg",
+      imagem: "/img/equiperetrato2.jpeg",
       email: "maria.santos@ifma.edu.br",
       lattes: "http://lattes.cnpq.br/987654321",
       linkedin: "https://linkedin.com/in/mariasantos",
@@ -50,7 +50,7 @@ export default function Equipe() {
       cargo: "Pesquisador",
       categoria: "professor",
       area: "Recursos Hídricos",
-      imagem: "/images/equipe/professor2.jpg",
+      imagem: "/img/equipamentosretrato1.jpeg",
       email: "roberto.lima@ifma.edu.br",
       lattes: "http://lattes.cnpq.br/456789123",
       linkedin: "https://linkedin.com/in/robertolima",
@@ -67,7 +67,7 @@ export default function Equipe() {
       cargo: "Bolsista de Doutorado",
       categoria: "aluno",
       area: "Química Analítica",
-      imagem: "/images/equipe/aluna1.jpg",
+      imagem: "/img/laboratorioretrato1.jpeg",
       email: "ana.mendes@estudante.ifma.edu.br",
       lattes: "http://lattes.cnpq.br/789123456",
       linkedin: "https://linkedin.com/in/anaclara",
@@ -84,7 +84,7 @@ export default function Equipe() {
       cargo: "Bolsista de Mestrado",
       categoria: "aluno",
       area: "Agronomia",
-      imagem: "/images/equipe/aluno1.jpg",
+      imagem: "/img/microcopioretrato1.jpeg",
       email: "joao.almeida@estudante.ifma.edu.br",
       lattes: "http://lattes.cnpq.br/321654987",
       linkedin: "https://linkedin.com/in/joaopedro",
@@ -101,7 +101,7 @@ export default function Equipe() {
       cargo: "Bolsista de Iniciação Científica",
       categoria: "aluno",
       area: "Tecnologia de Alimentos",
-      imagem: "/images/equipe/aluna2.jpg",
+      imagem: "/img/microcopioretrato2.jpeg",
       email: "fernanda.costa@estudante.ifma.edu.br",
       lattes: "http://lattes.cnpq.br/654987321",
       linkedin: "https://linkedin.com/in/fernandacosta",
@@ -118,7 +118,7 @@ export default function Equipe() {
       cargo: "Técnica de Laboratório",
       categoria: "colaborador",
       area: "Análises Laboratoriais",
-      imagem: "/images/equipe/tecnica1.jpg",
+      imagem: "/img/orgaosretrato.jpeg",
       email: "patricia.oliveira@ifma.edu.br",
       lattes: "http://lattes.cnpq.br/147258369",
       linkedin: "https://linkedin.com/in/patriciaoliveira",
@@ -135,7 +135,7 @@ export default function Equipe() {
       cargo: "Analista de Dados",
       categoria: "colaborador",
       area: "Ciência de Dados",
-      imagem: "/images/equipe/colaborador1.jpg",
+      imagem: "/img/orgaosretrato2.jpeg",
       email: "ricardo.souza@ifma.edu.br",
       lattes: "http://lattes.cnpq.br/369258147",
       linkedin: "https://linkedin.com/in/ricardosouza",
@@ -297,7 +297,7 @@ export default function Equipe() {
                       alt={member.nome}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `/images/placeholder-avatar.jpg`;
+                        e.target.src = `/img/equiperetrato.jpeg`;
                       }}
                     />
                     <div className={styles.memberCategory}>
@@ -405,11 +405,11 @@ export default function Equipe() {
               Junte-se a nós e contribua para a pesquisa científica no Maranhão.
             </p>
             <div className={styles.ctaButtons}>
-              <a href="/oportunidades" className={styles.ctaButtonPrimary}>
-                Ver Oportunidades
+              <a href="/pesquisas" className={styles.ctaButtonPrimary}>
+                Ver pesquisas
               </a>
-              <a href="/contato" className={styles.ctaButtonSecondary}>
-                Entrar em Contato
+              <a href="/projetos" className={styles.ctaButtonSecondary}>
+                Ver projetos
               </a>
             </div>
           </div>

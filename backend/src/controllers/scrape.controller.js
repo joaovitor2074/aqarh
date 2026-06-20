@@ -21,12 +21,13 @@ let lastScrapeEvent = {
 };
 
 const BROWSER_CONFIG = {
-  headless: process.env.SCRAPE_HEADLESS === "false" ? false : true,
+  headless: process.env.SCRAPE_HEADLESS === "true",
   executablePath: process.env.CHROME_PATH || undefined,
   args: [
     "--no-sandbox",
     "--disable-setuid-sandbox",
     "--disable-dev-shm-usage",
+    "--disable-extensions",
     "--disable-blink-features=AutomationControlled",
     "--window-size=1920,1080",
   ],

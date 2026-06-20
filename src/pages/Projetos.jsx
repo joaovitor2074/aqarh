@@ -12,7 +12,7 @@ export default function Projetos() {
       id: 1,
       title: "Análise da Qualidade da Água em Comunidades Rurais",
       category: "Científicos",
-      image: "/images/projetos/agua-comunidades.jpg",
+      image: "/img/laboratoriopaisagem1.jpeg",
       excerpt: "Estudo sobre parâmetros físico-químicos e microbiológicos da água consumida em povoados da região de Codó.",
       description: "Projeto de pesquisa aplicada que visa mapear e analisar a qualidade da água em comunidades rurais do Maranhão, identificando fontes de contaminação e propondo soluções de tratamento acessíveis.",
       status: "Em andamento",
@@ -28,7 +28,7 @@ export default function Projetos() {
       id: 2,
       title: "Avaliação Nutricional de Alimentos Regionais",
       category: "Científicos",
-      image: "/images/projetos/alimentos-regionais.jpg",
+      image: "/img/equipamentospaisagem1.jpeg",
       excerpt: "Pesquisa com foco na composição nutricional e aplicações tecnológicas de alimentos maranhenses.",
       description: "Estudo abrangente da composição nutricional de frutas, tubérculos e outros produtos agrícolas da região, visando valorizar a biodiversidade local e desenvolver produtos inovadores.",
       status: "Concluído",
@@ -44,7 +44,7 @@ export default function Projetos() {
       id: 3,
       title: "Relatório Técnico – Feira de Ciências do IFMA",
       category: "Acadêmicos",
-      image: "/images/projetos/feira-ciencias.jpg",
+      image: "/img/equipepaisagem.jpeg",
       excerpt: "Projeto apresentado na Feira de Ciências com foco em sustentabilidade e inovação.",
       description: "Projeto acadêmico desenvolvido por alunos do IFMA para a Feira de Ciências, abordando temas de sustentabilidade ambiental e inovação tecnológica.",
       status: "Concluído",
@@ -60,7 +60,7 @@ export default function Projetos() {
       id: 4,
       title: "Monitoramento de Recursos Hídricos",
       category: "Científicos",
-      image: "/images/projetos/monitoramento-hidrico.jpg",
+      image: "/img/microscopiopaisagem1.jpeg",
       excerpt: "Projeto contínuo de análise de rios locais e impactos ambientais.",
       description: "Projeto de monitoramento ambiental contínuo de recursos hídricos na região, utilizando tecnologias de sensoriamento e análise laboratorial avançada.",
       status: "Em andamento",
@@ -76,7 +76,7 @@ export default function Projetos() {
       id: 5,
       title: "Práticas de Laboratório – Química Geral",
       category: "Acadêmicos",
-      image: "/images/projetos/quimica-laboratorio.jpg",
+      image: "/img/laboratoriopaisagem2.jpeg",
       excerpt: "Registro dos experimentos realizados na disciplina de Química do IFMA.",
       description: "Projeto acadêmico de registro e documentação de práticas laboratoriais realizadas na disciplina de Química Geral, com foco em metodologia científica.",
       status: "Concluído",
@@ -92,7 +92,7 @@ export default function Projetos() {
       id: 6,
       title: "Sistemas Agroflorestais para Agricultura Familiar",
       category: "Científicos",
-      image: "/images/projetos/agroflorestas.jpg",
+      image: "/img/orgaospaisagem.jpeg",
       excerpt: "Desenvolvimento de sistemas integrados de produção para pequenos produtores.",
       description: "Projeto de pesquisa e extensão que desenvolve e implementa sistemas agroflorestais adaptados às condições do Maranhão, visando sustentabilidade e aumento da renda familiar.",
       status: "Em andamento",
@@ -222,7 +222,7 @@ export default function Projetos() {
                     alt={project.title}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = `/images/placeholder-project.jpg`;
+                      e.target.src = `/img/laboratoriopaisagem1.jpeg`;
                     }}
                   />
                   <div className={`${styles.statusBadge} ${project.status === 'Em andamento' ? styles.statusActive : styles.statusCompleted}`}>
@@ -319,11 +319,11 @@ export default function Projetos() {
               ou deseja colaborar com nossas pesquisas, entre em contato.
             </p>
             <div className={styles.ctaButtons}>
-              <a href="/parcerias" className={styles.ctaButtonPrimary}>
-                Propor Parceria
+              <a href="/equipe" className={styles.ctaButtonPrimary}>
+                Conhecer a equipe
               </a>
-              <a href="/contato" className={styles.ctaButtonSecondary}>
-                Fale Conosco
+              <a href="/publicacoes" className={styles.ctaButtonSecondary}>
+                Ver publicações
               </a>
             </div>
           </div>

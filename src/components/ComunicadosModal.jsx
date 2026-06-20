@@ -218,28 +218,6 @@ export default function ComunicadosModal() {
 
   return (
     <>
-      {/* Botão de debug - apenas para desenvolvimento */}
-      {process.env.NODE_ENV === 'development' && (
-        <button
-          onClick={limparDescartados}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            background: '#333',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 9998,
-            fontSize: '12px'
-          }}
-        >
-          🔄 Redefinir comunicados
-        </button>
-      )}
-      
       <div className={styles.modalOverlay}>
         <div className={styles.modal}>
           <div className={styles.modalHeader}>
@@ -285,10 +263,10 @@ export default function ComunicadosModal() {
             
             <div className={styles.metaInfo}>
               <span className={styles.data}>
-                📅 Publicado em: {formatarData(comunicado.criado_em)}
+                Publicado em: {formatarData(comunicado.criado_em)}
               </span>
               <span className={styles.statusBadge}>
-                ● Ativo
+                Ativo
               </span>
             </div>
           </div>

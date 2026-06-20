@@ -4,7 +4,7 @@
  * =====================================================
  */
 import React, { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 /**
  * =====================================================
@@ -123,6 +123,11 @@ function AppContent() {
 
             {/* ================= ROTAS ADMIN (PROTEGIDAS) ================= */}
             <Route
+              path="/admin"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+
+            <Route
               path="/admin/dashboard"
               element={
                 <ProtectedRoute>
@@ -194,6 +199,11 @@ function AppContent() {
             />
 
             {/* ================= ROTAS PÚBLICAS ================= */}
+            <Route
+              path="/admin/*"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+
             <Route path="/" element={<Home />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/pesquisas" element={<Pesquisas />} />

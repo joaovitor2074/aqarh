@@ -5,8 +5,8 @@ export default function Card({ children, className = "" }) {
     <div
       className={`
         bg-white
-        rounded-xl
-        shadow-sm
+        rounded-lg
+        shadow-[0_10px_30px_rgba(15,23,42,0.06)]
         border
         border-gray-200
         p-6

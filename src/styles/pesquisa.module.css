@@ -702,3 +702,279 @@
     padding: 0 1rem;
   }
 }
+
+/* ================================
+   CAMADA INSTITUCIONAL RESPONSIVA
+================================ */
+.pesquisasContainer {
+  background: #f5f7fa;
+  color: #1f2d3a;
+}
+
+.container {
+  width: min(100% - 2rem, 1180px);
+  max-width: none;
+  padding: 0;
+}
+
+.heroSection {
+  padding: 7.5rem 0 3rem;
+  background: linear-gradient(90deg, #004d3a, #123b5a);
+}
+
+.heroSection::before {
+  display: none;
+}
+
+.heroContent {
+  width: min(100% - 2rem, 1180px);
+  max-width: none;
+  padding: 0;
+}
+
+.heroText {
+  text-align: left;
+}
+
+.heroBadge {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.heroBadge span,
+.highlight {
+  color: #f0c35a;
+}
+
+.highlight::after {
+  display: none;
+}
+
+.heroTitle {
+  max-width: 760px;
+  color: #ffffff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0;
+}
+
+.heroDescription {
+  max-width: 760px;
+  margin-left: 0;
+  color: #dfe9ef;
+}
+
+.heroStats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 760px;
+  margin: 2rem 0 0;
+  gap: 0.75rem;
+}
+
+.statCard {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.statCard:hover {
+  transform: none;
+}
+
+.statIcon {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #f0c35a;
+}
+
+.statNumber {
+  color: #ffffff;
+}
+
+.filtersSection {
+  position: static;
+  padding: 1.25rem 0;
+  background: #ffffff;
+  border-bottom: 1px solid #d9e2e8;
+}
+
+.searchInput {
+  border: 1px solid #cfdbe2;
+  background: #ffffff;
+  color: #1f2d3a;
+}
+
+.searchIcon {
+  color: #667987;
+}
+
+.filterButtons {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+  scrollbar-width: thin;
+}
+
+.filterButton {
+  flex: 0 0 auto;
+  border: 1px solid #cfdbe2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344b5c;
+}
+
+.filterButton.active {
+  background: #edf7f3;
+  color: #006a4e;
+}
+
+.researchSection {
+  padding: 2.5rem 0 4rem;
+  background: #f5f7fa;
+}
+
+.researchGrid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.researchCard {
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1f2d3a;
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
+.researchCard:hover {
+  transform: none;
+  border-color: #b9cbd6;
+  background: #ffffff;
+}
+
+.categoryBadge,
+.tag {
+  border-radius: 8px;
+  background: #f1f5f8;
+  color: #526879;
+}
+
+.categoryIcon,
+.readMoreButton,
+.detailsSection h4 {
+  color: #006a4e;
+}
+
+.statusBadge {
+  border-radius: 8px;
+  letter-spacing: 0;
+}
+
+.statusActive {
+  background: #edf7f3;
+  color: #006a4e;
+  border-color: #c8e6dc;
+}
+
+.statusCompleted {
+  background: #f7f0df;
+  color: #8a6517;
+  border-color: #ecd9a8;
+}
+
+.researchTitle,
+.detailItem strong,
+.categoryText,
+.noResults h3 {
+  color: #1f2d3a;
+}
+
+.researchExcerpt,
+.metaItem,
+.researchDescription p,
+.detailItem span,
+.statLabel,
+.noResults p {
+  color: #667987;
+}
+
+.expandedContent,
+.cardFooter {
+  border-top-color: #e1e8ee;
+}
+
+.researchMeta,
+.cardHeader {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.ctaSection {
+  background: #123b5a;
+}
+
+.ctaSection::before {
+  display: none;
+}
+
+.ctaButtonPrimary,
+.ctaButtonSecondary {
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .container,
+  .heroContent {
+    width: min(100% - 1.25rem, 1180px);
+  }
+
+  .heroSection {
+    padding: 6rem 0 2.25rem;
+  }
+
+  .heroTitle {
+    font-size: 2.15rem;
+  }
+
+  .heroDescription {
+    font-size: 1rem;
+  }
+
+  .heroStats,
+  .researchGrid,
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard,
+  .researchCard {
+    padding: 1rem;
+  }
+
+  .filterButtons {
+    margin-inline: -0.625rem;
+    padding-inline: 0.625rem;
+  }
+
+  .filterButton {
+    min-height: 2.7rem;
+  }
+
+  .cardHeader {
+    align-items: flex-start;
+  }
+
+  .researchSection,
+  .ctaSection {
+    padding-block: 2.5rem;
+  }
+
+  .ctaContent {
+    text-align: left;
+  }
+}

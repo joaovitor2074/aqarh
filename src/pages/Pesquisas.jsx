@@ -293,11 +293,11 @@ export default function Pesquisas() {
               Entre em contato para saber sobre processos seletivos e vagas disponíveis.
             </p>
             <div className={styles.ctaButtons}>
-              <a href="/contato" className={styles.ctaButtonPrimary}>
-                Entre em Contato
+              <a href="/equipe" className={styles.ctaButtonPrimary}>
+                Conhecer a equipe
               </a>
-              <a href="/oportunidades" className={styles.ctaButtonSecondary}>
-                Ver Oportunidades
+              <a href="/projetos" className={styles.ctaButtonSecondary}>
+                Ver projetos
               </a>
             </div>
           </div>
