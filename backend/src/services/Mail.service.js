@@ -1,0 +1,177 @@
+// src/modules/mail/mail.service.js
+// Substituir o mail.service.ts por esta versão JS com Nodemailer real
+
+import nodemailer from "nodemailer";
+
+/**
+ * Cria o transporter baseado no ambiente.
+ * Em desenvolvimento usa Mailtrap, em produção usa Gmail.
+ *
+ * VARIÁVEIS DE AMBIENTE NECESSÁRIAS:
+ *
+ * Para Mailtrap (desenvolvimento/testes):
+ *   MAIL_ENV=mailtrap
+ *   MAILTRAP_USER=seu_usuario_mailtrap
+ *   MAILTRAP_PASS=sua_senha_mailtrap
+ *
+ * Para Gmail (produção):
+ *   MAIL_ENV=gmail
+ *   GMAIL_USER=seuemail@gmail.com
+ *   GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx   ← App Password de 16 dígitos
+ *
+ * Como gerar Gmail App Password:
+ *   1. Acesse myaccount.google.com
+ *   2. Segurança → Verificação em duas etapas (ativar se necessário)
+ *   3. Segurança → Senhas de app → Selecionar app "Outro" → Gerar
+ *   4. Copie os 16 dígitos e cole em GMAIL_APP_PASSWORD
+ */
+function criarTransporter() {
+  const env = process.env.MAIL_ENV || "mailtrap";
+
+  if (env === "gmail") {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+  }
+
+  // Padrão: Mailtrap (para testes — emails não chegam de verdade)
+  return nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: process.env.MAILTRAP_USER,
+      pass: process.env.MAILTRAP_PASS,
+    },
+  });
+}
+
+/**
+ * Monta o HTML do email.
+ * Template simples e limpo, compatível com a identidade do GIEPI/IFMA.
+ */
+function montarHTML({ assunto, corpo, remetente = "GIEPI – IFMA Campus Codó" }) {
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${assunto}</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0"
+               style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+          <!-- Cabeçalho verde IFMA -->
+          <tr>
+            <td style="background:#006A4E;padding:24px 32px;">
+              <p style="margin:0;color:#ffffff;font-size:13px;letter-spacing:1px;text-transform:uppercase;opacity:0.8;">
+                ${remetente}
+              </p>
+              <h1 style="margin:8px 0 0;color:#ffffff;font-size:22px;font-weight:700;line-height:1.3;">
+                ${assunto}
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Corpo do email -->
+          <tr>
+            <td style="padding:32px;">
+              <div style="color:#374151;font-size:15px;line-height:1.7;white-space:pre-line;">
+                ${corpo}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Rodapé -->
+          <tr>
+            <td style="padding:20px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.5;">
+                Este email foi enviado automaticamente pelo sistema GIEPI.<br/>
+                IFMA – Instituto Federal do Maranhão, Campus Codó.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+/**
+ * Envia um email para um único destinatário.
+ *
+ * @param {object} opcoes
+ * @param {string} opcoes.para - Email do destinatário
+ * @param {string} opcoes.assunto - Assunto do email
+ * @param {string} opcoes.corpo - Corpo em texto/html simples
+ * @param {string} [opcoes.nomeDestinatario] - Nome para personalizar saudação
+ */
+export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
+  const transporter = criarTransporter();
+
+  const corpoFinal = nomeDestinatario
+    ? `Olá, ${nomeDestinatario}!\n\n${corpo}`
+    : corpo;
+
+  const info = await transporter.sendMail({
+    from: process.env.MAIL_FROM || `"GIEPI IFMA" <no-reply@giepi.ifma.edu.br>`,
+    to: para,
+    subject: assunto,
+    text: corpoFinal,
+    html: montarHTML({ assunto, corpo: corpoFinal }),
+  });
+
+  console.log(`[MAIL] Enviado para ${para} — ID: ${info.messageId}`);
+  return info;
+}
+
+/**
+ * Envia email em massa para uma lista de destinatários.
+ * Envia individualmente para personalizar a saudação.
+ *
+ * @param {object} opcoes
+ * @param {Array<{email: string, nome: string}>} opcoes.destinatarios
+ * @param {string} opcoes.assunto
+ * @param {string} opcoes.corpo
+ * @param {boolean} [opcoes.personalizar] - Se true, adiciona "Olá, [nome]!" no início
+ */
+export async function enviarEmailEmMassa({ destinatarios, assunto, corpo, personalizar = true }) {
+  const resultados = {
+    total: destinatarios.length,
+    enviados: 0,
+    falhas: [],
+  };
+
+  for (const dest of destinatarios) {
+    try {
+      await enviarEmail({
+        para: dest.email,
+        assunto,
+        corpo,
+        nomeDestinatario: personalizar ? dest.nome : null,
+      });
+      resultados.enviados++;
+    } catch (err) {
+      console.error(`[MAIL] Falha ao enviar para ${dest.email}:`, err.message);
+      resultados.falhas.push({ email: dest.email, erro: err.message });
+    }
+  }
+
+  console.log(
+    `[MAIL] Campanha concluída: ${resultados.enviados}/${resultados.total} enviados, ${resultados.falhas.length} falhas`
+  );
+
+  return resultados;
+}

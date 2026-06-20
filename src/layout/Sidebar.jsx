@@ -1,22 +1,27 @@
 // src/components/layout/Sidebar.jsx
 
 import React from "react";
-import { NavLink } from "react-router-dom";
-
-// Tailwind classes usando o estilo IFMA
-import { FaBell } from "react-icons/fa";
-// Verde IFMA: #006A4E
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaBell, FaEnvelope } from "react-icons/fa";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
   const menu = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: HomeIcon },
-    { label: "Membros", path: "/admin/membros", icon: UsersIcon },
-    { label: "Projetos", path: "/admin/projetos", icon: ProjectsIcon },
-    { label: "Linhas de Pesquisa", path: "/admin/linhaspesquisas", icon: FlaskIcon },
-    { label: "Comunicados", path: "/admin/comunicados", icon: MegaphoneIcon },
-    {label: "Notificações", path: "/admin/notificacoes", icon: FaBell },
-    { label: "Configurações", path: "/admin/config", icon: ConfigIcon },
+    { label: "Dashboard",         path: "/admin/dashboard",       icon: HomeIcon },
+    { label: "Membros",           path: "/admin/membros",         icon: UsersIcon },
+    { label: "Projetos",          path: "/admin/projetos",        icon: ProjectsIcon },
+    { label: "Linhas de Pesquisa",path: "/admin/linhaspesquisas", icon: FlaskIcon },
+    { label: "Comunicados",       path: "/admin/comunicados",     icon: MegaphoneIcon },
+    { label: "Email em Massa",    path: "/admin/email-massa",     icon: FaEnvelope },
+    { label: "Notificações",      path: "/admin/notificacoes",    icon: FaBell },
+    { label: "Configurações",     path: "/admin/config",          icon: ConfigIcon },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <aside className="w-64 bg-[#006A4E] text-white min-h-screen flex flex-col">
@@ -53,7 +58,10 @@ export default function Sidebar() {
 
       {/* Botão de Logout */}
       <div className="p-4 border-t border-green-900/20">
-        <button className="w-full bg-white/10 text-white px-3 py-2 rounded-md text-left hover:bg-white/20">
+        <button
+          onClick={handleLogout}
+          className="w-full bg-white/10 text-white px-3 py-2 rounded-md text-left hover:bg-white/20 transition-colors"
+        >
           Sair
         </button>
       </div>

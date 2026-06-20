@@ -6,6 +6,7 @@ import Modal from "../../ui/Modal"
 import Input from "../../ui/Input"
 import FormGroup from "../../ui/FormGroup"
 import Select from "../../ui/Select"
+import EmailMembroModal from "../../components/EmailMembroModal"
 import { api } from "../../utils/api"
 import toast from "react-hot-toast"
 import styles from "../../styles/adminPages/membros.module.css"
@@ -23,28 +24,34 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaIdCard,
-  FaBriefcase,
-  FaUniversity
+  FaUniversity,
 } from "react-icons/fa"
 
 export default function Membros() {
-  // Estados
+  // ── Estados principais ──
   const [membros, setMembros] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [estatisticas, setEstatisticas] = useState(null)
 
-  // Filtros
+  // ── Modal de email individual ──
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [membroEmail, setMembroEmail] = useState(null)
+
+  // ── Filtros ──
   const [filtroStatus, setFiltroStatus] = useState("todos")
   const [filtroVinculo, setFiltroVinculo] = useState("todos")
   const [filtroTitulacao, setFiltroTitulacao] = useState("todos")
 
-  // Formulário
+  // ── Linhas de pesquisa para o select ──
+  const [linhasPesquisa, setLinhasPesquisa] = useState([])
+
+  // ── Formulário ──
   const [form, setForm] = useState({
     nome: "",
     titulacao_maxima: "",
-    data_inclusao: new Date().toISOString().split('T')[0],
+    data_inclusao: new Date().toISOString().split("T")[0],
     email: "",
     tipo_vinculo: "pesquisador",
     ativo: true,
@@ -52,27 +59,27 @@ export default function Membros() {
     lattes_url: "",
     orcid: "",
     instituicao: "",
-    cargo: ""
+    cargo: "",
   })
 
-  // Buscar todos os membros
-  // Alterar todas as chamadas API
+  // ────────────────────────────────────────
+  // Busca de dados
+  // ────────────────────────────────────────
+
   const buscarMembros = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
-      if (filtroStatus !== "todos") {
+
+      if (filtroStatus !== "todos")
         params.append("ativo", filtroStatus === "ativo" ? "true" : "false")
-      }
-      if (filtroVinculo !== "todos") {
+      if (filtroVinculo !== "todos")
         params.append("tipo_vinculo", filtroVinculo)
-      }
-      if (filtroTitulacao !== "todos") {
+      if (filtroTitulacao !== "todos")
         params.append("titulacao_maxima", filtroTitulacao)
-      }
 
       const query = params.toString()
-      const url = `/membros${query ? `?${query}` : ""}` // REMOVER /api
+      const url = `/membros${query ? `?${query}` : ""}`
       const data = await api.get(url)
       setMembros(data || [])
     } catch (error) {
@@ -85,19 +92,16 @@ export default function Membros() {
 
   const buscarEstatisticas = async () => {
     try {
-      const data = await api.get("/membros/quantidade") // REMOVER /api
+      const data = await api.get("/membros/quantidade")
       setEstatisticas(data)
     } catch (error) {
       console.error("Erro ao buscar estatísticas:", error)
     }
   }
 
-
-  // Buscar linhas de pesquisa para o select
-  const [linhasPesquisa, setLinhasPesquisa] = useState([])
   const buscarLinhasPesquisa = async () => {
     try {
-      const data = await api.get("/linhas-pesquisa") // REMOVER /api
+      const data = await api.get("/linhas-pesquisa")
       setLinhasPesquisa(data || [])
     } catch (error) {
       console.error("Erro ao buscar linhas de pesquisa:", error)
@@ -110,15 +114,36 @@ export default function Membros() {
     buscarLinhasPesquisa()
   }, [buscarMembros])
 
-  // Filtragem
-  const titulacoesUnicas = Array.from(new Set(membros.map(m => m.titulacao_maxima).filter(Boolean)))
+  // ────────────────────────────────────────
+  // Handlers do formulário
+  // ────────────────────────────────────────
+
+  const titulacoesUnicas = Array.from(
+    new Set(membros.map((m) => m.titulacao_maxima).filter(Boolean))
+  )
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }))
+  }
+
+  const resetForm = () => {
+    setForm({
+      nome: "",
+      titulacao_maxima: "",
+      data_inclusao: new Date().toISOString().split("T")[0],
+      email: "",
+      tipo_vinculo: "pesquisador",
+      ativo: true,
+      linha_pesquisa_id: null,
+      lattes_url: "",
+      orcid: "",
+      instituicao: "",
+      cargo: "",
+    })
   }
 
   const handleSubmit = async (e) => {
@@ -131,7 +156,6 @@ export default function Membros() {
         await api.post("/membros", form)
         toast.success("Membro criado com sucesso!")
       }
-
       setModalOpen(false)
       setEditing(null)
       resetForm()
@@ -142,28 +166,14 @@ export default function Membros() {
     }
   }
 
-  const resetForm = () => {
-    setForm({
-      nome: "",
-      titulacao_maxima: "",
-      data_inclusao: new Date().toISOString().split('T')[0],
-      email: "",
-      tipo_vinculo: "pesquisador",
-      ativo: true,
-      linha_pesquisa_id: null,
-      lattes_url: "",
-      orcid: "",
-      instituicao: "",
-      cargo: ""
-    })
-  }
-
   const handleEdit = (membro) => {
     setEditing(membro)
     setForm({
       nome: membro.nome || "",
       titulacao_maxima: membro.titulacao_maxima || "",
-      data_inclusao: membro.data_inclusao ? membro.data_inclusao.split('T')[0] : new Date().toISOString().split('T')[0],
+      data_inclusao: membro.data_inclusao
+        ? membro.data_inclusao.split("T")[0]
+        : new Date().toISOString().split("T")[0],
       email: membro.email || "",
       tipo_vinculo: membro.tipo_vinculo || "pesquisador",
       ativo: membro.ativo !== false,
@@ -171,14 +181,13 @@ export default function Membros() {
       lattes_url: membro.lattes_url || "",
       orcid: membro.orcid || "",
       instituicao: membro.instituicao || "",
-      cargo: membro.cargo || ""
+      cargo: membro.cargo || "",
     })
     setModalOpen(true)
   }
 
   const handleDelete = async (id) => {
     if (!confirm("Tem certeza que deseja excluir este membro?")) return
-
     try {
       await api.delete(`/membros/${id}`)
       toast.success("Membro excluído com sucesso!")
@@ -192,7 +201,7 @@ export default function Membros() {
   const toggleStatus = async (id, atualStatus) => {
     try {
       await api.patch(`/membros/${id}`, { ativo: !atualStatus })
-      toast.success(`Membro ${!atualStatus ? 'ativado' : 'desativado'} com sucesso!`)
+      toast.success(`Membro ${!atualStatus ? "ativado" : "desativado"} com sucesso!`)
       buscarMembros()
       buscarEstatisticas()
     } catch (error) {
@@ -200,34 +209,42 @@ export default function Membros() {
     }
   }
 
+  // ── Abre modal de email individual ──
+  const handleSendEmail = (membro) => {
+    setMembroEmail(membro)
+    setEmailModalOpen(true)
+  }
+
+  // ────────────────────────────────────────
+  // Render
+  // ────────────────────────────────────────
+
   return (
     <AdminLayout>
       <div className={styles.container}>
-        {/* Cabeçalho */}
+
+        {/* ── Cabeçalho ── */}
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Membros da Pesquisa</h1>
             <p className={styles.subtitle}>
               {estatisticas && (
                 <>
-                  Total: {estatisticas.total} |
-                  Ativos: {estatisticas.ativos} |
-                  Pesquisadores: {estatisticas.pesquisadores} |
+                  Total: {estatisticas.total} |&nbsp;
+                  Ativos: {estatisticas.ativos} |&nbsp;
+                  Pesquisadores: {estatisticas.pesquisadores} |&nbsp;
                   Estudantes: {estatisticas.estudantes}
                 </>
               )}
             </p>
           </div>
 
-          <Button
-            onClick={() => setModalOpen(true)}
-            className={styles.btnNovo}
-          >
+          <Button onClick={() => setModalOpen(true)} className={styles.btnNovo}>
             <FaPlus /> Novo Membro
           </Button>
         </div>
 
-        {/* Filtros */}
+        {/* ── Filtros ── */}
         <Card className={styles.filtrosCard}>
           <div className={styles.filtrosHeader}>
             <FaFilter />
@@ -268,7 +285,7 @@ export default function Membros() {
                   { value: "todos", label: "Todos" },
                   { value: "pesquisador", label: "Pesquisadores" },
                   { value: "estudante", label: "Estudantes" },
-                  { value: "colaborador", label: "Colaboradores" }
+                  { value: "colaborador", label: "Colaboradores" },
                 ]}
               />
             </div>
@@ -280,17 +297,17 @@ export default function Membros() {
                 onChange={(e) => setFiltroTitulacao(e.target.value)}
                 options={[
                   { value: "todos", label: "Todas" },
-                  ...titulacoesUnicas.map(tit => ({
+                  ...titulacoesUnicas.map((tit) => ({
                     value: tit,
-                    label: tit
-                  }))
+                    label: tit,
+                  })),
                 ]}
               />
             </div>
           </div>
         </Card>
 
-        {/* Lista de membros */}
+        {/* ── Tabela de membros ── */}
         <Card>
           {loading ? (
             <div className={styles.loading}>
@@ -321,6 +338,8 @@ export default function Membros() {
                 <tbody>
                   {membros.map((membro) => (
                     <tr key={membro.id}>
+
+                      {/* Nome + cargo + instituição */}
                       <td className={styles.colMembro}>
                         <div className={styles.avatar}>
                           {membro.tipo_vinculo === "pesquisador" ? (
@@ -342,15 +361,26 @@ export default function Membros() {
                         </div>
                       </td>
 
+                      {/* Email + Lattes + ORCID */}
                       <td>
                         <div className={styles.contato}>
-                          {membro.email && (
-                            <a href={`mailto:${membro.email}`} className={styles.email}>
+                          {membro.email ? (
+                            <a
+                              href={`mailto:${membro.email}`}
+                              className={styles.email}
+                            >
                               <FaEnvelope /> {membro.email}
                             </a>
+                          ) : (
+                            <span className={styles.semEmail}>Sem email</span>
                           )}
                           {membro.lattes_url && (
-                            <a href={membro.lattes_url} target="_blank" rel="noopener noreferrer" className={styles.lattes}>
+                            <a
+                              href={membro.lattes_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.lattes}
+                            >
                               <FaIdCard /> Lattes
                             </a>
                           )}
@@ -362,6 +392,7 @@ export default function Membros() {
                         </div>
                       </td>
 
+                      {/* Titulação + data */}
                       <td>
                         <div className={styles.titulacao}>
                           <FaGraduationCap />
@@ -370,26 +401,38 @@ export default function Membros() {
                         {membro.data_inclusao && (
                           <div className={styles.dataInclusao}>
                             <FaCalendarAlt />
-                            <span>{new Date(membro.data_inclusao).toLocaleDateString('pt-BR')}</span>
+                            <span>
+                              {new Date(membro.data_inclusao).toLocaleDateString("pt-BR")}
+                            </span>
                           </div>
                         )}
                       </td>
 
+                      {/* Tipo de vínculo */}
                       <td>
                         <span className={`${styles.vinculo} ${styles[membro.tipo_vinculo]}`}>
-                          {membro.tipo_vinculo === "pesquisador" ? "Pesquisador" :
-                            membro.tipo_vinculo === "estudante" ? "Estudante" :
-                              membro.tipo_vinculo === "colaborador" ? "Colaborador" :
-                                membro.tipo_vinculo}
+                          {membro.tipo_vinculo === "pesquisador"
+                            ? "Pesquisador"
+                            : membro.tipo_vinculo === "estudante"
+                            ? "Estudante"
+                            : membro.tipo_vinculo === "colaborador"
+                            ? "Colaborador"
+                            : membro.tipo_vinculo}
                         </span>
                       </td>
 
+                      {/* Status ativo/inativo */}
                       <td>
-                        <span className={`${styles.status} ${membro.ativo ? styles.ativo : styles.inativo}`}>
+                        <span
+                          className={`${styles.status} ${
+                            membro.ativo ? styles.ativo : styles.inativo
+                          }`}
+                        >
                           {membro.ativo ? "Ativo" : "Inativo"}
                         </span>
                       </td>
 
+                      {/* Ações */}
                       <td className={styles.colAcoes}>
                         <Button
                           onClick={() => handleEdit(membro)}
@@ -409,12 +452,12 @@ export default function Membros() {
                           {membro.ativo ? <FaTimesCircle /> : <FaCheckCircle />}
                         </Button>
 
-                        {/* NOVO BOTÃO — ENVIAR EMAIL */}
                         <Button
                           onClick={() => handleSendEmail(membro)}
                           variant="info"
                           size="sm"
-                          title="Enviar e-mail"
+                          title={membro.email ? "Enviar e-mail" : "Sem email cadastrado"}
+                          disabled={!membro.email}
                         >
                           <FaEnvelope />
                         </Button>
@@ -437,7 +480,7 @@ export default function Membros() {
           )}
         </Card>
 
-        {/* Modal para criar/editar */}
+        {/* ── Modal criar / editar membro ── */}
         <Modal
           isOpen={modalOpen}
           onClose={() => {
@@ -480,7 +523,7 @@ export default function Membros() {
                   options={[
                     { value: "pesquisador", label: "Pesquisador" },
                     { value: "estudante", label: "Estudante" },
-                    { value: "colaborador", label: "Colaborador" }
+                    { value: "colaborador", label: "Colaborador" },
                   ]}
                   required
                 />
@@ -513,10 +556,10 @@ export default function Membros() {
                   onChange={handleChange}
                   options={[
                     { value: "", label: "Não vinculada" },
-                    ...linhasPesquisa.map(linha => ({
+                    ...linhasPesquisa.map((linha) => ({
                       value: linha.id,
-                      label: linha.nome
-                    }))
+                      label: linha.nome,
+                    })),
                   ]}
                 />
               </FormGroup>
@@ -591,6 +634,17 @@ export default function Membros() {
             </div>
           </form>
         </Modal>
+
+        {/* ── Modal de email individual ── */}
+        <EmailMembroModal
+          isOpen={emailModalOpen}
+          onClose={() => {
+            setEmailModalOpen(false)
+            setMembroEmail(null)
+          }}
+          membro={membroEmail}
+        />
+
       </div>
     </AdminLayout>
   )

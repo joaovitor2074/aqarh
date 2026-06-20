@@ -61,6 +61,9 @@ import Config from "./pages/admin/Config";
  */
 import { Toaster } from "react-hot-toast";
 
+import EmailMassa from "./pages/admin/EmailMassa";
+
+
 /**
  * =====================================================
  * COMPONENTE PRINCIPAL DA APLICAÇÃO
@@ -133,6 +136,14 @@ function AppContent() {
               element={
                 <ProtectedRoute>
                   <Membros />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/email-massa"
+              element={
+                <ProtectedRoute>
+                  <EmailMassa />
                 </ProtectedRoute>
               }
             />

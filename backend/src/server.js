@@ -39,8 +39,8 @@ import comunicadosRoutes from "./routes/comunicados.routes.js";
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
 // Rotas de e-mail compiladas pelo TypeScript (dist)
-import mailRoutes from "../dist/routes/mail.routes.js";
 
+import mailRoutes from "./routes/mail.routes.js";
 /**
  * =====================================================
  * INICIALIZAÇÃO DO EXPRESS
