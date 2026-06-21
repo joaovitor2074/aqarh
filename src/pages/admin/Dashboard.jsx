@@ -56,7 +56,7 @@ export default function Dashboard() {
     totalMembros: 0,
     totalLinhas: 0,
     totalComunicados: 0,
-    totalProjetos: 14,
+    totalProjetos: 0,
     comunicadosAtivos: 0,
     comunicadosRascunhos: 0,
   })
@@ -87,6 +87,7 @@ export default function Dashboard() {
         membrosRes,
         linhasRes,
         comunicadosRes,
+        projetosRes,
         ultimasLinhasRes,
         atividadesRes,
         notificacoesRes,
@@ -94,6 +95,7 @@ export default function Dashboard() {
         api.get("/membros/quantidade"),
         api.get("/linhas-pesquisa/quantidade"),
         api.get("/comunicados/quantidade"),
+        api.get("/projetos/quantidade"),
         api.get("/linhas-pesquisa/ultimas"),
         api.get("/comunicados/recentes"),
         apiRequest("/adminjv/scrape/notificacoes"),
@@ -105,12 +107,13 @@ export default function Dashboard() {
         comunicadosRes.status === "fulfilled"
           ? comunicadosRes.value
           : { total: 0, ativos: 0, rascunhos: 0 }
+      const projetosData = projetosRes.status === "fulfilled" ? projetosRes.value : {}
 
       setStats({
         totalMembros: membrosData.total || 0,
         totalLinhas: linhasData.total || 0,
         totalComunicados: comunicadosData.total || 0,
-        totalProjetos: 14,
+        totalProjetos: projetosData.ativos || 0,
         comunicadosAtivos: comunicadosData.ativos || 0,
         comunicadosRascunhos: comunicadosData.rascunhos || 0,
       })

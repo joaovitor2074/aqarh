@@ -60,7 +60,10 @@ export default function Membros() {
     orcid: "",
     instituicao: "",
     cargo: "",
+    imagem: null,
+    imagem_url: "",
   })
+  const [imagemPreviewUrl, setImagemPreviewUrl] = useState("")
 
   // ────────────────────────────────────────
   // Busca de dados
@@ -114,6 +117,17 @@ export default function Membros() {
     buscarLinhasPesquisa()
   }, [buscarMembros])
 
+  useEffect(() => {
+    if (typeof File !== "undefined" && form.imagem instanceof File) {
+      const previewUrl = URL.createObjectURL(form.imagem)
+      setImagemPreviewUrl(previewUrl)
+      return () => URL.revokeObjectURL(previewUrl)
+    }
+
+    setImagemPreviewUrl(form.imagem_url || "")
+    return undefined
+  }, [form.imagem, form.imagem_url])
+
   // ────────────────────────────────────────
   // Handlers do formulário
   // ────────────────────────────────────────
@@ -123,11 +137,42 @@ export default function Membros() {
   )
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked, files } = e.target
+
+    if (name === "imagem") {
+      setForm((prev) => ({
+        ...prev,
+        imagem: files?.[0] || null,
+      }))
+      return
+    }
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }))
+  }
+
+  const buildMembroPayload = () => {
+    const payload = new FormData()
+
+    payload.append("nome", form.nome || "")
+    payload.append("titulacao_maxima", form.titulacao_maxima || "")
+    payload.append("data_inclusao", form.data_inclusao || "")
+    payload.append("email", form.email || "")
+    payload.append("tipo_vinculo", form.tipo_vinculo || "pesquisador")
+    payload.append("ativo", form.ativo ? "1" : "0")
+    payload.append("linha_pesquisa_id", form.linha_pesquisa_id || "")
+    payload.append("lattes_url", form.lattes_url || "")
+    payload.append("orcid", form.orcid || "")
+    payload.append("instituicao", form.instituicao || "")
+    payload.append("cargo", form.cargo || "")
+
+    if (typeof File !== "undefined" && form.imagem instanceof File) {
+      payload.append("imagem", form.imagem)
+    }
+
+    return payload
   }
 
   const resetForm = () => {
@@ -143,6 +188,8 @@ export default function Membros() {
       orcid: "",
       instituicao: "",
       cargo: "",
+      imagem: null,
+      imagem_url: "",
     })
   }
 
@@ -150,10 +197,10 @@ export default function Membros() {
     e.preventDefault()
     try {
       if (editing) {
-        await api.put(`/membros/${editing.id}`, form)
+        await api.put(`/membros/${editing.id}`, buildMembroPayload())
         toast.success("Membro atualizado com sucesso!")
       } else {
-        await api.post("/membros", form)
+        await api.post("/membros", buildMembroPayload())
         toast.success("Membro criado com sucesso!")
       }
       setModalOpen(false)
@@ -182,6 +229,8 @@ export default function Membros() {
       orcid: membro.orcid || "",
       instituicao: membro.instituicao || "",
       cargo: membro.cargo || "",
+      imagem: null,
+      imagem_url: membro.imagem_url || "",
     })
     setModalOpen(true)
   }
@@ -342,10 +391,23 @@ export default function Membros() {
                       {/* Nome + cargo + instituição */}
                       <td className={styles.colMembro}>
                         <div className={styles.avatar}>
-                          {membro.tipo_vinculo === "pesquisador" ? (
-                            <FaUser className={styles.avatarIcon} />
+                          {membro.imagem_url ? (
+                            <img
+                              src={membro.imagem_url}
+                              alt=""
+                              className={styles.avatarImage}
+                              onError={(event) => {
+                                event.currentTarget.style.display = "none"
+                              }}
+                            />
                           ) : (
-                            <FaUserGraduate className={styles.avatarIcon} />
+                            <>
+                              {membro.tipo_vinculo === "pesquisador" ? (
+                                <FaUser className={styles.avatarIcon} />
+                              ) : (
+                                <FaUserGraduate className={styles.avatarIcon} />
+                              )}
+                            </>
                           )}
                         </div>
                         <div className={styles.membroInfo}>
@@ -513,6 +575,31 @@ export default function Membros() {
                 />
               </FormGroup>
             </div>
+
+            <FormGroup label="Foto do membro">
+              <Input
+                name="imagem"
+                type="file"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              <small className={styles.helpText}>
+                Use uma foto vertical ou quadrada para ficar melhor na pagina de equipe.
+              </small>
+              {imagemPreviewUrl && (
+                <div className={styles.imagePreview}>
+                  <img
+                    src={imagemPreviewUrl}
+                    alt=""
+                  />
+                  <span>
+                    {typeof File !== "undefined" && form.imagem instanceof File
+                      ? form.imagem.name
+                      : "Imagem atual cadastrada"}
+                  </span>
+                </div>
+              )}
+            </FormGroup>
 
             <div className={styles.formRow}>
               <FormGroup label="Tipo de Vínculo *" className={styles.formGroup}>

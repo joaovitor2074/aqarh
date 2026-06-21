@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   listarLinhasPesquisa,
+  listarLinhasPesquisaPublicas,
   quantLinhas,
   ultimasLinha,
 } from "../controllers/linhas_pesquisas.controller.js";
@@ -11,6 +12,7 @@ const router = Router();
 
 router.get("/quantidade", quantLinhas);
 router.get("/ultimas", ultimasLinha);
+router.get("/publicas", listarLinhasPesquisaPublicas);
 router.get("/", authMiddleware, listarLinhasPesquisa);
 
 router.post("/", authMiddleware, async (req, res) => {

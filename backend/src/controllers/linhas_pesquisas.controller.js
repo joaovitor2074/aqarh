@@ -48,6 +48,47 @@ ORDER BY lp.nome ASC;
   }
 }
 
+export async function listarLinhasPesquisaPublicas(req, res) {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        lp.id,
+        lp.nome,
+        lp.grupo,
+        lp.ativo,
+        COUNT(DISTINCT CASE WHEN p.ativo = 1 THEN p.id END) AS total_pesquisadores,
+        GROUP_CONCAT(
+          DISTINCT CASE
+            WHEN p.ativo = 1 THEN p.nome
+          END
+          ORDER BY p.nome ASC
+          SEPARATOR '||'
+        ) AS pesquisadores_lista
+      FROM linhas_pesquisa lp
+      LEFT JOIN pesquisador_linha_pesquisa plp
+        ON plp.linha_pesquisa_id = lp.id
+      LEFT JOIN pesquisadores p
+        ON p.id = plp.pesquisador_id
+      WHERE lp.ativo = 1
+      GROUP BY lp.id
+      ORDER BY lp.nome ASC
+    `);
+
+    res.json(
+      rows.map((row) => ({
+        ...row,
+        total_pesquisadores: Number(row.total_pesquisadores || 0),
+        pesquisadores_lista: row.pesquisadores_lista
+          ? row.pesquisadores_lista.split("||").filter(Boolean)
+          : [],
+      }))
+    );
+  } catch (error) {
+    console.error("Erro ao listar linhas publicas:", error);
+    res.status(500).json({ message: "Erro ao listar linhas de pesquisa." });
+  }
+}
+
 
 export async function ultimasLinha(req, res) {
   try {

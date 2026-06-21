@@ -308,7 +308,7 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: 1.5rem;
+  overflow: hidden;
   transition: all var(--transition-base);
   cursor: pointer;
 }
@@ -320,11 +320,34 @@
   box-shadow: var(--shadow-xl);
 }
 
+.researchImage {
+  height: 190px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.researchImage img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.researchCard:hover .researchImage img {
+  transform: scale(1.04);
+}
+
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.5rem 1.5rem 0;
   margin-bottom: 1rem;
+}
+
+.cardBody {
+  padding: 0 1.5rem;
 }
 
 .categoryBadge {
@@ -393,6 +416,34 @@
   gap: 0.5rem;
   color: var(--text-secondary);
   font-size: 0.875rem;
+}
+
+.researchersPreview,
+.researchersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.researchersPreview span,
+.researchersPreview a,
+.researcherTag {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.researcherLink {
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.researcherLink:hover {
+  background: rgba(0, 196, 140, 0.15);
+  color: var(--accent-color);
 }
 
 .expandedContent {
@@ -486,8 +537,28 @@
 
 .cardFooter {
   margin-top: 1rem;
-  padding-top: 1rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loadingState,
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.loadingIcon {
+  color: var(--accent-color);
+}
+
+.errorState {
+  color: #fca5a5;
 }
 
 .readMoreButton {
@@ -851,6 +922,11 @@
   box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
 }
 
+.researchImage {
+  height: 180px;
+  background: #e7edf2;
+}
+
 .researchCard:hover {
   transform: none;
   border-color: #b9cbd6;
@@ -896,6 +972,9 @@
 
 .researchExcerpt,
 .metaItem,
+.researchersPreview span,
+.researchersPreview a,
+.researcherTag,
 .researchDescription p,
 .detailItem span,
 .statLabel,
@@ -903,9 +982,40 @@
   color: #667987;
 }
 
+.researchersPreview span,
+.researchersPreview a,
+.researcherTag {
+  border-radius: 8px;
+  background: #f1f5f8;
+}
+
+.researcherLink:hover {
+  background: #edf7f3;
+  color: #006a4e;
+}
+
 .expandedContent,
 .cardFooter {
   border-top-color: #e1e8ee;
+}
+
+.cardFooter {
+  background: #f8fafc;
+}
+
+.loadingState,
+.errorState {
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #667987;
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
+.errorState {
+  border-color: #f2c3bd;
+  background: #fff5f3;
+  color: #9f3d31;
 }
 
 .researchMeta,
@@ -951,9 +1061,18 @@
     grid-template-columns: 1fr;
   }
 
-  .statCard,
-  .researchCard {
+  .statCard {
     padding: 1rem;
+  }
+
+  .cardHeader,
+  .cardBody,
+  .cardFooter {
+    padding-inline: 1rem;
+  }
+
+  .researchImage {
+    height: 160px;
   }
 
   .filterButtons {

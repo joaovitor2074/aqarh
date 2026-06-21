@@ -5,17 +5,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   cleanupExtraPages,
-  closePageSafely,
+  collectPersonDetails,
   configureDgpPage,
   DGP_CONFIG,
-  extractMirrorData,
   extractPersonFromRow,
-  findActionLink,
   findPeopleTable,
   getLaunchOptions,
   getValidRows,
   navigateToDgpGroup,
-  openActionPage,
   sleep,
 } from "./dgpScraper.helpers.js";
 
@@ -46,46 +43,11 @@ async function processPerson(mainPage, rowHandle, index, total) {
 
   console.log(`[${index + 1}/${total}] Processando pesquisador: ${label}`);
 
-  let detailPage = null;
-  let lastError = null;
-
-  for (let attempt = 1; attempt <= DGP_CONFIG.retryAttempts; attempt++) {
-    try {
-      const linkHandle = await findActionLink(rowHandle, "pesquisador", "espelho");
-      if (!linkHandle) {
-        throw new Error("Botao de espelho do pesquisador nao encontrado");
-      }
-
-      detailPage = await openActionPage(mainPage, linkHandle);
-      const mirrorData = await extractMirrorData(detailPage);
-
-      await closePageSafely(detailPage);
-      detailPage = null;
-
-      return {
-        ...basePerson,
-        ...mirrorData,
-        espelhoUrl: mirrorData.espelhoUrl || mirrorData.espelho_url,
-        linhas_pesquisa: mirrorData.linhas_pesquisa || [],
-      };
-    } catch (error) {
-      lastError = error;
-      console.warn(`Tentativa ${attempt} falhou para ${label}: ${error.message}`);
-
-      if (detailPage && !detailPage.isClosed()) {
-        await closePageSafely(detailPage);
-        detailPage = null;
-      }
-
-      await cleanupExtraPages(mainPage.browser(), mainPage);
-      await sleep(DGP_CONFIG.delays.beforeRetry * attempt);
-    }
-  }
-
+  const person = await collectPersonDetails(mainPage, rowHandle, "pesquisador");
   return {
-    ...basePerson,
-    error: lastError?.message || "Falha ao processar pesquisador",
-    linhas_pesquisa: [],
+    ...person,
+    espelhoUrl: person.espelhoUrl || person.espelho_url,
+    linhas_pesquisa: person.linhas_pesquisa || [],
   };
 }
 

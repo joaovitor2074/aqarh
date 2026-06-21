@@ -1,128 +1,98 @@
-import { useState } from 'react';
-import { FaSearch, FaFilter, FaFlask, FaWater, FaSeedling, FaLeaf, FaGraduationCap, FaBookOpen, FaCalendarAlt, FaUserFriends, FaArrowRight } from 'react-icons/fa';
-import styles from '../styles/pesquisa.module.css';
+import { useEffect, useState } from "react";
+import {
+  FaArrowRight,
+  FaBookOpen,
+  FaExclamationTriangle,
+  FaFilter,
+  FaFlask,
+  FaGraduationCap,
+  FaSearch,
+  FaUsers,
+} from "react-icons/fa";
+import { carregarLinhasPublicas } from "../services/linhasPublicas.service";
+import { DEFAULT_LINHA_IMAGE } from "../utils/linhaImages";
+import { createResearcherHref } from "../utils/researcherLinks";
+import styles from "../styles/pesquisa.module.css";
 
 export default function Pesquisas() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('todos');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("todos");
   const [expandedResearch, setExpandedResearch] = useState(null);
+  const [linhasPesquisa, setLinhasPesquisa] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const researchData = [
-    {
-      id: 1,
-      title: "Análise da Qualidade da Água em Comunidades Rurais",
-      category: "Recursos Hídricos",
-      icon: <FaWater />,
-      excerpt: "Estudo voltado para avaliar a potabilidade e presença de contaminantes em fontes hídricas da região de Codó e municípios vizinhos.",
-      description: "Esta pesquisa tem como objetivo mapear e analisar a qualidade da água em comunidades rurais do Maranhão, identificando fontes de contaminação e propondo soluções de tratamento acessíveis. O estudo inclui análises físico-químicas, microbiológicas e avaliação de impactos na saúde pública.",
-      status: "Em andamento",
-      duration: "24 meses",
-      teamSize: 8,
-      publications: 3,
-      startDate: "2023-08-01",
-      tags: ["Qualidade da Água", "Saúde Pública", "Contaminantes", "Comunidades Rurais"]
-    },
-    {
-      id: 2,
-      title: "Avaliação de Produtos Alimentícios Regionais",
-      category: "Alimentos",
-      icon: <FaLeaf />,
-      excerpt: "Projetos focados em segurança alimentar, qualidade nutricional e desenvolvimento de produtos baseados na biodiversidade local.",
-      description: "Pesquisa que avalia o potencial nutricional e tecnológico de frutas, tubérculos e outros produtos agrícolas da região. Inclui desenvolvimento de produtos inovadores, estudos de vida útil e análises sensoriais para valorizar a biodiversidade maranhense.",
-      status: "Concluído",
-      duration: "18 meses",
-      teamSize: 6,
-      publications: 5,
-      startDate: "2022-03-15",
-      tags: ["Segurança Alimentar", "Biodiversidade", "Nutrição", "Desenvolvimento Regional"]
-    },
-    {
-      id: 3,
-      title: "Pesquisa em Química Aplicada",
-      category: "Química",
-      icon: <FaFlask />,
-      excerpt: "Trabalhos sobre reações químicas, análises laboratoriais e práticas industriais com foco em aplicações sustentáveis.",
-      description: "Desenvolvimento de métodos analíticos avançados para caracterização de materiais e compostos. Pesquisa em catálise, síntese orgânica e química verde, com aplicações nas indústrias farmacêutica, alimentícia e de materiais.",
-      status: "Em andamento",
-      duration: "36 meses",
-      teamSize: 10,
-      publications: 7,
-      startDate: "2023-01-10",
-      tags: ["Química Analítica", "Síntese Orgânica", "Química Verde", "Catálise"]
-    },
-    {
-      id: 4,
-      title: "Sistemas Agroflorestais Sustentáveis",
-      category: "Agronomia",
-      icon: <FaSeedling />,
-      excerpt: "Estudo de sistemas integrados de produção que combinam espécies florestais, agrícolas e pecuárias.",
-      description: "Pesquisa sobre implementação e manejo de sistemas agroflorestais adaptados ao bioma maranhense. Avaliação de produtividade, conservação do solo, biodiversidade e viabilidade econômica desses sistemas.",
-      status: "Em andamento",
-      duration: "48 meses",
-      teamSize: 12,
-      publications: 4,
-      startDate: "2022-06-01",
-      tags: ["Agroflorestas", "Sustentabilidade", "Conservação", "Agricultura Familiar"]
-    },
-    {
-      id: 5,
-      title: "Bioprospecção de Plantas Medicinais",
-      category: "Biologia",
-      icon: <FaLeaf />,
-      excerpt: "Identificação e estudo de espécies vegetais com potencial terapêutico e biotecnológico.",
-      description: "Pesquisa que busca identificar compostos bioativos em plantas da flora maranhense, avaliando suas propriedades farmacológicas e aplicações na indústria farmacêutica e cosmética.",
-      status: "Concluído",
-      duration: "20 meses",
-      teamSize: 7,
-      publications: 6,
-      startDate: "2021-09-01",
-      tags: ["Plantas Medicinais", "Compostos Bioativos", "Farmacologia", "Biotecnologia"]
-    },
-    {
-      id: 6,
-      title: "Monitoramento Ambiental de Bacias Hidrográficas",
-      category: "Recursos Hídricos",
-      icon: <FaWater />,
-      excerpt: "Sistema integrado de monitoramento da qualidade e quantidade de água em bacias críticas do estado.",
-      description: "Desenvolvimento de rede de sensores e metodologias para monitoramento contínuo de parâmetros ambientais em bacias hidrográficas. Análise de dados para gestão sustentável dos recursos hídricos.",
-      status: "Em andamento",
-      duration: "30 meses",
-      teamSize: 9,
-      publications: 2,
-      startDate: "2023-03-01",
-      tags: ["Monitoramento", "Bacias Hidrográficas", "Sensores", "Gestão Sustentável"]
+  useEffect(() => {
+    let isMounted = true;
+
+    async function carregarLinhas() {
+      try {
+        setLoading(true);
+        const linhas = await carregarLinhasPublicas();
+
+        if (isMounted) {
+          setLinhasPesquisa(linhas);
+          setErrorMessage("");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar linhas publicas:", error);
+
+        if (isMounted) {
+          setErrorMessage("Não foi possível carregar as linhas de pesquisa.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     }
-  ];
+
+    carregarLinhas();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const grupos = Array.from(
+    new Set(linhasPesquisa.map((linha) => linha.grupo).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b));
 
   const categories = [
-    { id: 'todos', label: 'Todas', icon: <FaFilter /> },
-    { id: 'Recursos Hídricos', label: 'Recursos Hídricos', icon: <FaWater /> },
-    { id: 'Alimentos', label: 'Alimentos', icon: <FaLeaf /> },
-    { id: 'Química', label: 'Química', icon: <FaFlask /> },
-    { id: 'Agronomia', label: 'Agronomia', icon: <FaSeedling /> },
-    { id: 'Biologia', label: 'Biologia', icon: <FaGraduationCap /> }
+    { id: "todos", label: "Todas", icon: <FaFilter /> },
+    ...grupos.map((grupo) => ({
+      id: grupo,
+      label: grupo,
+      icon: <FaFlask />,
+    })),
   ];
 
-  const filteredResearch = researchData.filter(research => {
-    const matchesSearch = research.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         research.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         research.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesFilter = activeFilter === 'todos' || research.category === activeFilter;
-    
+  const filteredResearch = linhasPesquisa.filter((linha) => {
+    const search = searchTerm.toLowerCase();
+    const matchesSearch =
+      linha.nome.toLowerCase().includes(search) ||
+      linha.grupo.toLowerCase().includes(search) ||
+      linha.pesquisadores.some((pesquisador) =>
+        pesquisador.toLowerCase().includes(search)
+      );
+
+    const matchesFilter = activeFilter === "todos" || linha.grupo === activeFilter;
+
     return matchesSearch && matchesFilter;
   });
 
+  const pesquisadoresUnicos = new Set(
+    linhasPesquisa.flatMap((linha) => linha.pesquisadores)
+  ).size;
+
   const stats = {
-    total: researchData.length,
-    emAndamento: researchData.filter(r => r.status === "Em andamento").length,
-    concluidos: researchData.filter(r => r.status === "Concluído").length,
-    publicacoes: researchData.reduce((acc, r) => acc + r.publications, 0)
+    total: linhasPesquisa.length,
+    grupos: grupos.length,
+    pesquisadores: pesquisadoresUnicos,
   };
 
   return (
     <div className={styles.pesquisasContainer}>
-      {/* Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
@@ -133,10 +103,10 @@ export default function Pesquisas() {
               Pesquisas do <span className={styles.highlight}>GIEPI</span>
             </h1>
             <p className={styles.heroDescription}>
-              Conheça os projetos de pesquisa desenvolvidos pelo grupo, abordando temas em alimentos, 
-              química, agronomia, recursos hídricos e biotecnologia.
+              Linhas reais cadastradas no banco de dados, com grupos e pesquisadores
+              vinculados ao cadastro do GIEPI.
             </p>
-            
+
             <div className={styles.heroStats}>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
@@ -144,16 +114,16 @@ export default function Pesquisas() {
                 </div>
                 <div className={styles.statContent}>
                   <div className={styles.statNumber}>{stats.total}</div>
-                  <div className={styles.statLabel}>Projetos</div>
+                  <div className={styles.statLabel}>Linhas Ativas</div>
                 </div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
-                  <FaCalendarAlt />
+                  <FaFlask />
                 </div>
                 <div className={styles.statContent}>
-                  <div className={styles.statNumber}>{stats.emAndamento}</div>
-                  <div className={styles.statLabel}>Em Andamento</div>
+                  <div className={styles.statNumber}>{stats.grupos}</div>
+                  <div className={styles.statLabel}>Grupos/Áreas</div>
                 </div>
               </div>
               <div className={styles.statCard}>
@@ -161,8 +131,8 @@ export default function Pesquisas() {
                   <FaGraduationCap />
                 </div>
                 <div className={styles.statContent}>
-                  <div className={styles.statNumber}>{stats.publicacoes}</div>
-                  <div className={styles.statLabel}>Publicações</div>
+                  <div className={styles.statNumber}>{stats.pesquisadores}</div>
+                  <div className={styles.statLabel}>Pesquisadores</div>
                 </div>
               </div>
             </div>
@@ -170,7 +140,6 @@ export default function Pesquisas() {
         </div>
       </section>
 
-      {/* Search and Filters */}
       <section className={styles.filtersSection}>
         <div className={styles.container}>
           <div className={styles.searchContainer}>
@@ -178,19 +147,22 @@ export default function Pesquisas() {
               <FaSearch className={styles.searchIcon} />
               <input
                 type="text"
-                placeholder="Buscar pesquisas por título, descrição ou palavras-chave..."
+                placeholder="Buscar por linha, grupo ou pesquisador..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 className={styles.searchInput}
               />
             </div>
-            
+
             <div className={styles.filterButtons}>
-              {categories.map(category => (
+              {categories.map((category) => (
                 <button
                   key={category.id}
-                  className={`${styles.filterButton} ${activeFilter === category.id ? styles.active : ''}`}
+                  className={`${styles.filterButton} ${
+                    activeFilter === category.id ? styles.active : ""
+                  }`}
                   onClick={() => setActiveFilter(category.id)}
+                  type="button"
                 >
                   <span className={styles.filterIcon}>{category.icon}</span>
                   <span className={styles.filterLabel}>{category.label}</span>
@@ -201,96 +173,152 @@ export default function Pesquisas() {
         </div>
       </section>
 
-      {/* Research Grid */}
       <section className={styles.researchSection}>
         <div className={styles.container}>
-          <div className={styles.researchGrid}>
-            {filteredResearch.map(research => (
-              <div 
-                key={research.id} 
-                className={styles.researchCard}
-                onClick={() => setExpandedResearch(expandedResearch === research.id ? null : research.id)}
-              >
-                <div className={styles.cardHeader}>
-                  <div className={styles.categoryBadge}>
-                    <span className={styles.categoryIcon}>{research.icon}</span>
-                    <span className={styles.categoryText}>{research.category}</span>
+          {loading && (
+            <div className={styles.loadingState}>
+              <FaFlask className={styles.loadingIcon} />
+              <p>Carregando linhas de pesquisa...</p>
+            </div>
+          )}
+
+          {!loading && errorMessage && (
+            <div className={styles.errorState}>
+              <FaExclamationTriangle />
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
+          {!loading && !errorMessage && (
+            <div className={styles.researchGrid}>
+              {filteredResearch.map((linha) => (
+                <div
+                  key={linha.id}
+                  className={styles.researchCard}
+                  onClick={() =>
+                    setExpandedResearch(expandedResearch === linha.id ? null : linha.id)
+                  }
+                >
+                  <div className={styles.researchImage}>
+                    <img
+                      src={linha.image}
+                      alt={`Linha de pesquisa: ${linha.nome}`}
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = DEFAULT_LINHA_IMAGE;
+                      }}
+                    />
                   </div>
-                  <div className={`${styles.statusBadge} ${research.status === 'Em andamento' ? styles.statusActive : styles.statusCompleted}`}>
-                    {research.status}
-                  </div>
-                </div>
-                
-                <div className={styles.cardBody}>
-                  <h3 className={styles.researchTitle}>{research.title}</h3>
-                  <p className={styles.researchExcerpt}>{research.excerpt}</p>
-                  
-                  <div className={styles.researchMeta}>
-                    <div className={styles.metaItem}>
-                      <FaCalendarAlt />
-                      <span>{research.duration}</span>
+
+                  <div className={styles.cardHeader}>
+                    <div className={styles.categoryBadge}>
+                      <span className={styles.categoryIcon}>
+                        <FaFlask />
+                      </span>
+                      <span className={styles.categoryText}>{linha.grupo}</span>
                     </div>
-                    <div className={styles.metaItem}>
-                      <FaUserFriends />
-                      <span>{research.teamSize} pesquisadores</span>
+                    <div className={`${styles.statusBadge} ${styles.statusActive}`}>
+                      Ativa
                     </div>
                   </div>
-                  
-                  {expandedResearch === research.id && (
-                    <div className={styles.expandedContent}>
-                      <div className={styles.researchDescription}>
-                        <h4>Descrição Detalhada</h4>
-                        <p>{research.description}</p>
+
+                  <div className={styles.cardBody}>
+                    <h3 className={styles.researchTitle}>{linha.nome}</h3>
+
+                    <div className={styles.researchMeta}>
+                      <div className={styles.metaItem}>
+                        <FaUsers />
+                        <span>
+                          {linha.totalPesquisadores === 1
+                            ? "1 pesquisador"
+                            : `${linha.totalPesquisadores} pesquisadores`}
+                        </span>
                       </div>
-                      
-                      <div className={styles.tagsContainer}>
-                        {research.tags.map((tag, index) => (
-                          <span key={index} className={styles.tag}>{tag}</span>
-                        ))}
-                      </div>
-                      
-                      <div className={styles.detailsGrid}>
-                        <div className={styles.detailItem}>
-                          <strong>Início:</strong>
-                          <span>{new Date(research.startDate).toLocaleDateString('pt-BR')}</span>
+                    </div>
+
+                    <div className={styles.researchersPreview}>
+                      {linha.pesquisadores.slice(0, 3).map((pesquisador) => (
+                        <a
+                          key={pesquisador}
+                          href={createResearcherHref(pesquisador)}
+                          className={styles.researcherLink}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {pesquisador}
+                        </a>
+                      ))}
+                      {linha.pesquisadores.length === 0 && (
+                        <span>Sem pesquisador vinculado</span>
+                      )}
+                      {linha.totalPesquisadores > 3 && (
+                        <span>+{linha.totalPesquisadores - 3}</span>
+                      )}
+                    </div>
+
+                    {expandedResearch === linha.id && (
+                      <div className={styles.expandedContent}>
+                        <div className={styles.researchDescription}>
+                          <h4>Pesquisadores vinculados</h4>
+                          {linha.pesquisadores.length > 0 ? (
+                            <div className={styles.researchersList}>
+                              {linha.pesquisadores.map((pesquisador) => (
+                                <a
+                                  key={pesquisador}
+                                  href={createResearcherHref(pesquisador)}
+                                  className={`${styles.researcherTag} ${styles.researcherLink}`}
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  {pesquisador}
+                                </a>
+                              ))}
+                            </div>
+                          ) : (
+                            <p>Nenhum pesquisador vinculado a esta linha.</p>
+                          )}
                         </div>
-                        <div className={styles.detailItem}>
-                          <strong>Publicações:</strong>
-                          <span>{research.publications}</span>
+
+                        <div className={styles.detailsGrid}>
+                          <div className={styles.detailItem}>
+                            <strong>Grupo/Área:</strong>
+                            <span>{linha.grupo}</span>
+                          </div>
+                          <div className={styles.detailItem}>
+                            <strong>Status:</strong>
+                            <span>Ativa</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+
+                  <div className={styles.cardFooter}>
+                    <button className={styles.readMoreButton} type="button">
+                      {expandedResearch === linha.id ? "Mostrar menos" : "Ver pesquisadores"}
+                      <FaArrowRight className={styles.arrowIcon} />
+                    </button>
+                  </div>
                 </div>
-                
-                <div className={styles.cardFooter}>
-                  <button className={styles.readMoreButton}>
-                    {expandedResearch === research.id ? 'Mostrar menos' : 'Ver detalhes'}
-                    <FaArrowRight className={styles.arrowIcon} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {filteredResearch.length === 0 && (
+              ))}
+            </div>
+          )}
+
+          {!loading && !errorMessage && filteredResearch.length === 0 && (
             <div className={styles.noResults}>
               <FaSearch className={styles.noResultsIcon} />
-              <h3>Nenhuma pesquisa encontrada</h3>
-              <p>Tente alterar os termos da busca ou selecione outra categoria</p>
+              <h3>Nenhuma linha encontrada</h3>
+              <p>Tente alterar os termos da busca ou selecione outro grupo.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaContent}>
-            <h2>Interessado em participar das nossas pesquisas?</h2>
+            <h2>Quer conhecer quem pesquisa no GIEPI?</h2>
             <p>
-              Temos oportunidades para estudantes de graduação e pós-graduação interessados em pesquisa científica.
-              Entre em contato para saber sobre processos seletivos e vagas disponíveis.
+              A equipe pública reúne os pesquisadores, estudantes e colaboradores cadastrados
+              no sistema.
             </p>
             <div className={styles.ctaButtons}>
               <a href="/equipe" className={styles.ctaButtonPrimary}>

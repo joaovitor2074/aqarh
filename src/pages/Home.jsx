@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   FaBookOpen,
   FaChartLine,
@@ -10,57 +10,99 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import ComunicadosModal from "../components/ComunicadosModal";
+import { carregarLinhasPublicas } from "../services/linhasPublicas.service";
+import { projetosService } from "../services/projetos.service";
+import { DEFAULT_LINHA_IMAGE, getLinhaImage } from "../utils/linhaImages";
+import { createResearcherHref } from "../utils/researcherLinks";
 import "../styles/Home.css";
 
-const linhasPesquisa = [
-  {
-    icon: <FaFlask />,
-    category: "Ensino e pesquisa",
-    title: "Educação, ciência e tecnologia",
-    text: "Estudos voltados à formação científica, práticas de ensino e produção de conhecimento aplicado.",
-    topics: ["Formação docente", "Metodologias de ensino", "Pesquisa aplicada"],
-  },
-  {
-    icon: <FaProjectDiagram />,
-    category: "Inovação",
-    title: "Soluções para problemas reais",
-    text: "Projetos desenvolvidos em diálogo com o território, instituições parceiras e demandas sociais.",
-    topics: ["Extensão", "Tecnologia social", "Parcerias"],
-  },
-  {
-    icon: <FaChartLine />,
-    category: "Gestão do conhecimento",
-    title: "Indicadores e produção científica",
-    text: "Organização de dados, publicações e resultados para apoiar decisões acadêmicas e institucionais.",
-    topics: ["Publicações", "Indicadores", "Comunicação científica"],
-  },
-];
-
-const projetosDestaque = [
-  {
-    image: "/img/laboratoriopaisagem1.jpeg",
-    status: "Em andamento",
-    title: "Pesquisa aplicada no IFMA Campus Codó",
-    text: "Ações integradas de ensino, pesquisa e inovação com participação de docentes, estudantes e colaboradores.",
-    tags: ["Pesquisa", "Formação", "IFMA"],
-  },
-  {
-    image: "/img/equipamentospaisagem1.jpeg",
-    status: "Institucional",
-    title: "Laboratórios e infraestrutura",
-    text: "Uso de equipamentos e ambientes de pesquisa para fortalecer projetos acadêmicos e tecnológicos.",
-    tags: ["Laboratório", "Tecnologia", "Ensino"],
-  },
-  {
-    image: "/img/orgaospaisagem.jpeg",
-    status: "Parcerias",
-    title: "Integração com instituições e comunidade",
-    text: "Projetos construídos com foco em impacto regional, cooperação técnica e desenvolvimento social.",
-    tags: ["Extensão", "Comunidade", "Cooperação"],
-  },
-];
-
 export default function Home() {
+  const [linhasPesquisa, setLinhasPesquisa] = useState([]);
+  const [linhasLoading, setLinhasLoading] = useState(true);
+  const [linhasError, setLinhasError] = useState("");
+  const [projetosPublicos, setProjetosPublicos] = useState([]);
+  const [projetosLoading, setProjetosLoading] = useState(true);
+  const [projetosError, setProjetosError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function carregarLinhas() {
+      try {
+        setLinhasLoading(true);
+        const linhas = await carregarLinhasPublicas();
+
+        if (isMounted) {
+          setLinhasPesquisa(linhas);
+          setLinhasError("");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar linhas publicas:", error);
+
+        if (isMounted) {
+          setLinhasError("Não foi possível carregar as linhas de pesquisa agora.");
+        }
+      } finally {
+        if (isMounted) {
+          setLinhasLoading(false);
+        }
+      }
+    }
+
+    carregarLinhas();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function carregarProjetos() {
+      try {
+        setProjetosLoading(true);
+        const data = await projetosService.buscarPublicos();
+
+        if (isMounted) {
+          setProjetosPublicos(data?.projetos || []);
+          setProjetosError("");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar projetos publicos:", error);
+
+        if (isMounted) {
+          setProjetosError("Não foi possível carregar os projetos agora.");
+        }
+      } finally {
+        if (isMounted) {
+          setProjetosLoading(false);
+        }
+      }
+    }
+
+    carregarProjetos();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const linhasDestaque = linhasPesquisa.slice(0, 3);
+  const projetosDestaque = projetosPublicos.slice(0, 3).map((projeto, index) => ({
+    id: projeto.id,
+    image:
+      projeto.imagem_url ||
+      getLinhaImage(
+        [projeto.titulo, projeto.area, projeto.linha_nome, projeto.linha_grupo],
+        index
+      ),
+    status: projeto.status,
+    title: projeto.titulo,
+    text: projeto.descricao || "Sem descrição cadastrada.",
+    tags: [projeto.area, projeto.linha_nome, projeto.status].filter(Boolean).slice(0, 3),
+  }));
+
   return (
     <>
       <ComunicadosModal />
@@ -75,7 +117,10 @@ export default function Home() {
 
         <div className="hero-content">
           <div className="hero-text">
-            <span className="hero-kicker">IFMA Campus Codó</span>
+            <div className="hero-brand" aria-label="GIEPI">
+              <img src="/img/header.png" alt="" className="hero-logo" />
+              <span className="hero-kicker">IFMA Campus Codó</span>
+            </div>
             <h1 className="hero-title">Grupo Interdisciplinar em Ensino, Pesquisa e Inovação</h1>
             <p className="hero-subtitle">
               Pesquisa aplicada, formação científica e projetos de inovação voltados ao
@@ -209,24 +254,62 @@ export default function Home() {
             <span className="section-tag">Atuação</span>
             <h2 className="section-title">Linhas de pesquisa</h2>
             <p className="section-subtitle">
-              Eixos que organizam os projetos e a produção acadêmica do grupo.
+              Linhas ativas cadastradas no banco, com pesquisadores vinculados ao grupo.
             </p>
           </div>
 
           <div className="linhas-grid">
-            {linhasPesquisa.map((linha) => (
-              <article className="linha-card" key={linha.title}>
-                <div className="linha-header">
-                  <div className="linha-icon">{linha.icon}</div>
-                  <span className="linha-category">{linha.category}</span>
+            {linhasLoading && (
+              <div className="linhas-feedback">Carregando linhas de pesquisa...</div>
+            )}
+
+            {!linhasLoading && linhasError && (
+              <div className="linhas-feedback error">{linhasError}</div>
+            )}
+
+            {!linhasLoading && !linhasError && linhasDestaque.length === 0 && (
+              <div className="linhas-feedback">Nenhuma linha de pesquisa ativa cadastrada.</div>
+            )}
+
+            {!linhasLoading && !linhasError && linhasDestaque.map((linha) => (
+              <article className="linha-card" key={linha.id}>
+                <div className="linha-image">
+                  <img
+                    src={linha.image}
+                    alt={`Linha de pesquisa: ${linha.nome}`}
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = DEFAULT_LINHA_IMAGE;
+                    }}
+                  />
                 </div>
-                <h3>{linha.title}</h3>
-                <p>{linha.text}</p>
-                <ul className="linha-topics">
-                  {linha.topics.map((topic) => (
-                    <li key={topic}>{topic}</li>
-                  ))}
-                </ul>
+                <div className="linha-body">
+                  <div className="linha-header">
+                    <span className="linha-category">{linha.grupo}</span>
+                  </div>
+                  <h3>{linha.nome}</h3>
+                  <div className="linha-researchers-summary">
+                    <FaUsers />
+                    <span>
+                      {linha.totalPesquisadores === 1
+                        ? "1 pesquisador vinculado"
+                        : `${linha.totalPesquisadores} pesquisadores vinculados`}
+                    </span>
+                  </div>
+                  <ul className="linha-topics">
+                    {linha.pesquisadores.slice(0, 3).map((pesquisador) => (
+                      <li key={pesquisador}>
+                        <a href={createResearcherHref(pesquisador)}>{pesquisador}</a>
+                      </li>
+                    ))}
+                    {linha.pesquisadores.length === 0 && (
+                      <li>Sem pesquisador vinculado</li>
+                    )}
+                    {linha.totalPesquisadores > 3 && (
+                      <li>+{linha.totalPesquisadores - 3}</li>
+                    )}
+                  </ul>
+                </div>
               </article>
             ))}
           </div>
@@ -244,28 +327,49 @@ export default function Home() {
           </div>
 
           <div className="projetos-grid">
-            {projetosDestaque.map((projeto) => (
-              <article className="projeto-card" key={projeto.title}>
-                <div className="projeto-image">
-                  <img src={projeto.image} alt={projeto.title} />
-                  <div className="projeto-badge">{projeto.status}</div>
-                </div>
-                <div className="projeto-content">
-                  <h3>{projeto.title}</h3>
-                  <p>{projeto.text}</p>
-                  <div className="projeto-meta">
-                    {projeto.tags.map((tag) => (
-                      <span className="projeto-tag" key={tag}>
-                        {tag}
-                      </span>
-                    ))}
+            {projetosLoading && (
+              <div className="linhas-feedback">Carregando projetos em destaque...</div>
+            )}
+
+            {!projetosLoading && projetosError && (
+              <div className="linhas-feedback error">{projetosError}</div>
+            )}
+
+            {!projetosLoading && !projetosError && projetosDestaque.length === 0 && (
+              <div className="linhas-feedback">Nenhum projeto publicado cadastrado.</div>
+            )}
+
+            {!projetosLoading &&
+              !projetosError &&
+              projetosDestaque.map((projeto) => (
+                <article className="projeto-card" key={projeto.id}>
+                  <div className="projeto-image">
+                    <img
+                      src={projeto.image}
+                      alt={projeto.title}
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = DEFAULT_LINHA_IMAGE;
+                      }}
+                    />
+                    <div className="projeto-badge">{projeto.status}</div>
                   </div>
-                  <a href="/projetos" className="projeto-link">
-                    Ver detalhes
-                  </a>
-                </div>
-              </article>
-            ))}
+                  <div className="projeto-content">
+                    <h3>{projeto.title}</h3>
+                    <p>{projeto.text}</p>
+                    <div className="projeto-meta">
+                      {projeto.tags.map((tag) => (
+                        <span className="projeto-tag" key={tag}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <a href="/projetos" className="projeto-link">
+                      Ver detalhes
+                    </a>
+                  </div>
+                </article>
+              ))}
           </div>
 
           <div className="section-cta">

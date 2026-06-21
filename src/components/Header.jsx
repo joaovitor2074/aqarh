@@ -39,7 +39,7 @@ export default function Header() {
         <div className={styles.headerContainer}>
           <Link to="/" className={styles.logoContainer} onClick={() => setOpen(false)}>
             <div className={styles.logoWrapper}>
-              <img src="/img/header.png" alt="GIEPI" className={styles.logo} />
+              <img src="/img/logohead.png" alt="GIEPI" className={styles.logo} />
             </div>
             <div className={styles.logoText}>
               <span className={styles.logoMain}>GIEPI</span>
@@ -89,7 +89,7 @@ export default function Header() {
       >
         <div className={styles.mobileHeader}>
           <div className={styles.mobileLogo}>
-            <img src="/img/header.png" alt="GIEPI" className={styles.mobileLogoImg} />
+            <img src="/img/logohead.png" alt="GIEPI" className={styles.mobileLogoImg} />
             <div>
               <span className={styles.mobileLogoText}>GIEPI</span>
               <span className={styles.mobileLogoSub}>IFMA Campus Codó</span>

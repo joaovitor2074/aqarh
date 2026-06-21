@@ -40,7 +40,15 @@ async function scrapeEstudantes(externalBrowser = null) {
     console.log(`Acessando pagina do grupo: ${DGP_CONFIG.url}`);
     await navigateToDgpGroup(page);
 
-    const resultados = await extractGroupPeople(page, "estudante");
+    const resultados = await extractGroupPeople(page, "estudante", {
+      includeDetails: DGP_CONFIG.includePersonDetails,
+      includeLattes: DGP_CONFIG.includeLattes,
+      onProgress: async (_, people) => {
+        if (DGP_CONFIG.includePersonDetails && people.length > 0 && people.length % 5 === 0) {
+          fs.writeFileSync(outputPath, JSON.stringify(people, null, 2), "utf-8");
+        }
+      },
+    });
     console.log(`Total de estudantes encontrados: ${resultados.length}`);
 
     fs.writeFileSync(outputPath, JSON.stringify(resultados, null, 2), "utf-8");

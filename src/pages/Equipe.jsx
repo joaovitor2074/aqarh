@@ -1,194 +1,226 @@
-import { useState } from 'react';
-import { FaSearch, FaFilter, FaUserGraduate, FaUserTie, FaChalkboardTeacher, FaUsers, FaEnvelope, FaLinkedin, FaLaptopCode, FaFlask, FaMicroscope, FaSeedling, FaWater, FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import styles from '../styles/equipe.module.css';
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaChalkboardTeacher,
+  FaChevronDown,
+  FaChevronUp,
+  FaEnvelope,
+  FaExclamationTriangle,
+  FaFilter,
+  FaFlask,
+  FaGraduationCap,
+  FaIdCard,
+  FaSearch,
+  FaUniversity,
+  FaUserGraduate,
+  FaUserTie,
+  FaUsers,
+} from "react-icons/fa";
+import { carregarMembrosPublicos } from "../services/membrosPublicos.service";
+import { createResearcherAnchor } from "../utils/researcherLinks";
+import styles from "../styles/equipe.module.css";
+
+const CATEGORY_CONFIG = {
+  pesquisador: {
+    label: "Pesquisadores",
+    singular: "Pesquisador",
+    icon: <FaChalkboardTeacher />,
+  },
+  estudante: {
+    label: "Estudantes",
+    singular: "Estudante",
+    icon: <FaUserGraduate />,
+  },
+  aluno: {
+    label: "Estudantes",
+    singular: "Estudante",
+    icon: <FaUserGraduate />,
+  },
+  colaborador: {
+    label: "Colaboradores",
+    singular: "Colaborador",
+    icon: <FaUserTie />,
+  },
+};
+
+function getCategoryConfig(tipoVinculo) {
+  return CATEGORY_CONFIG[tipoVinculo] || CATEGORY_CONFIG.pesquisador;
+}
+
+function formatDate(dateValue) {
+  if (!dateValue) return "Nao informada";
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime()) || date.getFullYear() < 1950) {
+    return "Nao informada";
+  }
+
+  return date.toLocaleDateString("pt-BR", {
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function formatMemberBio(member) {
+  if (member.resumo) {
+    return member.resumo.length > 220 ? `${member.resumo.slice(0, 220)}...` : member.resumo;
+  }
+
+  return `${member.titulacao}. Vinculado a ${
+    member.linhasPesquisa.length === 1
+      ? "1 linha de pesquisa"
+      : `${member.linhasPesquisa.length} linhas de pesquisa`
+  }.`;
+}
 
 export default function Equipe() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('todos');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todos");
   const [activeMember, setActiveMember] = useState(null);
   const [expandedBio, setExpandedBio] = useState(null);
+  const [highlightedAnchor, setHighlightedAnchor] = useState("");
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Dados da equipe
-  const teamMembers = [
-    {
-      id: 1,
-      nome: "Dr. Carlos Silva",
-      cargo: "Coordenador Geral",
-      categoria: "professor",
-      area: "Química de Alimentos",
-      imagem: "/img/equiperetrato.jpeg",
-      email: "carlos.silva@ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/123456789",
-      linkedin: "https://linkedin.com/in/carlossilva",
-      descricao: "Doutor em Ciência de Alimentos pela USP com pós-doutorado na University of California. Coordena projetos de pesquisa em bioprospecção e desenvolvimento de alimentos funcionais.",
-      projetos: 8,
-      publicacoes: 32,
-      formacao: "Doutorado em Ciência de Alimentos (USP)",
-      areasInteresse: ["Química de Alimentos", "Bioprospecção", "Alimentos Funcionais"],
-      status: "ativo"
-    },
-    {
-      id: 2,
-      nome: "Dra. Maria Santos",
-      cargo: "Pesquisadora Principal",
-      categoria: "professor",
-      area: "Agronomia",
-      imagem: "/img/equiperetrato2.jpeg",
-      email: "maria.santos@ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/987654321",
-      linkedin: "https://linkedin.com/in/mariasantos",
-      descricao: "Especialista em agricultura sustentável e manejo de solos. Desenvolve pesquisas em sistemas agroflorestais e recuperação de áreas degradadas.",
-      projetos: 6,
-      publicacoes: 28,
-      formacao: "Doutorado em Agronomia (UFV)",
-      areasInteresse: ["Agricultura Sustentável", "Manejo de Solos", "Agroflorestas"],
-      status: "ativo"
-    },
-    {
-      id: 3,
-      nome: "Dr. Roberto Lima",
-      cargo: "Pesquisador",
-      categoria: "professor",
-      area: "Recursos Hídricos",
-      imagem: "/img/equipamentosretrato1.jpeg",
-      email: "roberto.lima@ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/456789123",
-      linkedin: "https://linkedin.com/in/robertolima",
-      descricao: "Especialista em gestão de recursos hídricos e qualidade da água. Desenvolve tecnologias para tratamento de efluentes e monitoramento ambiental.",
-      projetos: 5,
-      publicacoes: 21,
-      formacao: "Doutorado em Engenharia Ambiental (UFMG)",
-      areasInteresse: ["Gestão de Recursos Hídricos", "Qualidade da Água", "Tratamento de Efluentes"],
-      status: "ativo"
-    },
-    {
-      id: 4,
-      nome: "Ana Clara Mendes",
-      cargo: "Bolsista de Doutorado",
-      categoria: "aluno",
-      area: "Química Analítica",
-      imagem: "/img/laboratorioretrato1.jpeg",
-      email: "ana.mendes@estudante.ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/789123456",
-      linkedin: "https://linkedin.com/in/anaclara",
-      descricao: "Desenvolve pesquisa em métodos analíticos para detecção de contaminantes em alimentos. Mestre em Química pela UFMA.",
-      projetos: 3,
-      publicacoes: 9,
-      formacao: "Mestrado em Química (UFMA)",
-      areasInteresse: ["Química Analítica", "Contaminantes em Alimentos", "Métodos Analíticos"],
-      status: "ativo"
-    },
-    {
-      id: 5,
-      nome: "João Pedro Almeida",
-      cargo: "Bolsista de Mestrado",
-      categoria: "aluno",
-      area: "Agronomia",
-      imagem: "/img/microcopioretrato1.jpeg",
-      email: "joao.almeida@estudante.ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/321654987",
-      linkedin: "https://linkedin.com/in/joaopedro",
-      descricao: "Pesquisa sistemas de irrigação eficientes e manejo hídrico em culturas do Maranhão. Engenheiro Agrônomo formado pelo IFMA.",
-      projetos: 2,
-      publicacoes: 5,
-      formacao: "Engenharia Agronômica (IFMA)",
-      areasInteresse: ["Irrigação", "Manejo Hídrico", "Agricultura de Precisão"],
-      status: "ativo"
-    },
-    {
-      id: 6,
-      nome: "Fernanda Costa",
-      cargo: "Bolsista de Iniciação Científica",
-      categoria: "aluno",
-      area: "Tecnologia de Alimentos",
-      imagem: "/img/microcopioretrato2.jpeg",
-      email: "fernanda.costa@estudante.ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/654987321",
-      linkedin: "https://linkedin.com/in/fernandacosta",
-      descricao: "Desenvolve pesquisa em processamento de frutas nativas do Maranhão e desenvolvimento de produtos alimentícios.",
-      projetos: 1,
-      publicacoes: 2,
-      formacao: "Tecnologia em Alimentos (IFMA)",
-      areasInteresse: ["Processamento de Alimentos", "Frutas Nativas", "Desenvolvimento de Produtos"],
-      status: "ativo"
-    },
-    {
-      id: 7,
-      nome: "Patrícia Oliveira",
-      cargo: "Técnica de Laboratório",
-      categoria: "colaborador",
-      area: "Análises Laboratoriais",
-      imagem: "/img/orgaosretrato.jpeg",
-      email: "patricia.oliveira@ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/147258369",
-      linkedin: "https://linkedin.com/in/patriciaoliveira",
-      descricao: "Responsável pela manutenção dos equipamentos e análises laboratoriais nos projetos do grupo. Especialista em análises químicas.",
-      projetos: 12,
-      publicacoes: 8,
-      formacao: "Especialização em Química Analítica (UEMA)",
-      areasInteresse: ["Análises Laboratoriais", "Gestão de Equipamentos", "Controle de Qualidade"],
-      status: "ativo"
-    },
-    {
-      id: 8,
-      nome: "Ricardo Souza",
-      cargo: "Analista de Dados",
-      categoria: "colaborador",
-      area: "Ciência de Dados",
-      imagem: "/img/orgaosretrato2.jpeg",
-      email: "ricardo.souza@ifma.edu.br",
-      lattes: "http://lattes.cnpq.br/369258147",
-      linkedin: "https://linkedin.com/in/ricardosouza",
-      descricao: "Responsável pela análise estatística e modelagem de dados dos projetos de pesquisa. Mestre em Estatística pela UFMA.",
-      projetos: 15,
-      publicacoes: 18,
-      formacao: "Mestrado em Estatística (UFMA)",
-      areasInteresse: ["Análise Estatística", "Modelagem de Dados", "Machine Learning"],
-      status: "ativo"
+  useEffect(() => {
+    let isMounted = true;
+
+    async function carregarEquipe() {
+      try {
+        setLoading(true);
+        const membros = await carregarMembrosPublicos();
+
+        if (isMounted) {
+          setTeamMembers(membros);
+          setErrorMessage("");
+        }
+      } catch (error) {
+        console.error("Erro ao carregar equipe publica:", error);
+
+        if (isMounted) {
+          setErrorMessage("Nao foi possivel carregar a equipe agora.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     }
-  ];
 
-  // Categorias para filtro
-  const categories = [
-    { id: 'todos', label: 'Todos', icon: <FaUsers />, count: teamMembers.length },
-    { id: 'professor', label: 'Professores', icon: <FaChalkboardTeacher />, count: teamMembers.filter(m => m.categoria === 'professor').length },
-    { id: 'aluno', label: 'Alunos', icon: <FaUserGraduate />, count: teamMembers.filter(m => m.categoria === 'aluno').length },
-    { id: 'colaborador', label: 'Colaboradores', icon: <FaUserTie />, count: teamMembers.filter(m => m.categoria === 'colaborador').length },
-  ];
+    carregarEquipe();
 
-  // Áreas de pesquisa
-  const researchAreas = [
-    { id: 'alimentos', label: 'Alimentos', icon: <FaFlask /> },
-    { id: 'quimica', label: 'Química', icon: <FaMicroscope /> },
-    { id: 'agronomia', label: 'Agronomia', icon: <FaSeedling /> },
-    { id: 'recursos-hidricos', label: 'Recursos Hídricos', icon: <FaWater /> },
-    { id: 'tecnologia', label: 'Tecnologia', icon: <FaLaptopCode /> },
-  ];
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  // Filtrar membros
-  const filteredMembers = teamMembers.filter(member => {
-    const matchesSearch = member.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.cargo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.area.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'todos' || member.categoria === selectedCategory;
-    
+  useEffect(() => {
+    if (loading || teamMembers.length === 0) return undefined;
+    const timeoutIds = [];
+
+    function forceScrollToAnchor(anchor, attempt = 0) {
+      const element = document.getElementById(anchor);
+
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const top =
+          rect.top + window.scrollY - Math.max(80, (window.innerHeight - rect.height) / 2);
+        const nextTop = Math.max(0, top);
+
+        document.documentElement.scrollTop = nextTop;
+        document.body.scrollTop = nextTop;
+        window.scrollTo(0, nextTop);
+        return;
+      }
+
+      if (attempt < 12) {
+        const timeoutId = window.setTimeout(
+          () => forceScrollToAnchor(anchor, attempt + 1),
+          150
+        );
+        timeoutIds.push(timeoutId);
+      }
+    }
+
+    function scrollToHashMember() {
+      const anchor = decodeURIComponent(window.location.hash.replace("#", ""));
+      if (!anchor) return;
+
+      setSearchTerm("");
+      setSelectedCategory("todos");
+      setHighlightedAnchor(anchor);
+      forceScrollToAnchor(anchor);
+    }
+
+    scrollToHashMember();
+    window.addEventListener("hashchange", scrollToHashMember);
+
+    return () => {
+      window.removeEventListener("hashchange", scrollToHashMember);
+      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    };
+  }, [loading, teamMembers.length]);
+
+  const categories = useMemo(() => {
+    const categoryCounts = teamMembers.reduce((acc, member) => {
+      acc[member.tipoVinculo] = (acc[member.tipoVinculo] || 0) + 1;
+      return acc;
+    }, {});
+
+    return [
+      { id: "todos", label: "Todos", icon: <FaUsers />, count: teamMembers.length },
+      ...Object.entries(categoryCounts).map(([id, count]) => ({
+        id,
+        label: getCategoryConfig(id).label,
+        icon: getCategoryConfig(id).icon,
+        count,
+      })),
+    ];
+  }, [teamMembers]);
+
+  const researchAreas = useMemo(() => {
+    const counts = new Map();
+
+    teamMembers.forEach((member) => {
+      member.gruposPesquisa.forEach((grupo) => {
+        counts.set(grupo, (counts.get(grupo) || 0) + 1);
+      });
+    });
+
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 5)
+      .map(([label, count]) => ({ label, count }));
+  }, [teamMembers]);
+
+  const filteredMembers = teamMembers.filter((member) => {
+    const search = searchTerm.toLowerCase();
+    const matchesSearch =
+      member.nome.toLowerCase().includes(search) ||
+      member.tipoVinculo.toLowerCase().includes(search) ||
+      member.titulacao.toLowerCase().includes(search) ||
+      member.areaPrincipal.toLowerCase().includes(search) ||
+      member.linhasPesquisa.some((linha) => linha.toLowerCase().includes(search)) ||
+      member.gruposPesquisa.some((grupo) => grupo.toLowerCase().includes(search));
+
+    const matchesCategory =
+      selectedCategory === "todos" || member.tipoVinculo === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
-  // Estatísticas da equipe
   const stats = {
     total: teamMembers.length,
-    professores: teamMembers.filter(m => m.categoria === 'professor').length,
-    alunos: teamMembers.filter(m => m.categoria === 'aluno').length,
-    colaboradores: teamMembers.filter(m => m.categoria === 'colaborador').length,
-    projetosAtivos: teamMembers.reduce((acc, m) => acc + m.projetos, 0),
-    publicacoes: teamMembers.reduce((acc, m) => acc + m.publicacoes, 0),
+    pesquisadores: teamMembers.filter((member) => member.tipoVinculo === "pesquisador").length,
+    estudantes: teamMembers.filter((member) =>
+      ["estudante", "aluno"].includes(member.tipoVinculo)
+    ).length,
+    colaboradores: teamMembers.filter((member) => member.tipoVinculo === "colaborador").length,
   };
 
   return (
     <div className={styles.equipeContainer}>
-      {/* Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
@@ -196,8 +228,7 @@ export default function Equipe() {
               Nossa <span className={styles.highlight}>Equipe</span>
             </h1>
             <p className={styles.heroDescription}>
-              Conheça os pesquisadores, professores, alunos e colaboradores que fazem do GIEPI 
-              uma referência em pesquisa interdisciplinar no Maranhão.
+              Conheça os pesquisadores, estudantes e colaboradores cadastrados no GIEPI.
             </p>
             <div className={styles.heroStats}>
               <div className={styles.statItem}>
@@ -205,41 +236,42 @@ export default function Equipe() {
                 <div className={styles.statLabel}>Membros</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>{stats.professores}</div>
-                <div className={styles.statLabel}>Professores</div>
+                <div className={styles.statNumber}>{stats.pesquisadores}</div>
+                <div className={styles.statLabel}>Pesquisadores</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>{stats.alunos}</div>
-                <div className={styles.statLabel}>Alunos</div>
+                <div className={styles.statNumber}>{stats.estudantes}</div>
+                <div className={styles.statLabel}>Estudantes</div>
               </div>
               <div className={styles.statItem}>
-                <div className={styles.statNumber}>{stats.publicacoes}</div>
-                <div className={styles.statLabel}>Publicações</div>
+                <div className={styles.statNumber}>{stats.colaboradores}</div>
+                <div className={styles.statLabel}>Colaboradores</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Áreas de Pesquisa */}
       <section className={styles.areasSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Áreas de <span className={styles.highlight}>Pesquisa</span></h2>
+            <h2 className={styles.sectionTitle}>Grupos de Pesquisa</h2>
             <p className={styles.sectionSubtitle}>
-              Nossa equipe atua em diversas áreas do conhecimento, promovendo pesquisa interdisciplinar
+              Áreas reais vinculadas aos membros ativos no banco de dados.
             </p>
           </div>
-          
+
           <div className={styles.areasGrid}>
-            {researchAreas.map(area => (
-              <div key={area.id} className={styles.areaCard}>
+            {researchAreas.map((area) => (
+              <div key={area.label} className={styles.areaCard}>
                 <div className={styles.areaIcon}>
-                  {area.icon}
+                  <FaFlask />
                 </div>
                 <h3 className={styles.areaTitle}>{area.label}</h3>
                 <p className={styles.areaDescription}>
-                  Pesquisa avançada em {area.label.toLowerCase()} com aplicações práticas e impacto social
+                  {area.count === 1
+                    ? "1 membro vinculado"
+                    : `${area.count} membros vinculados`}
                 </p>
               </div>
             ))}
@@ -247,7 +279,6 @@ export default function Equipe() {
         </div>
       </section>
 
-      {/* Filtros e Busca */}
       <section className={styles.filtersSection}>
         <div className={styles.container}>
           <div className={styles.searchContainer}>
@@ -255,21 +286,26 @@ export default function Equipe() {
               <FaSearch className={styles.searchIcon} />
               <input
                 type="text"
-                placeholder="Buscar por nome, cargo ou área..."
+                placeholder="Buscar por nome, linha, grupo ou formação..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 className={styles.searchInput}
               />
             </div>
-            
+
             <div className={styles.filterButtons}>
-              {categories.map(category => (
+              {categories.map((category) => (
                 <button
                   key={category.id}
-                  className={`${styles.filterButton} ${selectedCategory === category.id ? styles.active : ''}`}
+                  className={`${styles.filterButton} ${
+                    selectedCategory === category.id ? styles.active : ""
+                  }`}
                   onClick={() => setSelectedCategory(category.id)}
+                  type="button"
                 >
-                  <span className={styles.filterIcon}>{category.icon}</span>
+                  <span className={styles.filterIcon}>
+                    {category.id === "todos" ? <FaFilter /> : category.icon}
+                  </span>
                   <span className={styles.filterLabel}>{category.label}</span>
                   <span className={styles.filterCount}>{category.count}</span>
                 </button>
@@ -279,130 +315,176 @@ export default function Equipe() {
         </div>
       </section>
 
-      {/* Grid de Membros */}
       <section className={styles.membersSection}>
         <div className={styles.container}>
-          <div className={styles.membersGrid}>
-            {filteredMembers.map(member => (
-              <div 
-                key={member.id} 
-                className={`${styles.memberCard} ${activeMember === member.id ? styles.active : ''}`}
-                onMouseEnter={() => setActiveMember(member.id)}
-                onMouseLeave={() => setActiveMember(null)}
-              >
-                <div className={styles.memberImage}>
-                  <div className={styles.imageWrapper}>
-                    <img 
-                      src={member.imagem} 
-                      alt={member.nome}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = `/img/equiperetrato.jpeg`;
-                      }}
-                    />
-                    <div className={styles.memberCategory}>
-                      {member.categoria === 'professor' && <FaChalkboardTeacher />}
-                      {member.categoria === 'aluno' && <FaUserGraduate />}
-                      {member.categoria === 'colaborador' && <FaUserTie />}
-                      <span>{member.categoria}</span>
+          {loading && (
+            <div className={styles.loadingState}>
+              <FaFlask />
+              <p>Carregando equipe...</p>
+            </div>
+          )}
+
+          {!loading && errorMessage && (
+            <div className={styles.errorState}>
+              <FaExclamationTriangle />
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
+          {!loading && !errorMessage && (
+            <div className={styles.membersGrid}>
+              {filteredMembers.map((member) => {
+                const categoryConfig = getCategoryConfig(member.tipoVinculo);
+                const anchor = createResearcherAnchor(member.nome);
+                const isHighlighted = highlightedAnchor === anchor;
+
+                return (
+                  <div
+                    id={anchor}
+                    key={member.id}
+                    className={`${styles.memberCard} ${
+                      activeMember === member.id ? styles.active : ""
+                    } ${isHighlighted ? styles.highlightedMember : ""}`}
+                    onMouseEnter={() => setActiveMember(member.id)}
+                    onMouseLeave={() => setActiveMember(null)}
+                  >
+                    <div className={styles.memberImage}>
+                      <div className={styles.imageWrapper}>
+                        <img
+                          src={member.imagem}
+                          alt={member.nome}
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = "/img/equiperetrato.jpeg";
+                          }}
+                        />
+                        <div className={styles.memberCategory}>
+                          {categoryConfig.icon}
+                          <span>{categoryConfig.singular}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                <div className={styles.memberInfo}>
-                  <div className={styles.memberHeader}>
-                    <h3 className={styles.memberName}>{member.nome}</h3>
-                    <p className={styles.memberRole}>{member.cargo}</p>
-                    <div className={styles.memberArea}>
-                      <span className={styles.areaBadge}>{member.area}</span>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.memberStats}>
-                    <div className={styles.stat}>
-                      <span className={styles.statNumber}>{member.projetos}</span>
-                      <span className={styles.statLabel}>Projetos</span>
-                    </div>
-                    <div className={styles.stat}>
-                      <span className={styles.statNumber}>{member.publicacoes}</span>
-                      <span className={styles.statLabel}>Publicações</span>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.memberBio}>
-                    <p className={styles.bioText}>
-                      {expandedBio === member.id ? member.descricao : `${member.descricao.substring(0, 100)}...`}
-                    </p>
-                    <button 
-                      className={styles.readMore}
-                      onClick={() => setExpandedBio(expandedBio === member.id ? null : member.id)}
-                    >
-                      {expandedBio === member.id ? (
-                        <>
-                          Ler menos <FaChevronUp />
-                        </>
-                      ) : (
-                        <>
-                          Ler mais <FaChevronDown />
-                        </>
+
+                    <div className={styles.memberInfo}>
+                      <div className={styles.memberHeader}>
+                        <h3 className={styles.memberName}>{member.nome}</h3>
+                        <p className={styles.memberRole}>
+                          {member.cargo || categoryConfig.singular}
+                        </p>
+                        {member.instituicao && (
+                          <p className={styles.memberInstitution}>
+                            <FaUniversity /> {member.instituicao}
+                          </p>
+                        )}
+                        <div className={styles.memberArea}>
+                          <span className={styles.areaBadge}>{member.areaPrincipal}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.memberStats}>
+                        <div className={styles.stat}>
+                          <span className={styles.statNumber}>
+                            {member.linhasPesquisa.length}
+                          </span>
+                          <span className={styles.statLabel}>Linhas</span>
+                        </div>
+                        <div className={styles.stat}>
+                          <span className={styles.statNumber}>
+                            {member.gruposPesquisa.length}
+                          </span>
+                          <span className={styles.statLabel}>Grupos</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.memberBio}>
+                        <p className={styles.bioText}>{formatMemberBio(member)}</p>
+                        <button
+                          className={styles.readMore}
+                          onClick={() =>
+                            setExpandedBio(expandedBio === member.id ? null : member.id)
+                          }
+                          type="button"
+                        >
+                          {expandedBio === member.id ? (
+                            <>
+                              Ver menos <FaChevronUp />
+                            </>
+                          ) : (
+                            <>
+                              Ver linhas <FaChevronDown />
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {expandedBio === member.id && (
+                        <div className={styles.memberDetails}>
+                          <div className={styles.detailItem}>
+                            <strong>Inclusão:</strong> {formatDate(member.dataInclusao)}
+                          </div>
+                          {member.ultimaAtualizacaoLattes && (
+                            <div className={styles.detailItem}>
+                              <strong>Lattes:</strong> {member.ultimaAtualizacaoLattes}
+                            </div>
+                          )}
+                          <div className={styles.areasList}>
+                            <strong>Linhas de pesquisa:</strong>
+                            <div className={styles.tags}>
+                              {member.linhasPesquisa.map((linha) => (
+                                <span key={linha} className={styles.tag}>
+                                  {linha}
+                                </span>
+                              ))}
+                              {member.linhasPesquisa.length === 0 && (
+                                <span className={styles.tag}>Sem linha vinculada</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       )}
-                    </button>
-                  </div>
-                  
-                  <div className={styles.memberDetails}>
-                    <div className={styles.detailItem}>
-                      <strong>Formação:</strong> {member.formacao}
-                    </div>
-                    <div className={styles.areasList}>
-                      <strong>Áreas de Interesse:</strong>
-                      <div className={styles.tags}>
-                        {member.areasInteresse.map((area, idx) => (
-                          <span key={idx} className={styles.tag}>{area}</span>
-                        ))}
+
+                      <div className={styles.memberContact}>
+                        {member.email && (
+                          <a href={`mailto:${member.email}`} className={styles.contactLink}>
+                            <FaEnvelope /> Email
+                          </a>
+                        )}
+                        {member.lattesUrl && (
+                          <a
+                            href={member.lattesUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.contactLink}
+                          >
+                            <FaIdCard /> Lattes
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
-                  
-                  <div className={styles.memberContact}>
-                    <a href={`mailto:${member.email}`} className={styles.contactLink}>
-                      <FaEnvelope /> Email
-                    </a>
-                    {member.lattes && (
-                      <a href={member.lattes} target="_blank" rel="noopener noreferrer" className={styles.contactLink}>
-                        Lattes
-                      </a>
-                    )}
-                    {member.linkedin && (
-                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className={styles.contactLink}>
-                        <FaLinkedin /> LinkedIn
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {filteredMembers.length === 0 && (
+                );
+              })}
+            </div>
+          )}
+
+          {!loading && !errorMessage && filteredMembers.length === 0 && (
             <div className={styles.noResults}>
               <FaSearch className={styles.noResultsIcon} />
               <h3>Nenhum membro encontrado</h3>
-              <p>Tente alterar os termos da busca ou os filtros selecionados</p>
+              <p>Tente alterar os termos da busca ou os filtros selecionados.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaContent}>
             <h2 className={styles.ctaTitle}>
-              Quer fazer parte da nossa <span className={styles.highlight}>equipe</span>?
+              Conheça as <span className={styles.highlight}>linhas</span> do grupo
             </h2>
             <p className={styles.ctaDescription}>
-              Temos oportunidades para alunos de iniciação científica, mestrado, doutorado e colaboradores.
-              Junte-se a nós e contribua para a pesquisa científica no Maranhão.
+              Veja como cada pesquisador se conecta às linhas de pesquisa cadastradas.
             </p>
             <div className={styles.ctaButtons}>
               <a href="/pesquisas" className={styles.ctaButtonPrimary}>
@@ -411,34 +493,6 @@ export default function Equipe() {
               <a href="/projetos" className={styles.ctaButtonSecondary}>
                 Ver projetos
               </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Info */}
-      <section className={styles.infoSection}>
-        <div className={styles.container}>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoCard}>
-              <h3>Localização</h3>
-              <p>IFMA - Campus Codó</p>
-              <p>Rodovia MA-356, s/n</p>
-              <p>Codó - MA, CEP: 65400-000</p>
-            </div>
-            
-            <div className={styles.infoCard}>
-              <h3>Contato</h3>
-              <p>Email: giepi@ifma.edu.br</p>
-              <p>Telefone: (99) 9999-9999</p>
-              <p>Horário: Seg-Sex, 8h-18h</p>
-            </div>
-            
-            <div className={styles.infoCard}>
-              <h3>Junte-se a nós</h3>
-              <p>Tem interesse em pesquisa?</p>
-              <p>Envie seu currículo para:</p>
-              <p>selecao@giepi.ifma.edu.br</p>
             </div>
           </div>
         </div>

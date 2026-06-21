@@ -1,5 +1,26 @@
 import {db} from "../config/db.js"
 
+function normalizarDadosLattes(p = {}) {
+  if (p.dados_lattes && typeof p.dados_lattes === "object") {
+    return p.dados_lattes;
+  }
+
+  const dados = {
+    lattes_url: p.lattes_url || p.lattesUrl || null,
+    id_lattes: p.id_lattes || null,
+    nome_citacoes: p.nome_citacoes || null,
+    resumo_lattes: p.resumo_lattes || null,
+    ultima_atualizacao_lattes: p.ultima_atualizacao_lattes || null,
+    linhas_pesquisa_lattes: p.linhas_pesquisa_lattes || [],
+  };
+
+  return Object.values(dados).some((value) =>
+    Array.isArray(value) ? value.length > 0 : Boolean(value)
+  )
+    ? dados
+    : null;
+}
+
 export function normalizarPesquisadores(brutos) {
   return brutos
     .filter(p => p.nome && !p.error)
@@ -11,7 +32,12 @@ export function normalizarPesquisadores(brutos) {
       espelho_url: p.espelho_url || p.espelhoUrl || null,
       lattes_url: p.lattes_url || p.lattesUrl || null,
       id_lattes: p.id_lattes || null,
-      ultima_atualizacao_lattes: p.ultima_atualizacao_lattes || null
+      ultima_atualizacao_lattes: p.ultima_atualizacao_lattes || null,
+      resumo_lattes: p.resumo_lattes || null,
+      nome_citacoes: p.nome_citacoes || null,
+      dados_lattes: normalizarDadosLattes(p),
+      linhas_pesquisa: Array.isArray(p.linhas_pesquisa) ? p.linhas_pesquisa : [],
+      scraping_erros: Array.isArray(p.scraping_erros) ? p.scraping_erros : []
     }));
 }
 

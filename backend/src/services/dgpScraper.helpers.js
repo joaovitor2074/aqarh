@@ -22,6 +22,8 @@ export const DGP_CONFIG = {
     beforeRetry: Number(process.env.SCRAPE_BEFORE_RETRY_DELAY || 1800),
     afterPopupClose: Number(process.env.SCRAPE_AFTER_POPUP_CLOSE_DELAY || 400),
   },
+  includePersonDetails: process.env.SCRAPE_INCLUDE_DETAILS !== "false",
+  includeLattes: process.env.SCRAPE_INCLUDE_LATTES !== "false",
 };
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -234,7 +236,12 @@ export async function findActionLink(rowHandle, kind, action) {
     });
 
     const isEgresso = meta.includes("egresso");
-    const isLattes = meta.includes("btnacessolattes") || meta.includes("ui-icon-contact");
+    const isLattes =
+      meta.includes("btnacessolattes") ||
+      meta.includes("ui-icon-contact") ||
+      meta.includes("curriculo lattes") ||
+      meta.includes("curriculo") ||
+      meta.includes("lattes");
     const isMirror = meta.includes(expectedMirror) || meta.includes("ui-icon-battery-2");
 
     if (action === "lattes" && isLattes && !isEgresso) return link;
@@ -423,15 +430,269 @@ export async function extractMirrorData(page) {
   });
 }
 
-export async function extractGroupPeople(page, kind) {
+export async function extractLattesData(page) {
+  await page.waitForSelector("body", { timeout: DGP_CONFIG.timeouts.pageLoad }).catch(() => {});
+
+  return page.evaluate(() => {
+    function clean(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function key(value) {
+      return clean(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
+    function unique(values) {
+      const seen = new Set();
+      return values.filter((value) => {
+        const normalized = key(value);
+        if (!normalized || seen.has(normalized)) return false;
+        seen.add(normalized);
+        return true;
+      });
+    }
+
+    const rawText = document.body.innerText || "";
+    const lines = rawText
+      .split(/\n+/)
+      .map(clean)
+      .filter(Boolean);
+
+    const sectionLabels = [
+      "dados pessoais",
+      "formacao academica",
+      "formacao complementar",
+      "atuacao profissional",
+      "areas de atuacao",
+      "linhas de pesquisa",
+      "projetos de pesquisa",
+      "projetos de extensao",
+      "producao bibliografica",
+      "producoes bibliograficas",
+      "producao tecnica",
+      "producoes tecnicas",
+      "bancas",
+      "orientacoes",
+      "eventos",
+      "educacao e popularizacao",
+      "resumo",
+    ];
+
+    const valueAfterKey = (...patterns) => {
+      const index = lines.findIndex((line) => {
+        const lineKey = key(line).replace(/:$/, "");
+        return patterns.some((pattern) => lineKey === pattern || lineKey.includes(pattern));
+      });
+
+      if (index < 0) return "";
+
+      const line = lines[index];
+      const colonIndex = line.indexOf(":");
+      if (colonIndex >= 0) {
+        const inlineValue = clean(line.slice(colonIndex + 1));
+        if (inlineValue) return inlineValue;
+      }
+
+      const updateMatch = line.match(/em\s+(.+)$/i);
+      if (updateMatch?.[1]) return clean(updateMatch[1]);
+
+      const nextLine = lines[index + 1] || "";
+      return sectionLabels.some((label) => key(nextLine) === label) ? "" : nextLine;
+    };
+
+    const collectSection = (startPatterns, limit = 10) => {
+      const startIndex = lines.findIndex((line) => {
+        const lineKey = key(line).replace(/:$/, "");
+        return startPatterns.some((pattern) => lineKey === pattern || lineKey.includes(pattern));
+      });
+
+      if (startIndex < 0) return [];
+
+      const values = [];
+      for (let index = startIndex + 1; index < lines.length; index++) {
+        const line = lines[index];
+        const lineKey = key(line).replace(/:$/, "");
+        const isNextSection =
+          values.length > 0 &&
+          sectionLabels.some((label) => lineKey === label || lineKey.startsWith(`${label} `));
+
+        if (isNextSection) break;
+        if (!line || startPatterns.some((pattern) => lineKey.includes(pattern))) continue;
+
+        values.push(line);
+        if (values.length >= limit) break;
+      }
+
+      return unique(values);
+    };
+
+    const idMatch =
+      location.href.match(/lattes\.cnpq\.br\/(\d+)/i) ||
+      location.href.match(/[?&]id=(\d+)/i) ||
+      rawText.match(/lattes\.cnpq\.br\/(\d+)/i);
+    const idLattes = idMatch?.[1] || "";
+    const lattesUrl = idLattes ? `http://lattes.cnpq.br/${idLattes}` : location.href;
+    const resumo = collectSection(["resumo informado pelo autor", "resumo"], 6).join(" ");
+    const linhasPesquisaLattes = collectSection(["linhas de pesquisa"], 20);
+
+    const dadosLattes = {
+      lattes_url: lattesUrl,
+      id_lattes: idLattes,
+      nome_citacoes: valueAfterKey("nome em citacoes bibliograficas", "nome em citações bibliográficas"),
+      ultima_atualizacao_lattes: valueAfterKey(
+        "ultima atualizacao do curriculo",
+        "ultima atualizacao do curriculo lattes"
+      ),
+      resumo_lattes: resumo,
+      formacao_academica: collectSection(["formacao academica", "formacao academica/titulacao"], 12),
+      atuacao_profissional: collectSection(["atuacao profissional"], 12),
+      areas_atuacao: collectSection(["areas de atuacao"], 12),
+      linhas_pesquisa_lattes: linhasPesquisaLattes,
+      projetos_pesquisa: collectSection(["projetos de pesquisa"], 12),
+      producoes_bibliograficas: collectSection(
+        ["producao bibliografica", "producoes bibliograficas"],
+        16
+      ),
+      producoes_tecnicas: collectSection(["producao tecnica", "producoes tecnicas"], 12),
+      pagina_lattes_coletada_em: new Date().toISOString(),
+    };
+
+    return {
+      lattes_url: lattesUrl,
+      lattesUrl,
+      id_lattes: idLattes,
+      ultima_atualizacao_lattes: dadosLattes.ultima_atualizacao_lattes,
+      resumo_lattes: resumo,
+      nome_citacoes: dadosLattes.nome_citacoes,
+      linhas_pesquisa_lattes: linhasPesquisaLattes,
+      dados_lattes: dadosLattes,
+    };
+  });
+}
+
+async function collectActionData(mainPage, rowHandle, kind, action, extractor) {
+  let detailPage = null;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= DGP_CONFIG.retryAttempts; attempt++) {
+    try {
+      const linkHandle = await findActionLink(rowHandle, kind, action);
+      if (!linkHandle) {
+        throw new Error(`Botao de ${action} nao encontrado`);
+      }
+
+      detailPage = await openActionPage(mainPage, linkHandle);
+      const data = await extractor(detailPage);
+
+      await closePageSafely(detailPage);
+      detailPage = null;
+
+      return { data, error: null };
+    } catch (error) {
+      lastError = error;
+
+      if (detailPage && !detailPage.isClosed()) {
+        await closePageSafely(detailPage);
+        detailPage = null;
+      }
+
+      await cleanupExtraPages(mainPage.browser(), mainPage);
+      await sleep(DGP_CONFIG.delays.beforeRetry * attempt);
+    }
+  }
+
+  return {
+    data: null,
+    error: lastError?.message || `Falha ao coletar ${action}`,
+  };
+}
+
+export async function collectPersonDetails(mainPage, rowHandle, kind, options = {}) {
+  const basePerson = await extractPersonFromRow(rowHandle);
+  const errors = [];
+
+  const mirrorResult = await collectActionData(
+    mainPage,
+    rowHandle,
+    kind,
+    "espelho",
+    extractMirrorData
+  );
+  const mirrorData = mirrorResult.data || {};
+
+  if (mirrorResult.error) {
+    errors.push({ fonte: "espelho", mensagem: mirrorResult.error });
+  }
+
+  const shouldIncludeLattes = options.includeLattes ?? DGP_CONFIG.includeLattes;
+  let lattesData = {};
+
+  if (shouldIncludeLattes) {
+    const lattesResult = await collectActionData(
+      mainPage,
+      rowHandle,
+      kind,
+      "lattes",
+      extractLattesData
+    );
+
+    lattesData = lattesResult.data || {};
+
+    if (lattesResult.error) {
+      errors.push({ fonte: "lattes", mensagem: lattesResult.error });
+    }
+  }
+
+  const espelhoUrl = mirrorData.espelho_url || mirrorData.espelhoUrl || "";
+  const lattesUrl =
+    lattesData.lattes_url || lattesData.lattesUrl || mirrorData.lattes_url || mirrorData.lattesUrl || "";
+
+  return {
+    ...basePerson,
+    ...mirrorData,
+    ...lattesData,
+    espelho_url: espelhoUrl || null,
+    espelhoUrl: espelhoUrl || null,
+    lattes_url: lattesUrl || null,
+    lattesUrl: lattesUrl || null,
+    id_lattes: lattesData.id_lattes || mirrorData.id_lattes || null,
+    ultima_atualizacao_lattes:
+      lattesData.ultima_atualizacao_lattes || mirrorData.ultima_atualizacao_lattes || null,
+    linhas_pesquisa: mirrorData.linhas_pesquisa || [],
+    dados_lattes: lattesData.dados_lattes || null,
+    scraping_erros: errors,
+  };
+}
+
+export async function extractGroupPeople(page, kind, options = {}) {
   const table = await findPeopleTable(page, kind);
   const rows = await getValidRows(table);
   const selectedRows = DGP_CONFIG.maxItems > 0 ? rows.slice(0, DGP_CONFIG.maxItems) : rows;
   const people = [];
+  const includeDetails = Boolean(options.includeDetails);
 
-  for (const row of selectedRows) {
-    const person = await extractPersonFromRow(row);
+  for (let index = 0; index < selectedRows.length; index++) {
+    const row = selectedRows[index];
+    const person = includeDetails
+      ? await collectPersonDetails(page, row, kind, {
+          includeLattes: options.includeLattes,
+          index,
+          total: selectedRows.length,
+        })
+      : await extractPersonFromRow(row);
+
     if (person.nome) people.push(person);
+
+    if (typeof options.onProgress === "function") {
+      await options.onProgress(person, people);
+    }
+
+    if (includeDetails && index < selectedRows.length - 1) {
+      await sleep(DGP_CONFIG.delays.betweenPeople);
+    }
   }
 
   return people;

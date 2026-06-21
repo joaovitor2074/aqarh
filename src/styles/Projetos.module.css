@@ -255,6 +255,30 @@
   flex-wrap: wrap;
 }
 
+.filterSelects {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  min-width: 180px;
+  min-height: 44px;
+  padding: 0 2.25rem 0 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.filterSelect option {
+  color: #1f2d3a;
+  background: #ffffff;
+}
+
 .filterButton {
   padding: 0.75rem 1.5rem;
   background: rgba(255, 255, 255, 0.08);
@@ -352,6 +376,12 @@
   background: rgba(75, 144, 226, 0.15);
   color: #4A90E2;
   border: 1px solid rgba(75, 144, 226, 0.3);
+}
+
+.statusPlanned {
+  background: rgba(240, 195, 90, 0.16);
+  color: #f0c35a;
+  border: 1px solid rgba(240, 195, 90, 0.35);
 }
 
 .categoryBadge {
@@ -484,6 +514,21 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+.externalLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--accent-color);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.externalLink:hover {
+  text-decoration: underline;
 }
 
 .projectActions {
@@ -835,6 +880,17 @@
   color: #006a4e;
 }
 
+.filterSelects {
+  justify-content: flex-start;
+}
+
+.filterSelect {
+  border: 1px solid #cfdbe2;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344b5c;
+}
+
 .projectsSection {
   padding: 2.5rem 0 4rem;
   background: #f5f7fa;
@@ -903,8 +959,15 @@
   border-color: #ecd9a8;
 }
 
+.statusPlanned {
+  background: #eaf1fb;
+  color: #1d4ed8;
+  border-color: #c9d9f4;
+}
+
 .detailsButton,
-.detailsSection h4 {
+.detailsSection h4,
+.externalLink {
   color: #006a4e;
 }
 
@@ -964,6 +1027,14 @@
 
   .filterButton {
     min-height: 2.7rem;
+  }
+
+  .filterSelects {
+    flex-direction: column;
+  }
+
+  .filterSelect {
+    width: 100%;
   }
 
   .projectImage {

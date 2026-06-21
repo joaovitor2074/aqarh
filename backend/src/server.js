@@ -36,6 +36,7 @@ import authRoutes from "./routes/auth.routes.js";
 import membrosRoutes from "./routes/membros.routes.js";
 import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
 import comunicadosRoutes from "./routes/comunicados.routes.js";
+import projetosRoutes from "./routes/projetos.routes.js";
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
 // Rotas de e-mail compiladas pelo TypeScript (dist)
@@ -106,6 +107,7 @@ app.use("/api", authRoutes);
 app.use("/api/membros", membrosRoutes);
 app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
 app.use("/api/comunicados", comunicadosRoutes);
+app.use("/api/projetos", projetosRoutes);
 app.use("/api/mail", mailRoutes);
 app.use("/adminjv", adminjvRoutes);
 

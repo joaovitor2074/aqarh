@@ -366,6 +366,7 @@
   overflow: hidden;
   transition: all var(--transition-base);
   position: relative;
+  scroll-margin-top: 110px;
 }
 
 .memberCard:hover {
@@ -378,6 +379,11 @@
 .memberCard.active {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-color);
+}
+
+.highlightedMember {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(0, 196, 140, 0.16), var(--shadow-xl);
 }
 
 .memberImage {
@@ -444,6 +450,16 @@
   font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
+}
+
+.memberInstitution {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: -0.25rem 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .memberArea {
@@ -599,6 +615,26 @@
   text-align: center;
   padding: 4rem 2rem;
   color: var(--text-secondary);
+}
+
+.loadingState,
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.loadingState svg {
+  color: var(--accent-color);
+}
+
+.errorState {
+  color: #fca5a5;
 }
 
 .noResultsIcon {
@@ -968,6 +1004,11 @@
   background: #ffffff;
 }
 
+.highlightedMember {
+  border-color: #006a4e;
+  box-shadow: 0 0 0 3px rgba(0, 106, 78, 0.16), 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
 .memberName,
 .detailItem strong,
 .areasList strong,
@@ -980,6 +1021,10 @@
 .readMore,
 .contactLink:hover {
   color: #006a4e;
+}
+
+.memberInstitution {
+  color: #667987;
 }
 
 .memberStats,
@@ -1006,6 +1051,21 @@
 
 .contactLink {
   border-radius: 8px;
+}
+
+.loadingState,
+.errorState {
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #667987;
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
+.errorState {
+  border-color: #f2c3bd;
+  background: #fff5f3;
+  color: #9f3d31;
 }
 
 .ctaSection {
