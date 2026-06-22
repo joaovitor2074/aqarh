@@ -2,10 +2,13 @@ FROM node:20-slim
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+  PUPPETEER_SKIP_DOWNLOAD=true \
+  CHROME_PATH=/usr/bin/chromium \
+  SCRAPE_HEADLESS=true
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates python3 make g++ \
+  && apt-get install -y --no-install-recommends ca-certificates python3 make g++ chromium fonts-liberation \
   && rm -rf /var/lib/apt/lists/*
 
 COPY backend/package*.json ./backend/
