@@ -1,0 +1,11 @@
+.git
+.vercel
+node_modules
+dist
+backend/node_modules
+backend/dist
+.env
+.env.*
+backend/.env
+backend/.env.*
+*.log
