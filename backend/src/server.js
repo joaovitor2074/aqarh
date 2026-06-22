@@ -48,13 +48,17 @@ import mailRoutes from "./routes/mail.routes.js";
  * =====================================================
  */
 const app = express();
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, "");
+const allowedOrigins = (
+  process.env.CORS_ORIGIN || "http://localhost:5173,https://aqarh.vercel.app"
+)
   .split(",")
-  .map((origin) => origin.trim());
+  .map(normalizeOrigin)
+  .filter(Boolean);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
       return callback(null, true);
     }
 
