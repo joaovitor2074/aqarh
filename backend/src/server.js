@@ -48,6 +48,9 @@ import mailRoutes from "./routes/mail.routes.js";
  * =====================================================
  */
 const app = express();
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
 
 /**
  * =====================================================
@@ -56,7 +59,13 @@ const app = express();
  */
 app.use(
   cors({
-    origin: "http://localhost:5173", // Frontend (Vite)
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origem não permitida pelo CORS"));
+    },
     credentials: true,
   })
 );
@@ -129,10 +138,10 @@ app.get("/debug-public", (req, res) => {
       files,
       accessibleUrls: {
         defaults: files.defaults.map(
-          (f) => `http://localhost:${process.env.PORT}/img/defaults/${f}`
+          (f) => `http://localhost:${PORT}/img/defaults/${f}`
         ),
         uploads: files.uploads.map(
-          (f) => `http://localhost:${process.env.PORT}/uploads/${f}`
+          (f) => `http://localhost:${PORT}/uploads/${f}`
         ),
       },
     });
@@ -146,11 +155,13 @@ app.get("/debug-public", (req, res) => {
  * INICIALIZAÇÃO DO SERVIDOR
  * =====================================================
  */
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${process.env.PORT}`);
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log("📁 Pasta public:", publicPath);
   console.log(
-    `🌐 Debug: http://localhost:${process.env.PORT}/debug-public`
+    `🌐 Debug: http://localhost:${PORT}/debug-public`
   );
 });
 
