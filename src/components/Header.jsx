@@ -10,6 +10,27 @@ const menuItems = [
   { path: "/equipe", label: "Equipe", key: "equipe" },
 ];
 
+function LogoMark({ className = "" }) {
+  const [logoError, setLogoError] = useState(false);
+
+  return (
+    <div className={`${styles.logoFrame} ${className}`}>
+      {!logoError ? (
+        <img
+          src="/img/logohead.png"
+          alt="GIEPI"
+          className={styles.logo}
+          onError={() => setLogoError(true)}
+        />
+      ) : (
+        <span className={styles.logoFallback} aria-label="GIEPI">
+          G
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -38,9 +59,7 @@ export default function Header() {
       <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
         <div className={styles.headerContainer}>
           <Link to="/" className={styles.logoContainer} onClick={() => setOpen(false)}>
-            <div className={styles.logoWrapper}>
-              <img src="/img/logohead.png" alt="GIEPI" className={styles.logo} />
-            </div>
+            <LogoMark />
             <div className={styles.logoText}>
               <span className={styles.logoMain}>GIEPI</span>
               <span className={styles.logoSubtitle}>IFMA Campus Codó</span>
@@ -89,7 +108,7 @@ export default function Header() {
       >
         <div className={styles.mobileHeader}>
           <div className={styles.mobileLogo}>
-            <img src="/img/logohead.png" alt="GIEPI" className={styles.mobileLogoImg} />
+            <LogoMark className={styles.mobileLogoImg} />
             <div>
               <span className={styles.mobileLogoText}>GIEPI</span>
               <span className={styles.mobileLogoSub}>IFMA Campus Codó</span>
