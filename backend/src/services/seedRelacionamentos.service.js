@@ -17,7 +17,7 @@ let relationshipMaps = null;
 
 function fixMojibake(value) {
   if (typeof value !== "string") return value;
-  if (!/[\u00c3\u00c2\u00e2]/.test(value)) return value;
+  if (!/[\u00c3\u00c2\u00e2][\u0080-\u00bf]/.test(value)) return value;
 
   try {
     return Buffer.from(value, "latin1").toString("utf8");
