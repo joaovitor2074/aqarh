@@ -44,21 +44,6 @@ function readSeedPeople() {
   });
 }
 
-async function getRelacionamentosCount() {
-  const [[row]] = await db.query(
-    `
-    SELECT COUNT(*) AS total
-    FROM pesquisador_linha_pesquisa plp
-    INNER JOIN pesquisadores p
-      ON p.id = plp.pesquisador_id
-    INNER JOIN linhas_pesquisa lp
-      ON lp.id = plp.linha_pesquisa_id
-    `
-  );
-
-  return Number(row?.total || 0);
-}
-
 async function buildPesquisadoresIndex() {
   const [rows] = await db.query("SELECT id, nome FROM pesquisadores");
   return new Map(rows.map((row) => [normalizeKey(row.nome), row.id]));
@@ -99,11 +84,6 @@ export async function seedRelacionamentosIfEmpty() {
 
   seedPromise = (async () => {
     await ensurePesquisaRelacionamentosSchema();
-
-    const currentTotal = await getRelacionamentosCount();
-    if (currentTotal > 0) {
-      return { inserted: 0, skipped: true, reason: "already_seeded" };
-    }
 
     const people = readSeedPeople();
     if (people.length === 0) {
