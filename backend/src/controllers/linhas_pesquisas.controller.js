@@ -1,5 +1,6 @@
 import { db } from "../config/db.js";
 import { getQuantidadeLinhas } from "../services/getquantidadeLinhas.service.js";
+import { ensurePesquisaRelacionamentosSchema } from "../services/pesquisadoresSchema.service.js";
 
 export async function quantLinhas(req, res) {
   try {
@@ -11,6 +12,8 @@ export async function quantLinhas(req, res) {
 }
 export async function listarLinhasPesquisa(req, res) {
   try {
+    await ensurePesquisaRelacionamentosSchema();
+
     const [rows] = await db.query(`
       SELECT 
   lp.id,
@@ -50,6 +53,8 @@ ORDER BY lp.nome ASC;
 
 export async function listarLinhasPesquisaPublicas(req, res) {
   try {
+    await ensurePesquisaRelacionamentosSchema();
+
     const [rows] = await db.query(`
       SELECT
         lp.id,

@@ -2,7 +2,10 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { db } from "../config/db.js";
-import { ensurePesquisadoresSchema } from "../services/pesquisadoresSchema.service.js";
+import {
+  ensurePesquisaRelacionamentosSchema,
+  ensurePesquisadoresSchema,
+} from "../services/pesquisadoresSchema.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,6 +13,7 @@ const PUBLIC_PATH = path.join(__dirname, "..", "..", "public");
 
 async function ensureMembrosSchema() {
   await ensurePesquisadoresSchema();
+  await ensurePesquisaRelacionamentosSchema();
 }
 
 function getImagePath(filename) {
