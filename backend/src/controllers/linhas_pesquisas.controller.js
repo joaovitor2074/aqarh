@@ -83,8 +83,9 @@ export async function listarLinhasPesquisa(req, res) {
         SELECT
           plp.linha_pesquisa_id,
           GROUP_CONCAT(
+            DISTINCT
             CASE
-              WHEN p.ativo = 1 THEN p.nome
+              WHEN p.ativo = 1 THEN NULLIF(TRIM(p.nome), '')
             END
             ORDER BY p.nome ASC
             SEPARATOR ', '
@@ -122,10 +123,10 @@ export async function listarLinhasPesquisaPublicas(req, res) {
           lp.nome,
           lp.grupo,
           lp.ativo,
-          COUNT(DISTINCT CASE WHEN p.ativo = 1 THEN p.id END) AS total_pesquisadores,
+          COUNT(DISTINCT CASE WHEN p.ativo = 1 THEN NULLIF(TRIM(p.nome), '') END) AS total_pesquisadores,
           GROUP_CONCAT(
             DISTINCT CASE
-              WHEN p.ativo = 1 THEN p.nome
+              WHEN p.ativo = 1 THEN NULLIF(TRIM(p.nome), '')
             END
             ORDER BY p.nome ASC
             SEPARATOR '||'

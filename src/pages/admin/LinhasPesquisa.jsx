@@ -22,6 +22,29 @@ import {
   FaTimesCircle
 } from "react-icons/fa"
 
+const EMPTY_RESEARCHERS = "Nenhum pesquisador relacionado"
+
+function getPesquisadoresUnicos(value) {
+  if (!value || value === EMPTY_RESEARCHERS) return []
+
+  const nomes = Array.isArray(value) ? value : String(value).split(",")
+  const seen = new Set()
+
+  return nomes
+    .map((nome) => String(nome || "").trim())
+    .filter(Boolean)
+    .filter((nome) => {
+      const key = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+}
+
+function formatPesquisadores(value) {
+  return getPesquisadoresUnicos(value).join(", ")
+}
+
 export default function LinhasPesquisas() {
   const [linhas, setLinhas] = useState([])
   const [loading, setLoading] = useState(true)
@@ -48,16 +71,6 @@ export default function LinhasPesquisas() {
     toast.error(error.message || "Erro ao carregar linhas de pesquisa")
   } finally {
     setLoading(false)
-  }
-}
-
-const buscarEstatisticas = async () => {
-  try {
-    const data = await api.get("/linhas-pesquisa/quantidade") // REMOVER /api
-    return data
-  } catch (error) {
-    console.error("Erro ao buscar estatísticas:", error)
-    return null
   }
 }
 
@@ -111,7 +124,7 @@ const buscarEstatisticas = async () => {
     setEditing(linha)
     setForm({
       nome: linha.nome || "",
-      pesquisadores: linha.pesquisadores || "",
+      pesquisadores: formatPesquisadores(linha.pesquisadores),
       grupo: linha.grupo || "",
       ativo: linha.ativo !== false
     })
@@ -237,7 +250,10 @@ const buscarEstatisticas = async () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {linhasFiltradas.map((linha) => (
+                  {linhasFiltradas.map((linha) => {
+                    const pesquisadores = formatPesquisadores(linha.pesquisadores)
+
+                    return (
                     <tr key={linha.id}>
                       <td className={styles.colNome}>
                         <FaFlask className={styles.rowIcon} />
@@ -246,7 +262,7 @@ const buscarEstatisticas = async () => {
                       <td>
                         <div className={styles.pesquisadores}>
                           <FaUsers />
-                          <span>{linha.pesquisadores || "Não especificado"}</span>
+                          <span>{pesquisadores || "Não especificado"}</span>
                         </div>
                       </td>
                       <td>
@@ -289,7 +305,8 @@ const buscarEstatisticas = async () => {
                         </Button>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

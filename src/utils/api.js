@@ -89,7 +89,7 @@ export async function apiRequest(endpoint, options = {}) {
      * TRATAMENTO DE TOKEN EXPIRADO
      * =====================================================
      */
-    const IS_DEV = true;
+    const IS_DEV = import.meta.env.DEV;
 
     if (response.status === 401) {
 
@@ -136,7 +136,14 @@ export async function apiRequest(endpoint, options = {}) {
      * RESPOSTA JSON PADRÃO
      * =====================================================
      */
-    return response.json();
+    const responseText = await response.text();
+    if (!responseText) return null;
+
+    try {
+      return JSON.parse(responseText);
+    } catch {
+      return responseText;
+    }
   } catch (error) {
     console.error("❌ Erro na requisição:", error);
     throw error;

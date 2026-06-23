@@ -192,7 +192,7 @@ export async function listarMembros(req, res) {
         SELECT
           plp.pesquisador_id,
           MIN(lp.id) AS linha_pesquisa_id,
-          GROUP_CONCAT(lp.nome ORDER BY lp.nome ASC SEPARATOR ', ') AS linhas_pesquisa
+          GROUP_CONCAT(DISTINCT NULLIF(TRIM(lp.nome), '') ORDER BY lp.nome ASC SEPARATOR ', ') AS linhas_pesquisa
         FROM pesquisador_linha_pesquisa plp
         LEFT JOIN linhas_pesquisa lp
           ON lp.id = plp.linha_pesquisa_id

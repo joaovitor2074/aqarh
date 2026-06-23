@@ -3,16 +3,32 @@ import { getLinhaImage } from "../utils/linhaImages";
 
 const EMPTY_RESEARCHERS = "Nenhum pesquisador relacionado";
 
+function uniqueNames(names = []) {
+  const seen = new Set();
+
+  return names
+    .map((nome) => String(nome || "").trim())
+    .filter(Boolean)
+    .filter((nome) => {
+      const key = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
 export function getPesquisadoresDaLinha(linha = {}) {
   if (Array.isArray(linha.pesquisadores_lista)) {
-    return linha.pesquisadores_lista.filter(Boolean);
+    return uniqueNames(linha.pesquisadores_lista);
   }
 
   if (typeof linha.pesquisadores_lista === "string" && linha.pesquisadores_lista.trim()) {
-    return linha.pesquisadores_lista
-      .split("||")
-      .map((nome) => nome.trim())
-      .filter(Boolean);
+    return uniqueNames(
+      linha.pesquisadores_lista
+        .split("||")
+        .map((nome) => nome.trim())
+        .filter(Boolean)
+    );
   }
 
   if (typeof linha.pesquisadores === "string" && linha.pesquisadores.trim()) {
@@ -20,10 +36,12 @@ export function getPesquisadoresDaLinha(linha = {}) {
       return [];
     }
 
-    return linha.pesquisadores
-      .split(",")
-      .map((nome) => nome.trim())
-      .filter(Boolean);
+    return uniqueNames(
+      linha.pesquisadores
+        .split(",")
+        .map((nome) => nome.trim())
+        .filter(Boolean)
+    );
   }
 
   return [];

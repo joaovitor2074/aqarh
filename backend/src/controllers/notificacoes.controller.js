@@ -2,10 +2,12 @@
 import { db } from '../config/db.js';
 import { normalizarNome } from '../services/normalizacao.service.js';
 import { obterLinhasDePessoa } from '../services/arquivoBruto.service.js';
-import { aprovarPessoa } from '../services/aprovacao.service.js';
 import { criarOuBuscarLinha } from '../services/resolvers.service.js';
 import { logger } from '../services/log.service.js';
-import { ensurePesquisadoresSchema } from '../services/pesquisadoresSchema.service.js';
+import {
+  ensurePesquisaRelacionamentosSchema,
+  ensurePesquisadoresSchema,
+} from '../services/pesquisadoresSchema.service.js';
 
 function serializeJsonValue(value) {
   if (!value) return null;
@@ -93,6 +95,7 @@ export async function listarNotificacoes(req, res) {
 
 export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
   await ensurePesquisadoresSchema();
+  await ensurePesquisaRelacionamentosSchema();
 
   const conn = await db.getConnection();
   
@@ -279,6 +282,8 @@ export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
 // Mantenha as outras funções (listarNotificacoes, AprovarNotificacaoLinha) conforme você já tem
 // ... restante do código ...
 export async function AprovarNotificacaoLinha(idNotificacao) {
+  await ensurePesquisaRelacionamentosSchema();
+
   const conn = await db.getConnection();
   
   try {
