@@ -7,6 +7,7 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   build: {
     outDir: "dist",
   },

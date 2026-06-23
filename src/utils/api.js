@@ -6,7 +6,38 @@
  * - Usa variável de ambiente (Vite)
  * - Fallback para localhost em desenvolvimento
  */
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.NEXT_PUBLIC_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001";
+
+export const API_URL = String(API_BASE_URL).replace(/\/+$/, "");
+
+function isAbsoluteUrl(endpoint = "") {
+  return /^https?:\/\//i.test(endpoint);
+}
+
+function withLeadingSlash(endpoint = "") {
+  return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+}
+
+function normalizeApiEndpoint(endpoint = "") {
+  if (isAbsoluteUrl(endpoint)) return endpoint;
+
+  const path = withLeadingSlash(endpoint);
+
+  if (
+    path === "/api" ||
+    path.startsWith("/api/") ||
+    path === "/adminjv" ||
+    path.startsWith("/adminjv/")
+  ) {
+    return path;
+  }
+
+  return `/api${path}`;
+}
 
 /**
  * =====================================================
@@ -44,9 +75,9 @@ export async function apiRequest(endpoint, options = {}) {
      * EXECUÇÃO DA REQUISIÇÃO
      * =====================================================
      */
-    const requestUrl = endpoint.startsWith("http")
+    const requestUrl = isAbsoluteUrl(endpoint)
       ? endpoint
-      : `${API_URL}${endpoint}`;
+      : `${API_URL}${withLeadingSlash(endpoint)}`;
 
     const response = await fetch(requestUrl, {
       ...options,
@@ -121,9 +152,7 @@ export async function apiRequest(endpoint, options = {}) {
  */
 export const api = {
   get: (endpoint, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "GET",
@@ -132,9 +161,7 @@ export const api = {
   },
 
   post: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "POST",
@@ -144,9 +171,7 @@ export const api = {
   },
 
   put: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "PUT",
@@ -156,9 +181,7 @@ export const api = {
   },
 
   patch: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "PATCH",
@@ -168,9 +191,7 @@ export const api = {
   },
 
   delete: (endpoint, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "DELETE",
