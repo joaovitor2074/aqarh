@@ -7,7 +7,10 @@ import {
   ensurePesquisadoresSchema,
   getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
-import { seedRelacionamentosIfEmpty } from "../services/seedRelacionamentos.service.js";
+import {
+  getSeedLinhasForPessoa,
+  seedRelacionamentosIfEmpty,
+} from "../services/seedRelacionamentos.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -244,15 +247,21 @@ export async function listarMembrosPublicos(req, res) {
       `);
 
       return res.json(
-        rows.map((row) => ({
-          ...withImageUrl(row, req),
-          linhas_pesquisa: row.linhas_pesquisa
+        rows.map((row) => {
+          const seed = getSeedLinhasForPessoa(row.nome);
+          const linhasBanco = row.linhas_pesquisa
             ? row.linhas_pesquisa.split("||").filter(Boolean)
-            : [],
-          grupos_pesquisa: row.grupos_pesquisa
+            : [];
+          const gruposBanco = row.grupos_pesquisa
             ? row.grupos_pesquisa.split("||").filter(Boolean)
-            : [],
-        }))
+            : [];
+
+          return {
+            ...withImageUrl(row, req),
+            linhas_pesquisa: linhasBanco.length ? linhasBanco : seed.linhas,
+            grupos_pesquisa: gruposBanco.length ? gruposBanco : seed.grupos,
+          };
+        })
       );
     } catch (queryError) {
       console.warn("Fallback para membros publicos basicos:", queryError.message);
@@ -261,8 +270,13 @@ export async function listarMembrosPublicos(req, res) {
       return res.json(
         rows.map((row) => ({
           ...withImageUrl(row, req),
-          linhas_pesquisa: [],
-          grupos_pesquisa: [],
+          ...(() => {
+            const seed = getSeedLinhasForPessoa(row.nome);
+            return {
+              linhas_pesquisa: seed.linhas,
+              grupos_pesquisa: seed.grupos,
+            };
+          })(),
         }))
       );
     }

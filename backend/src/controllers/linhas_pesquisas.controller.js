@@ -4,15 +4,28 @@ import {
   ensurePesquisaRelacionamentosSchema,
   getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
-import { seedRelacionamentosIfEmpty } from "../services/seedRelacionamentos.service.js";
+import {
+  getSeedPesquisadoresForLinha,
+  seedRelacionamentosIfEmpty,
+} from "../services/seedRelacionamentos.service.js";
 
 function formatLinhasPublicas(rows) {
   return rows.map((row) => ({
     ...row,
-    total_pesquisadores: Number(row.total_pesquisadores || 0),
-    pesquisadores_lista: row.pesquisadores_lista
-      ? row.pesquisadores_lista.split("||").filter(Boolean)
-      : [],
+    ...(() => {
+      const pesquisadoresBanco = row.pesquisadores_lista
+        ? row.pesquisadores_lista.split("||").filter(Boolean)
+        : [];
+      const pesquisadoresSeed = getSeedPesquisadoresForLinha(row.nome, row.grupo);
+      const pesquisadores = pesquisadoresBanco.length
+        ? pesquisadoresBanco
+        : pesquisadoresSeed;
+
+      return {
+        total_pesquisadores: pesquisadores.length || Number(row.total_pesquisadores || 0),
+        pesquisadores_lista: pesquisadores,
+      };
+    })(),
   }));
 }
 

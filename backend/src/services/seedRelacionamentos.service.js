@@ -13,6 +13,7 @@ const DATA_FILES = [
 ];
 
 let seedPromise = null;
+let relationshipMaps = null;
 
 function fixMojibake(value) {
   if (typeof value !== "string") return value;
@@ -44,6 +45,75 @@ function readSeedPeople() {
   });
 }
 
+function getLineName(linha) {
+  return fixMojibake(linha?.linha_pesquisa || linha?.nome || "").trim();
+}
+
+function getLineGroup(linha) {
+  return fixMojibake(linha?.grupo || "").trim();
+}
+
+function lineKey(nome, grupo) {
+  return `${normalizeKey(nome)}|${normalizeKey(grupo)}`;
+}
+
+export function getSeedRelationshipMaps() {
+  if (relationshipMaps) return relationshipMaps;
+
+  const byLine = new Map();
+  const byPerson = new Map();
+
+  for (const person of readSeedPeople()) {
+    const personName = fixMojibake(person.nome || "").trim();
+    const personKey = normalizeKey(personName);
+    if (!personName || !personKey || !Array.isArray(person.linhas_pesquisa)) {
+      continue;
+    }
+
+    const personEntry = byPerson.get(personKey) || {
+      linhas: new Map(),
+      grupos: new Set(),
+    };
+
+    for (const linha of person.linhas_pesquisa) {
+      const nome = getLineName(linha);
+      const grupo = getLineGroup(linha);
+      if (!nome) continue;
+
+      const key = lineKey(nome, grupo);
+      const lineEntry = byLine.get(key) || {
+        pesquisadores: new Set(),
+      };
+
+      lineEntry.pesquisadores.add(personName);
+      byLine.set(key, lineEntry);
+      personEntry.linhas.set(key, nome);
+      if (grupo) personEntry.grupos.add(grupo);
+    }
+
+    byPerson.set(personKey, personEntry);
+  }
+
+  relationshipMaps = { byLine, byPerson };
+  return relationshipMaps;
+}
+
+export function getSeedPesquisadoresForLinha(nome, grupo) {
+  const { byLine } = getSeedRelationshipMaps();
+  const entry = byLine.get(lineKey(nome, grupo));
+  return entry ? Array.from(entry.pesquisadores).sort((a, b) => a.localeCompare(b)) : [];
+}
+
+export function getSeedLinhasForPessoa(nome) {
+  const { byPerson } = getSeedRelationshipMaps();
+  const entry = byPerson.get(normalizeKey(nome));
+
+  return {
+    linhas: entry ? Array.from(entry.linhas.values()).sort((a, b) => a.localeCompare(b)) : [],
+    grupos: entry ? Array.from(entry.grupos.values()).sort((a, b) => a.localeCompare(b)) : [],
+  };
+}
+
 async function buildPesquisadoresIndex() {
   const [rows] = await db.query("SELECT id, nome FROM pesquisadores");
   return new Map(rows.map((row) => [normalizeKey(row.nome), row.id]));
@@ -60,11 +130,11 @@ async function buildLinhasIndex() {
 }
 
 async function findOrCreateLinha(conn, linhasIndex, linha) {
-  const nome = fixMojibake(linha.linha_pesquisa || linha.nome || "").trim();
-  const grupo = fixMojibake(linha.grupo || "").trim();
+  const nome = getLineName(linha);
+  const grupo = getLineGroup(linha);
   if (!nome) return null;
 
-  const key = `${normalizeKey(nome)}|${normalizeKey(grupo)}`;
+  const key = lineKey(nome, grupo);
   if (linhasIndex.has(key)) return linhasIndex.get(key);
 
   const [result] = await conn.query(
