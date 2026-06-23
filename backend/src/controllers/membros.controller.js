@@ -5,6 +5,7 @@ import { db } from "../config/db.js";
 import {
   ensurePesquisaRelacionamentosSchema,
   ensurePesquisadoresSchema,
+  getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -68,6 +69,46 @@ function parseBoolean(value, fallback = true) {
   return ["1", "true", "sim", "on", "yes"].includes(
     String(value).trim().toLowerCase()
   );
+}
+
+async function listarMembrosPublicosBasicos() {
+  const columns = await getTableColumns("pesquisadores");
+  const publicColumns = [
+    "id",
+    "nome",
+    "email",
+    "imagem",
+    "espelho_url",
+    "lattes_url",
+    "id_lattes",
+    "ultima_atualizacao_lattes",
+    "dados_lattes",
+    "orcid",
+    "instituicao",
+    "cargo",
+    "ativo",
+    "titulacao_maxima",
+    "data_inclusao",
+    "tipo_vinculo",
+  ].filter((column) => columns.has(column));
+  const selectedColumns = publicColumns.length
+    ? publicColumns.map((column) => `p.${column}`).join(", ")
+    : "p.*";
+  const where = columns.has("ativo") ? "WHERE p.ativo = 1" : "";
+  const orderBy = columns.has("nome")
+    ? "ORDER BY p.nome ASC"
+    : columns.has("id")
+      ? "ORDER BY p.id ASC"
+      : "";
+
+  const [rows] = await db.query(`
+    SELECT ${selectedColumns}
+    FROM pesquisadores p
+    ${where}
+    ${orderBy}
+  `);
+
+  return rows;
 }
 
 export async function quantMembros(req, res) {
@@ -163,49 +204,66 @@ export async function listarMembros(req, res) {
 
 export async function listarMembrosPublicos(req, res) {
   try {
-    await ensureMembrosSchema();
+    try {
+      await ensureMembrosSchema();
+    } catch (schemaError) {
+      console.warn("Nao foi possivel garantir schema de membros:", schemaError.message);
+    }
 
-    const [rows] = await db.query(`
-      SELECT
-        p.id,
-        p.nome,
-        p.email,
-        p.imagem,
-        p.espelho_url,
-        p.lattes_url,
-        p.id_lattes,
-        p.ultima_atualizacao_lattes,
-        p.dados_lattes,
-        p.orcid,
-        p.instituicao,
-        p.cargo,
-        p.ativo,
-        p.titulacao_maxima,
-        p.data_inclusao,
-        p.tipo_vinculo,
-        GROUP_CONCAT(DISTINCT lp.nome ORDER BY lp.nome ASC SEPARATOR '||') AS linhas_pesquisa,
-        GROUP_CONCAT(DISTINCT lp.grupo ORDER BY lp.grupo ASC SEPARATOR '||') AS grupos_pesquisa
-      FROM pesquisadores p
-      LEFT JOIN pesquisador_linha_pesquisa plp
-        ON p.id = plp.pesquisador_id
-      LEFT JOIN linhas_pesquisa lp
-        ON lp.id = plp.linha_pesquisa_id AND lp.ativo = 1
-      WHERE p.ativo = 1
-      GROUP BY p.id
-      ORDER BY p.nome ASC
-    `);
+    try {
+      const [rows] = await db.query(`
+        SELECT
+          p.id,
+          p.nome,
+          p.email,
+          p.imagem,
+          p.espelho_url,
+          p.lattes_url,
+          p.id_lattes,
+          p.ultima_atualizacao_lattes,
+          p.dados_lattes,
+          p.orcid,
+          p.instituicao,
+          p.cargo,
+          p.ativo,
+          p.titulacao_maxima,
+          p.data_inclusao,
+          p.tipo_vinculo,
+          GROUP_CONCAT(DISTINCT lp.nome ORDER BY lp.nome ASC SEPARATOR '||') AS linhas_pesquisa,
+          GROUP_CONCAT(DISTINCT lp.grupo ORDER BY lp.grupo ASC SEPARATOR '||') AS grupos_pesquisa
+        FROM pesquisadores p
+        LEFT JOIN pesquisador_linha_pesquisa plp
+          ON p.id = plp.pesquisador_id
+        LEFT JOIN linhas_pesquisa lp
+          ON lp.id = plp.linha_pesquisa_id AND lp.ativo = 1
+        WHERE p.ativo = 1
+        GROUP BY p.id
+        ORDER BY p.nome ASC
+      `);
 
-    res.json(
-      rows.map((row) => ({
-        ...withImageUrl(row, req),
-        linhas_pesquisa: row.linhas_pesquisa
-          ? row.linhas_pesquisa.split("||").filter(Boolean)
-          : [],
-        grupos_pesquisa: row.grupos_pesquisa
-          ? row.grupos_pesquisa.split("||").filter(Boolean)
-          : [],
-      }))
-    );
+      return res.json(
+        rows.map((row) => ({
+          ...withImageUrl(row, req),
+          linhas_pesquisa: row.linhas_pesquisa
+            ? row.linhas_pesquisa.split("||").filter(Boolean)
+            : [],
+          grupos_pesquisa: row.grupos_pesquisa
+            ? row.grupos_pesquisa.split("||").filter(Boolean)
+            : [],
+        }))
+      );
+    } catch (queryError) {
+      console.warn("Fallback para membros publicos basicos:", queryError.message);
+      const rows = await listarMembrosPublicosBasicos();
+
+      return res.json(
+        rows.map((row) => ({
+          ...withImageUrl(row, req),
+          linhas_pesquisa: [],
+          grupos_pesquisa: [],
+        }))
+      );
+    }
   } catch (err) {
     console.error("Erro ao listar membros publicos:", err);
     res.status(500).json({ message: "Erro ao listar membros" });

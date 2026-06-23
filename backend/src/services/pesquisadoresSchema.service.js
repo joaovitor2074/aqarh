@@ -52,6 +52,20 @@ async function ensureColumns(tableName, columns) {
   }
 }
 
+export async function getTableColumns(tableName) {
+  const [columns] = await db.query(
+    `
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+    `,
+    [tableName]
+  );
+
+  return new Set(columns.map((column) => column.COLUMN_NAME));
+}
+
 export async function ensurePesquisadoresSchema() {
   if (schemaPromise) return schemaPromise;
 
