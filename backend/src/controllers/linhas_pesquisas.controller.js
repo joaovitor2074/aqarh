@@ -2,6 +2,7 @@ import { db } from "../config/db.js";
 import { getQuantidadeLinhas } from "../services/getquantidadeLinhas.service.js";
 import {
   ensurePesquisaRelacionamentosSchema,
+  ensurePesquisadoresSchema,
   getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
 import {
@@ -61,41 +62,40 @@ export async function quantLinhas(req, res) {
   try {
     const total = await getQuantidadeLinhas();
     return res.json({ total });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ message: "Erro interno" });
   }
 }
 export async function listarLinhasPesquisa(req, res) {
   try {
+    await ensurePesquisadoresSchema();
     await ensurePesquisaRelacionamentosSchema();
 
     const [rows] = await db.query(`
       SELECT 
-  lp.id,
-  lp.nome,
-  lp.grupo,
-  lp.ativo,
-
-  COALESCE(
-    GROUP_CONCAT(
-      CASE 
-        WHEN p.ativo = 1 THEN p.nome
-      END
-      SEPARATOR ', '
-    ),
-    'Nenhum pesquisador relacionado'
-  ) AS pesquisadores
-
-FROM linhas_pesquisa lp
-
-LEFT JOIN pesquisador_linha_pesquisa plp
-  ON plp.linha_pesquisa_id = lp.id
-
-LEFT JOIN pesquisadores p
-  ON p.id = plp.pesquisador_id
-
-GROUP BY lp.id
-ORDER BY lp.nome ASC;
+        lp.id,
+        lp.nome,
+        lp.grupo,
+        lp.ativo,
+        COALESCE(rel.pesquisadores, 'Nenhum pesquisador relacionado') AS pesquisadores
+      FROM linhas_pesquisa lp
+      LEFT JOIN (
+        SELECT
+          plp.linha_pesquisa_id,
+          GROUP_CONCAT(
+            CASE
+              WHEN p.ativo = 1 THEN p.nome
+            END
+            ORDER BY p.nome ASC
+            SEPARATOR ', '
+          ) AS pesquisadores
+        FROM pesquisador_linha_pesquisa plp
+        LEFT JOIN pesquisadores p
+          ON p.id = plp.pesquisador_id
+        GROUP BY plp.linha_pesquisa_id
+      ) rel
+        ON rel.linha_pesquisa_id = lp.id
+      ORDER BY lp.nome ASC;
 
     `);
 

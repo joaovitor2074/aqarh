@@ -1,6 +1,11 @@
 import { db } from "../config/db.js";
 
 const PESQUISADORES_COLUMNS = {
+  email: "VARCHAR(255) NULL",
+  ativo: "TINYINT(1) NOT NULL DEFAULT 1",
+  titulacao_maxima: "VARCHAR(255) NULL",
+  data_inclusao: "DATE NULL",
+  tipo_vinculo: "VARCHAR(50) NOT NULL DEFAULT 'pesquisador'",
   imagem: "VARCHAR(255) NULL",
   espelho_url: "VARCHAR(500) NULL",
   lattes_url: "VARCHAR(500) NULL",
@@ -70,6 +75,21 @@ export async function ensurePesquisadoresSchema() {
   if (schemaPromise) return schemaPromise;
 
   schemaPromise = (async () => {
+    await db.query(
+      `
+      CREATE TABLE IF NOT EXISTS pesquisadores (
+        id INT NOT NULL AUTO_INCREMENT,
+        nome VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NULL,
+        ativo TINYINT(1) NOT NULL DEFAULT 1,
+        titulacao_maxima VARCHAR(255) NULL,
+        data_inclusao DATE NULL,
+        tipo_vinculo VARCHAR(50) NOT NULL DEFAULT 'pesquisador',
+        PRIMARY KEY (id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      `
+    );
+
     await ensureColumns("pesquisadores", PESQUISADORES_COLUMNS);
   })().catch((error) => {
     schemaPromise = null;

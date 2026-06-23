@@ -185,15 +185,21 @@ export async function listarMembros(req, res) {
         p.titulacao_maxima,
         p.data_inclusao,
         p.tipo_vinculo,
-        MIN(lp.id) AS linha_pesquisa_id,
-        GROUP_CONCAT(lp.nome SEPARATOR ', ') AS linhas_pesquisa
+        rel.linha_pesquisa_id,
+        rel.linhas_pesquisa
       FROM pesquisadores p
-      LEFT JOIN pesquisador_linha_pesquisa plp
-        ON p.id = plp.pesquisador_id
-      LEFT JOIN linhas_pesquisa lp
-        ON lp.id = plp.linha_pesquisa_id
+      LEFT JOIN (
+        SELECT
+          plp.pesquisador_id,
+          MIN(lp.id) AS linha_pesquisa_id,
+          GROUP_CONCAT(lp.nome ORDER BY lp.nome ASC SEPARATOR ', ') AS linhas_pesquisa
+        FROM pesquisador_linha_pesquisa plp
+        LEFT JOIN linhas_pesquisa lp
+          ON lp.id = plp.linha_pesquisa_id
+        GROUP BY plp.pesquisador_id
+      ) rel
+        ON rel.pesquisador_id = p.id
       ${where}
-      GROUP BY p.id
       ORDER BY p.nome ASC
       `,
       params
