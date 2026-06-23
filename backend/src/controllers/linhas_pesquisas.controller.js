@@ -4,6 +4,7 @@ import {
   ensurePesquisaRelacionamentosSchema,
   getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
+import { seedRelacionamentosIfEmpty } from "../services/seedRelacionamentos.service.js";
 
 function formatLinhasPublicas(rows) {
   return rows.map((row) => ({
@@ -96,6 +97,7 @@ export async function listarLinhasPesquisaPublicas(req, res) {
   try {
     try {
       await ensurePesquisaRelacionamentosSchema();
+      await seedRelacionamentosIfEmpty();
     } catch (schemaError) {
       console.warn("Nao foi possivel garantir schema de linhas:", schemaError.message);
     }

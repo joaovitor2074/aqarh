@@ -7,6 +7,7 @@ import {
   ensurePesquisadoresSchema,
   getTableColumns,
 } from "../services/pesquisadoresSchema.service.js";
+import { seedRelacionamentosIfEmpty } from "../services/seedRelacionamentos.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -206,6 +207,7 @@ export async function listarMembrosPublicos(req, res) {
   try {
     try {
       await ensureMembrosSchema();
+      await seedRelacionamentosIfEmpty();
     } catch (schemaError) {
       console.warn("Nao foi possivel garantir schema de membros:", schemaError.message);
     }
