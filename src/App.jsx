@@ -20,6 +20,7 @@ import Footer from "./components/Footer";
  * =====================================================
  */
 import Home from "./pages/Home";
+import Sobre from "./pages/Sobre";
 import Projetos from "./pages/Projetos";
 import Pesquisas from "./pages/Pesquisas";
 import Publicacoes from "./pages/Publicacoes";
@@ -205,6 +206,7 @@ function AppContent() {
             />
 
             <Route path="/" element={<Home />} />
+            <Route path="/sobre" element={<Sobre />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/pesquisas" element={<Pesquisas />} />
             <Route path="/publicacoes" element={<Publicacoes />} />

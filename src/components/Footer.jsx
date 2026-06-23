@@ -14,6 +14,7 @@ export default function Footer() {
           <h3>Navegação</h3>
           <ul>
             <li><a href="/">Início</a></li>
+            <li><a href="/sobre">Sobre</a></li>
             <li><a href="/pesquisas">Pesquisas</a></li>
             <li><a href="/projetos">Projetos</a></li>
             <li><a href="/publicacoes">Publicações</a></li>

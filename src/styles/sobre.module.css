@@ -1,0 +1,401 @@
+.page {
+  min-height: 100vh;
+  background: #f5f7fa;
+  color: #1f2d3a;
+}
+
+.container {
+  width: min(100% - 2rem, 1180px);
+  margin: 0 auto;
+}
+
+.hero {
+  min-height: 82vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(7rem, 13vh, 9.5rem) 0 clamp(3.5rem, 7vw, 5rem);
+  color: #ffffff;
+}
+
+.heroImage,
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  background:
+    linear-gradient(90deg, rgba(0, 50, 39, 0.9), rgba(18, 59, 90, 0.72)),
+    rgba(0, 0, 0, 0.18);
+}
+
+.heroContent {
+  width: min(100% - 2rem, 1180px);
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+}
+
+.kicker,
+.sectionTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.kicker {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.14);
+  color: #e8f5f0;
+}
+
+.hero h1 {
+  max-width: 890px;
+  margin: 1.1rem 0 1rem;
+  color: #ffffff;
+  font-size: clamp(2.35rem, 5vw, 4.4rem);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.hero p {
+  max-width: 720px;
+  margin: 0 0 1.7rem;
+  color: #eef6f3;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.heroActions,
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primaryAction,
+.secondaryAction,
+.secondaryDarkAction {
+  min-height: 2.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0 1rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.primaryAction {
+  background: #006a4e;
+  color: #ffffff;
+}
+
+.primaryAction:hover {
+  background: #004d3a;
+}
+
+.secondaryAction {
+  border-color: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.secondaryDarkAction {
+  border-color: rgba(255, 255, 255, 0.64);
+  background: transparent;
+  color: #ffffff;
+}
+
+.identitySection,
+.pillarsSection,
+.workflowSection {
+  padding: clamp(3.5rem, 7vw, 6rem) 0;
+}
+
+.identitySection,
+.workflowSection {
+  background: #ffffff;
+}
+
+.identityGrid,
+.workflowGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.sectionTag {
+  margin-bottom: 0.9rem;
+  border: 1px solid #cce4dc;
+  background: #edf7f3;
+  color: #006a4e;
+}
+
+.copyBlock h2,
+.sectionHeader h2,
+.workflowText h2,
+.ctaContent h2 {
+  margin: 0;
+  color: #1f2d3a;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.copyBlock p,
+.sectionHeader p,
+.workflowText p,
+.ctaContent p {
+  color: #5a6f7c;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.identityMedia {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #e7edf2;
+}
+
+.identityMedia img {
+  width: 100%;
+  min-height: 430px;
+  display: block;
+  object-fit: cover;
+}
+
+.mediaCaption {
+  position: absolute;
+  inset: auto 1rem 1rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.12);
+}
+
+.mediaCaption strong {
+  color: #006a4e;
+}
+
+.mediaCaption span {
+  color: #5a6f7c;
+  line-height: 1.45;
+}
+
+.metricsSection {
+  padding: 1.4rem 0;
+  background: #123b5a;
+  color: #ffffff;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric {
+  min-height: 116px;
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.metric svg {
+  color: #f0c35a;
+  font-size: 1.3rem;
+}
+
+.metric strong {
+  font-size: 1.05rem;
+}
+
+.metric span {
+  color: #dbe7e4;
+  line-height: 1.45;
+}
+
+.sectionHeader {
+  max-width: 760px;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.pillarsSection {
+  background: #f5f7fa;
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.pillar {
+  min-height: 248px;
+  padding: 1.25rem;
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(21, 42, 58, 0.08);
+}
+
+.pillarIcon {
+  width: 2.85rem;
+  height: 2.85rem;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: #edf7f3;
+  color: #006a4e;
+  font-size: 1.2rem;
+}
+
+.pillar h3 {
+  margin: 0 0 0.65rem;
+  color: #123b5a;
+  font-size: 1.12rem;
+}
+
+.pillar p {
+  margin: 0;
+  color: #667987;
+  line-height: 1.58;
+}
+
+.workflowList {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workflowList li {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 1rem;
+  align-items: center;
+  min-height: 4.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.workflowList span {
+  color: #c79a2b;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.workflowList p {
+  margin: 0;
+  color: #243746;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.ctaSection {
+  padding: clamp(3rem, 7vw, 5rem) 0;
+  background: #0f2f48;
+  color: #ffffff;
+}
+
+.ctaContent {
+  max-width: 780px;
+}
+
+.ctaContent h2 {
+  color: #ffffff;
+}
+
+.ctaContent p {
+  max-width: 640px;
+  color: #dfe9ef;
+}
+
+@media (max-width: 980px) {
+  .identityGrid,
+  .workflowGrid,
+  .metricsGrid,
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .identityMedia img {
+    min-height: 300px;
+  }
+
+  .pillar {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .container,
+  .heroContent {
+    width: min(100% - 1.25rem, 1180px);
+  }
+
+  .hero {
+    padding-top: 6rem;
+  }
+
+  .hero h1 {
+    font-size: 2.15rem;
+  }
+
+  .heroActions,
+  .ctaActions {
+    display: grid;
+  }
+
+  .primaryAction,
+  .secondaryAction,
+  .secondaryDarkAction {
+    width: 100%;
+  }
+
+  .workflowList li {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .mediaCaption {
+    position: static;
+    border-radius: 0;
+  }
+}

@@ -127,7 +127,7 @@ export default function Home() {
               desenvolvimento regional.
             </p>
             <div className="hero-buttons">
-              <a href="#sobre" className="btn btn-primary">
+              <a href="/sobre" className="btn btn-primary">
                 <FaFlask /> Conhecer o GIEPI
               </a>
               <a href="/projetos" className="btn btn-outline">
@@ -191,6 +191,14 @@ export default function Home() {
                 A produção do GIEPI busca fortalecer a formação acadêmica, apoiar
                 iniciativas institucionais e ampliar o impacto da pesquisa no Maranhão.
               </p>
+              <div className="sobre-actions">
+                <a href="/sobre" className="btn btn-secondary">
+                  <FaUsers /> Sobre nós
+                </a>
+                <a href="/equipe" className="btn btn-light">
+                  <FaGraduationCap /> Ver equipe
+                </a>
+              </div>
 
               <div className="features-grid">
                 <div className="feature">

@@ -4,6 +4,7 @@ import styles from "../styles/Header.module.css";
 
 const menuItems = [
   { path: "/", label: "Início", key: "inicio" },
+  { path: "/sobre", label: "Sobre", key: "sobre" },
   { path: "/pesquisas", label: "Pesquisas", key: "pesquisas" },
   { path: "/projetos", label: "Projetos", key: "projetos" },
   { path: "/publicacoes", label: "Publicações", key: "publicacoes" },
