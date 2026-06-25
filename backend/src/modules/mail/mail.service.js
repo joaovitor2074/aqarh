@@ -2,6 +2,119 @@
 // Substituir o mail.service.ts por esta versão JS com Nodemailer real
 
 import nodemailer from "nodemailer";
+import process from "node:process";
+
+const TEMPOS_SMTP = {
+  connectionTimeout: 15_000,
+  greetingTimeout: 15_000,
+  socketTimeout: 30_000,
+};
+
+function valorEnv(nome) {
+  return (process.env[nome] || "").trim();
+}
+
+function erroConfiguracao(message) {
+  const error = new Error(message);
+  error.code = "MAIL_CONFIGURATION_ERROR";
+  return error;
+}
+
+/**
+ * Retorna a configuração efetiva do provedor e valida as credenciais antes
+ * de tentar abrir uma conexão SMTP.
+ */
+export function obterConfiguracaoEmail() {
+  const gmailUser = valorEnv("GMAIL_USER");
+  const gmailPassword = valorEnv("GMAIL_APP_PASSWORD").replace(/\s/g, "");
+  const mailtrapUser = valorEnv("MAILTRAP_USER");
+  const mailtrapPassword = valorEnv("MAILTRAP_PASS");
+  const providerInformado = valorEnv("MAIL_ENV").toLowerCase();
+
+  const provider =
+    providerInformado ||
+    (gmailUser && gmailPassword
+      ? "gmail"
+      : mailtrapUser && mailtrapPassword
+        ? "mailtrap"
+        : "");
+
+  if (!provider) {
+    throw erroConfiguracao(
+      "O serviço de email não está configurado. Defina MAIL_ENV e as credenciais do provedor."
+    );
+  }
+
+  if (provider === "gmail") {
+    if (!gmailUser || !gmailPassword) {
+      throw erroConfiguracao(
+        "A configuração do Gmail está incompleta. Verifique GMAIL_USER e GMAIL_APP_PASSWORD."
+      );
+    }
+
+    return {
+      provider,
+      from: valorEnv("MAIL_FROM") || `"GIEPI IFMA" <${gmailUser}>`,
+      transport: {
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: gmailUser,
+          pass: gmailPassword,
+        },
+        ...TEMPOS_SMTP,
+      },
+    };
+  }
+
+  if (provider === "mailtrap") {
+    if (!mailtrapUser || !mailtrapPassword) {
+      throw erroConfiguracao(
+        "A configuração do Mailtrap está incompleta. Verifique MAILTRAP_USER e MAILTRAP_PASS."
+      );
+    }
+
+    return {
+      provider,
+      from: valorEnv("MAIL_FROM") || '"GIEPI IFMA" <no-reply@giepi.local>',
+      transport: {
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
+        secure: false,
+        auth: {
+          user: mailtrapUser,
+          pass: mailtrapPassword,
+        },
+        ...TEMPOS_SMTP,
+      },
+    };
+  }
+
+  throw erroConfiguracao(
+    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=gmail ou MAIL_ENV=mailtrap.`
+  );
+}
+
+export function mensagemErroEmail(error) {
+  if (error?.code === "MAIL_CONFIGURATION_ERROR") {
+    return error.message;
+  }
+
+  if (error?.code === "EAUTH" || error?.responseCode === 535) {
+    return "O provedor recusou a autenticação. Verifique o usuário e a senha de aplicativo.";
+  }
+
+  if (
+    ["ECONNECTION", "ECONNREFUSED", "ETIMEDOUT", "ESOCKET"].includes(
+      error?.code
+    )
+  ) {
+    return "Não foi possível conectar ao servidor de email. Tente novamente em alguns instantes.";
+  }
+
+  return "O provedor de email não conseguiu entregar a mensagem.";
+}
 
 /**
  * Cria o transporter baseado no ambiente.
@@ -26,27 +139,11 @@ import nodemailer from "nodemailer";
  *   4. Copie os 16 dígitos e cole em GMAIL_APP_PASSWORD
  */
 function criarTransporter() {
-  const env = process.env.MAIL_ENV || "mailtrap";
-
-  if (env === "gmail") {
-    return nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
-  }
-
-  // Padrão: Mailtrap (para testes — emails não chegam de verdade)
-  return nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-      user: process.env.MAILTRAP_USER,
-      pass: process.env.MAILTRAP_PASS,
-    },
-  });
+  const config = obterConfiguracaoEmail();
+  return {
+    config,
+    transporter: nodemailer.createTransport(config.transport),
+  };
 }
 
 /**
@@ -119,14 +216,14 @@ function montarHTML({ assunto, corpo, remetente = "GIEPI – IFMA Campus Codó" 
  * @param {string} [opcoes.nomeDestinatario] - Nome para personalizar saudação
  */
 export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
-  const transporter = criarTransporter();
+  const { config, transporter } = criarTransporter();
 
   const corpoFinal = nomeDestinatario
     ? `Olá, ${nomeDestinatario}!\n\n${corpo}`
     : corpo;
 
   const info = await transporter.sendMail({
-    from: process.env.MAIL_FROM || `"GIEPI IFMA" <no-reply@giepi.ifma.edu.br>`,
+    from: config.from,
     to: para,
     subject: assunto,
     text: corpoFinal,
@@ -165,7 +262,10 @@ export async function enviarEmailEmMassa({ destinatarios, assunto, corpo, person
       resultados.enviados++;
     } catch (err) {
       console.error(`[MAIL] Falha ao enviar para ${dest.email}:`, err.message);
-      resultados.falhas.push({ email: dest.email, erro: err.message });
+      resultados.falhas.push({
+        email: dest.email,
+        erro: mensagemErroEmail(err),
+      });
     }
   }
 

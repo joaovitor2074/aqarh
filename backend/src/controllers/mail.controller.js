@@ -1,7 +1,11 @@
 // src/controllers/mail.controller.js
 
 import { db } from "../config/db.js";
-import { enviarEmail, enviarEmailEmMassa } from "../modules/mail/mail.service.js";
+import {
+  enviarEmail,
+  enviarEmailEmMassa,
+  mensagemErroEmail,
+} from "../modules/mail/mail.service.js";
 
 /**
  * POST /api/mail/enviar-em-massa
@@ -53,6 +57,15 @@ export async function enviarEmMassa(req, res) {
       corpo,
       personalizar,
     });
+
+    if (resultados.enviados === 0) {
+      return res.status(502).json({
+        message:
+          resultados.falhas[0]?.erro ||
+          "Nenhum email foi enviado. Verifique a configuração do serviço de email.",
+        ...resultados,
+      });
+    }
 
     return res.json({
       message: `Campanha concluída: ${resultados.enviados} de ${resultados.total} emails enviados.`,
@@ -124,7 +137,8 @@ export async function enviarIndividual(req, res) {
     });
   } catch (err) {
     console.error("[MAIL] Erro ao enviar individual:", err);
-    return res.status(500).json({ message: "Erro interno ao enviar email." });
+    const status = err?.code === "MAIL_CONFIGURATION_ERROR" ? 503 : 502;
+    return res.status(status).json({ message: mensagemErroEmail(err) });
   }
 }
 

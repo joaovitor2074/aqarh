@@ -109,17 +109,25 @@ export async function apiRequest(endpoint, options = {}) {
      */
     if (!response.ok) {
       const errorText = await response.text();
+      let errorData = null;
 
       try {
-        const error = JSON.parse(errorText);
-        throw new Error(
-          error.message || error.error || `Erro ${response.status}`
-        );
+        errorData = JSON.parse(errorText);
       } catch {
-        throw new Error(
-          `Erro ${response.status}: ${errorText || response.statusText}`
-        );
+        // A resposta pode não ser JSON (por exemplo, erro de proxy).
       }
+
+      const message =
+        errorData?.message ||
+        errorData?.error ||
+        errorText ||
+        response.statusText ||
+        `Erro ${response.status}`;
+
+      const requestError = new Error(message);
+      requestError.status = response.status;
+      requestError.data = errorData;
+      throw requestError;
     }
 
     /**
