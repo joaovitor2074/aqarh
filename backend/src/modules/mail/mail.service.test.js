@@ -6,6 +6,10 @@ import { obterConfiguracaoEmail } from "./mail.service.js";
 const MAIL_KEYS = [
   "MAIL_ENV",
   "MAIL_FROM",
+  "RESEND_API_KEY",
+  "RESEND_FROM",
+  "SENDGRID_API_KEY",
+  "SENDGRID_FROM",
   "GMAIL_USER",
   "GMAIL_APP_PASSWORD",
   "MAILTRAP_USER",
@@ -49,6 +53,56 @@ test("configura Gmail e usa a conta autenticada como remetente", () => {
       assert.equal(config.provider, "gmail");
       assert.equal(config.transport.auth.pass, "abcdefghijklmnop");
       assert.match(config.from, /conta@example\.com/);
+    }
+  );
+});
+
+test("configura Resend para envio HTTPS no Railway", () => {
+  comAmbiente(
+    {
+      MAIL_ENV: "resend",
+      RESEND_API_KEY: "re_123",
+      RESEND_FROM: "GIEPI <contato@example.com>",
+    },
+    () => {
+      const config = obterConfiguracaoEmail();
+
+      assert.equal(config.provider, "resend");
+      assert.equal(config.apiKey, "re_123");
+      assert.equal(config.from, "GIEPI <contato@example.com>");
+      assert.equal(config.transport, undefined);
+    }
+  );
+});
+
+test("prioriza Resend quando MAIL_ENV não foi definida", () => {
+  comAmbiente(
+    {
+      RESEND_API_KEY: "re_123",
+      RESEND_FROM: "GIEPI <contato@example.com>",
+      GMAIL_USER: "conta@example.com",
+      GMAIL_APP_PASSWORD: "abcdefghijklmnop",
+    },
+    () => {
+      assert.equal(obterConfiguracaoEmail().provider, "resend");
+    }
+  );
+});
+
+test("configura SendGrid para envio HTTPS com remetente verificado", () => {
+  comAmbiente(
+    {
+      MAIL_ENV: "sendgrid",
+      SENDGRID_API_KEY: "SG.123",
+      SENDGRID_FROM: "GIEPI <conta@gmail.com>",
+    },
+    () => {
+      const config = obterConfiguracaoEmail();
+
+      assert.equal(config.provider, "sendgrid");
+      assert.equal(config.apiKey, "SG.123");
+      assert.equal(config.from, "GIEPI <conta@gmail.com>");
+      assert.equal(config.transport, undefined);
     }
   );
 });

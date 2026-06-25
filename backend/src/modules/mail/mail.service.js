@@ -25,6 +25,10 @@ function erroConfiguracao(message) {
  * de tentar abrir uma conexão SMTP.
  */
 export function obterConfiguracaoEmail() {
+  const resendApiKey = valorEnv("RESEND_API_KEY");
+  const resendFrom = valorEnv("RESEND_FROM") || valorEnv("MAIL_FROM");
+  const sendgridApiKey = valorEnv("SENDGRID_API_KEY");
+  const sendgridFrom = valorEnv("SENDGRID_FROM") || valorEnv("MAIL_FROM");
   const gmailUser = valorEnv("GMAIL_USER");
   const gmailPassword = valorEnv("GMAIL_APP_PASSWORD").replace(/\s/g, "");
   const mailtrapUser = valorEnv("MAILTRAP_USER");
@@ -33,16 +37,48 @@ export function obterConfiguracaoEmail() {
 
   const provider =
     providerInformado ||
-    (gmailUser && gmailPassword
-      ? "gmail"
-      : mailtrapUser && mailtrapPassword
-        ? "mailtrap"
-        : "");
+    (resendApiKey
+      ? "resend"
+      : sendgridApiKey
+        ? "sendgrid"
+        : gmailUser && gmailPassword
+          ? "gmail"
+          : mailtrapUser && mailtrapPassword
+            ? "mailtrap"
+            : "");
 
   if (!provider) {
     throw erroConfiguracao(
       "O serviço de email não está configurado. Defina MAIL_ENV e as credenciais do provedor."
     );
+  }
+
+  if (provider === "resend") {
+    if (!resendApiKey || !resendFrom) {
+      throw erroConfiguracao(
+        "A configuração do Resend está incompleta. Verifique RESEND_API_KEY e RESEND_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: resendApiKey,
+      from: resendFrom,
+    };
+  }
+
+  if (provider === "sendgrid") {
+    if (!sendgridApiKey || !sendgridFrom) {
+      throw erroConfiguracao(
+        "A configuração do SendGrid está incompleta. Verifique SENDGRID_API_KEY e SENDGRID_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: sendgridApiKey,
+      from: sendgridFrom,
+    };
   }
 
   if (provider === "gmail") {
@@ -92,7 +128,7 @@ export function obterConfiguracaoEmail() {
   }
 
   throw erroConfiguracao(
-    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=gmail ou MAIL_ENV=mailtrap.`
+    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=sendgrid, resend, gmail ou mailtrap.`
   );
 }
 
@@ -103,6 +139,10 @@ export function mensagemErroEmail(error) {
 
   if (error?.code === "EAUTH" || error?.responseCode === 535) {
     return "O provedor recusou a autenticação. Verifique o usuário e a senha de aplicativo.";
+  }
+
+  if (error?.code === "MAIL_PROVIDER_ERROR") {
+    return error.message;
   }
 
   if (
@@ -143,6 +183,102 @@ function criarTransporter() {
   return {
     config,
     transporter: nodemailer.createTransport(config.transport),
+  };
+}
+
+async function enviarComResend({ config, para, assunto, corpoFinal, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: config.from,
+        to: [para],
+        subject: assunto,
+        text: corpoFinal,
+        html,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message || `O Resend recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: data.id,
+    response: data,
+  };
+}
+
+function separarEndereco(remetente) {
+  const match = remetente.match(/^\s*(.*?)\s*<([^<>]+)>\s*$/);
+
+  if (!match) {
+    return { email: remetente };
+  }
+
+  return {
+    email: match[2].trim(),
+    ...(match[1].trim() && { name: match[1].trim().replace(/^"|"$/g, "") }),
+  };
+}
+
+async function enviarComSendGrid({ config, para, assunto, corpoFinal, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: para }] }],
+        from: separarEndereco(config.from),
+        subject: assunto,
+        content: [
+          { type: "text/plain", value: corpoFinal },
+          { type: "text/html", value: html },
+        ],
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const error = new Error(
+      data.errors?.[0]?.message ||
+        `O SendGrid recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: response.headers.get("x-message-id"),
   };
 }
 
@@ -216,19 +352,37 @@ function montarHTML({ assunto, corpo, remetente = "GIEPI – IFMA Campus Codó" 
  * @param {string} [opcoes.nomeDestinatario] - Nome para personalizar saudação
  */
 export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
-  const { config, transporter } = criarTransporter();
+  const config = obterConfiguracaoEmail();
 
   const corpoFinal = nomeDestinatario
     ? `Olá, ${nomeDestinatario}!\n\n${corpo}`
     : corpo;
+  const html = montarHTML({ assunto, corpo: corpoFinal });
 
-  const info = await transporter.sendMail({
-    from: config.from,
-    to: para,
-    subject: assunto,
-    text: corpoFinal,
-    html: montarHTML({ assunto, corpo: corpoFinal }),
-  });
+  const info =
+    config.provider === "resend"
+      ? await enviarComResend({
+          config,
+          para,
+          assunto,
+          corpoFinal,
+          html,
+        })
+      : config.provider === "sendgrid"
+        ? await enviarComSendGrid({
+            config,
+            para,
+            assunto,
+            corpoFinal,
+            html,
+          })
+      : await criarTransporter().transporter.sendMail({
+          from: config.from,
+          to: para,
+          subject: assunto,
+          text: corpoFinal,
+          html,
+        });
 
   console.log(`[MAIL] Enviado para ${para} — ID: ${info.messageId}`);
   return info;
