@@ -7,9 +7,16 @@ import {
   obterDiagnosticoEmail,
 } from "./mail.service.js";
 
+const EMAIL_BRAND_NAME =
+  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - GIEPI";
+
 const MAIL_KEYS = [
   "MAIL_ENV",
   "MAIL_FROM",
+  "EMAIL_ASSET_BASE_URL",
+  "APP_URL",
+  "SITE_URL",
+  "FRONTEND_URL",
   "BREVO_API_KEY",
   "BREVO_FROM",
   "BREVO_FROM_NAME",
@@ -84,6 +91,7 @@ test("configura Gmail e usa a conta autenticada como remetente", () => {
       assert.equal(config.provider, "gmail");
       assert.equal(config.transport.auth.pass, "abcdefghijklmnop");
       assert.match(config.from, /conta@example\.com/);
+      assert.match(config.from, /Grupo Interdisciplinar/);
     }
   );
 });
@@ -94,7 +102,7 @@ test("configura Brevo para envio HTTPS no Railway", () => {
       MAIL_ENV: " BREVO ",
       BREVO_API_KEY: "xkeysib-123",
       BREVO_FROM: "conta@example.com",
-      BREVO_FROM_NAME: "GIEPI IFMA",
+      BREVO_FROM_NAME: EMAIL_BRAND_NAME,
     },
     () => {
       const config = obterConfiguracaoEmail();
@@ -103,7 +111,7 @@ test("configura Brevo para envio HTTPS no Railway", () => {
       assert.equal(config.apiKey, "xkeysib-123");
       assert.deepEqual(config.sender, {
         email: "conta@example.com",
-        name: "GIEPI IFMA",
+        name: EMAIL_BRAND_NAME,
       });
       assert.equal(config.transport, undefined);
     }
@@ -153,7 +161,7 @@ test("envia pela API HTTPS da Brevo com o payload esperado", async () => {
         MAIL_ENV: "brevo",
         BREVO_API_KEY: "xkeysib-chave-de-teste",
         BREVO_FROM: "conta@example.com",
-        BREVO_FROM_NAME: "GIEPI IFMA",
+        EMAIL_ASSET_BASE_URL: "https://site.example.com",
       },
       async () => {
         globalThis.fetch = async (url, options) => {
@@ -194,11 +202,17 @@ test("envia pela API HTTPS da Brevo com o payload esperado", async () => {
   );
   assert.deepEqual(requisicao.body.sender, {
     email: "conta@example.com",
-    name: "GIEPI IFMA",
+    name: EMAIL_BRAND_NAME,
   });
   assert.deepEqual(requisicao.body.to, [{ email: "destino@example.com" }]);
   assert.equal(requisicao.body.subject, "Teste");
   assert.match(requisicao.body.htmlContent, /Mensagem de teste/);
+  assert.match(
+    requisicao.body.htmlContent,
+    /https:\/\/site\.example\.com\/img\/email\/imagem-fundo-email\.png/
+  );
+  assert.match(requisicao.body.htmlContent, /Grupo Interdisciplinar/);
+  assert.doesNotMatch(requisicao.body.htmlContent, /Campus Cod/);
 });
 
 test("configura Resend para envio HTTPS no Railway", () => {
