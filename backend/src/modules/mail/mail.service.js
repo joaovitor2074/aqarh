@@ -20,6 +20,29 @@ function erroConfiguracao(message) {
   return error;
 }
 
+function mascararEmail(email = "") {
+  const [usuario, dominio] = email.split("@");
+
+  if (!usuario || !dominio) {
+    return email ? "***" : "";
+  }
+
+  const inicio = usuario.slice(0, Math.min(2, usuario.length));
+  return `${inicio}***@${dominio}`;
+}
+
+function registrarEventoEmail(evento, dados = {}, nivel = "log") {
+  const payload = Object.fromEntries(
+    Object.entries({
+      timestamp: new Date().toISOString(),
+      evento,
+      ...dados,
+    }).filter(([, valor]) => valor !== undefined)
+  );
+
+  console[nivel](`[MAIL] ${JSON.stringify(payload)}`);
+}
+
 /**
  * Retorna a configuração efetiva do provedor e valida as credenciais antes
  * de tentar abrir uma conexão SMTP.
@@ -154,6 +177,27 @@ export function obterConfiguracaoEmail() {
   );
 }
 
+export function obterDiagnosticoEmail() {
+  try {
+    const config = obterConfiguracaoEmail();
+    const remetente =
+      config.sender?.email || separarEndereco(config.from || "").email || "";
+
+    return {
+      configurado: true,
+      provider: config.provider,
+      remetente: mascararEmail(remetente),
+      credencialConfigurada: Boolean(config.apiKey || config.transport?.auth),
+    };
+  } catch (error) {
+    return {
+      configurado: false,
+      provider: valorEnv("MAIL_ENV").toLowerCase() || null,
+      erro: error.message,
+    };
+  }
+}
+
 export function mensagemErroEmail(error) {
   if (error?.code === "MAIL_CONFIGURATION_ERROR") {
     return error.message;
@@ -286,6 +330,7 @@ async function enviarComBrevo({ config, para, assunto, html }) {
 
   return {
     messageId: data.messageId,
+    providerStatus: response.status,
     response: data,
   };
 }
@@ -414,48 +459,89 @@ function montarHTML({ assunto, corpo, remetente = "GIEPI – IFMA Campus Codó" 
  * @param {string} opcoes.corpo - Corpo em texto/html simples
  * @param {string} [opcoes.nomeDestinatario] - Nome para personalizar saudação
  */
-export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
+export async function enviarEmail({
+  para,
+  assunto,
+  corpo,
+  nomeDestinatario,
+  requestId,
+}) {
   const config = obterConfiguracaoEmail();
+  const inicio = Date.now();
 
   const corpoFinal = nomeDestinatario
     ? `Olá, ${nomeDestinatario}!\n\n${corpo}`
     : corpo;
   const html = montarHTML({ assunto, corpo: corpoFinal });
 
-  const info =
-    config.provider === "brevo"
-      ? await enviarComBrevo({
-          config,
-          para,
-          assunto,
-          html,
-        })
-      : config.provider === "resend"
-      ? await enviarComResend({
-          config,
-          para,
-          assunto,
-          corpoFinal,
-          html,
-        })
-      : config.provider === "sendgrid"
-        ? await enviarComSendGrid({
+  registrarEventoEmail("envio_iniciado", {
+    requestId,
+    provider: config.provider,
+    destinatario: mascararEmail(para),
+    remetente: mascararEmail(
+      config.sender?.email || separarEndereco(config.from || "").email
+    ),
+  });
+
+  try {
+    const info =
+      config.provider === "brevo"
+        ? await enviarComBrevo({
             config,
             para,
             assunto,
-            corpoFinal,
             html,
           })
-      : await criarTransporter().transporter.sendMail({
-          from: config.from,
-          to: para,
-          subject: assunto,
-          text: corpoFinal,
-          html,
-        });
+        : config.provider === "resend"
+          ? await enviarComResend({
+              config,
+              para,
+              assunto,
+              corpoFinal,
+              html,
+            })
+          : config.provider === "sendgrid"
+            ? await enviarComSendGrid({
+                config,
+                para,
+                assunto,
+                corpoFinal,
+                html,
+              })
+            : await criarTransporter().transporter.sendMail({
+                from: config.from,
+                to: para,
+                subject: assunto,
+                text: corpoFinal,
+                html,
+              });
 
-  console.log(`[MAIL] Enviado para ${para} — ID: ${info.messageId}`);
-  return info;
+    registrarEventoEmail("envio_aceito", {
+      requestId,
+      provider: config.provider,
+      destinatario: mascararEmail(para),
+      providerStatus: info.providerStatus,
+      messageId: info.messageId || null,
+      duracaoMs: Date.now() - inicio,
+    });
+
+    return info;
+  } catch (error) {
+    registrarEventoEmail(
+      "envio_falhou",
+      {
+        requestId,
+        provider: config.provider,
+        destinatario: mascararEmail(para),
+        code: error.code,
+        providerStatus: error.responseCode,
+        mensagem: mensagemErroEmail(error),
+        duracaoMs: Date.now() - inicio,
+      },
+      "error"
+    );
+    throw error;
+  }
 }
 
 /**
@@ -468,7 +554,13 @@ export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
  * @param {string} opcoes.corpo
  * @param {boolean} [opcoes.personalizar] - Se true, adiciona "Olá, [nome]!" no início
  */
-export async function enviarEmailEmMassa({ destinatarios, assunto, corpo, personalizar = true }) {
+export async function enviarEmailEmMassa({
+  destinatarios,
+  assunto,
+  corpo,
+  personalizar = true,
+  requestId,
+}) {
   const resultados = {
     total: destinatarios.length,
     enviados: 0,
@@ -482,10 +574,10 @@ export async function enviarEmailEmMassa({ destinatarios, assunto, corpo, person
         assunto,
         corpo,
         nomeDestinatario: personalizar ? dest.nome : null,
+        requestId,
       });
       resultados.enviados++;
     } catch (err) {
-      console.error(`[MAIL] Falha ao enviar para ${dest.email}:`, err.message);
       resultados.falhas.push({
         email: dest.email,
         erro: mensagemErroEmail(err),
@@ -493,9 +585,12 @@ export async function enviarEmailEmMassa({ destinatarios, assunto, corpo, person
     }
   }
 
-  console.log(
-    `[MAIL] Campanha concluída: ${resultados.enviados}/${resultados.total} enviados, ${resultados.falhas.length} falhas`
-  );
+  registrarEventoEmail("campanha_concluida", {
+    requestId,
+    total: resultados.total,
+    enviados: resultados.enviados,
+    falhas: resultados.falhas.length,
+  });
 
   return resultados;
 }

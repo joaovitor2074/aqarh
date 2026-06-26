@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import process from "node:process";
-import { obterConfiguracaoEmail } from "./mail.service.js";
+import {
+  enviarEmail,
+  obterConfiguracaoEmail,
+  obterDiagnosticoEmail,
+} from "./mail.service.js";
 
 const MAIL_KEYS = [
   "MAIL_ENV",
@@ -32,6 +36,30 @@ function comAmbiente(values, callback) {
 
   try {
     callback();
+  } finally {
+    for (const key of MAIL_KEYS) {
+      if (original[key] === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = original[key];
+      }
+    }
+  }
+}
+
+async function comAmbienteAsync(values, callback) {
+  const original = Object.fromEntries(
+    MAIL_KEYS.map((key) => [key, process.env[key]])
+  );
+
+  for (const key of MAIL_KEYS) {
+    delete process.env[key];
+  }
+
+  Object.assign(process.env, values);
+
+  try {
+    await callback();
   } finally {
     for (const key of MAIL_KEYS) {
       if (original[key] === undefined) {
@@ -94,6 +122,83 @@ test("prioriza Brevo quando MAIL_ENV não foi definida", () => {
       assert.equal(obterConfiguracaoEmail().provider, "brevo");
     }
   );
+});
+
+test("diagnóstico não expõe a chave da Brevo", () => {
+  comAmbiente(
+    {
+      MAIL_ENV: "brevo",
+      BREVO_API_KEY: "xkeysib-segredo",
+      BREVO_FROM: "conta@example.com",
+    },
+    () => {
+      const diagnostico = obterDiagnosticoEmail();
+      const serializado = JSON.stringify(diagnostico);
+
+      assert.equal(diagnostico.configurado, true);
+      assert.equal(diagnostico.provider, "brevo");
+      assert.equal(diagnostico.remetente, "co***@example.com");
+      assert.doesNotMatch(serializado, /xkeysib-segredo/);
+    }
+  );
+});
+
+test("envia pela API HTTPS da Brevo com o payload esperado", async () => {
+  const fetchOriginal = globalThis.fetch;
+  let requisicao;
+
+  try {
+    await comAmbienteAsync(
+      {
+        MAIL_ENV: "brevo",
+        BREVO_API_KEY: "xkeysib-chave-de-teste",
+        BREVO_FROM: "conta@example.com",
+        BREVO_FROM_NAME: "GIEPI IFMA",
+      },
+      async () => {
+        globalThis.fetch = async (url, options) => {
+          requisicao = {
+            url,
+            options,
+            body: JSON.parse(options.body),
+          };
+
+          return new Response(
+            JSON.stringify({ messageId: "<mensagem@brevo>" }),
+            {
+              status: 201,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        };
+
+        const info = await enviarEmail({
+          para: "destino@example.com",
+          assunto: "Teste",
+          corpo: "Mensagem de teste",
+          requestId: "teste-request-id",
+        });
+
+        assert.equal(info.messageId, "<mensagem@brevo>");
+      }
+    );
+  } finally {
+    globalThis.fetch = fetchOriginal;
+  }
+
+  assert.equal(requisicao.url, "https://api.brevo.com/v3/smtp/email");
+  assert.equal(requisicao.options.method, "POST");
+  assert.equal(
+    requisicao.options.headers["api-key"],
+    "xkeysib-chave-de-teste"
+  );
+  assert.deepEqual(requisicao.body.sender, {
+    email: "conta@example.com",
+    name: "GIEPI IFMA",
+  });
+  assert.deepEqual(requisicao.body.to, [{ email: "destino@example.com" }]);
+  assert.equal(requisicao.body.subject, "Teste");
+  assert.match(requisicao.body.htmlContent, /Mensagem de teste/);
 });
 
 test("configura Resend para envio HTTPS no Railway", () => {

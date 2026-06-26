@@ -1,11 +1,17 @@
 // src/controllers/mail.controller.js
 
 import { db } from "../config/db.js";
+import { randomUUID } from "node:crypto";
 import {
   enviarEmail,
   enviarEmailEmMassa,
   mensagemErroEmail,
+  obterDiagnosticoEmail,
 } from "../modules/mail/mail.service.js";
+
+function obterRequestId(req) {
+  return req.headers["x-railway-request-id"] || randomUUID();
+}
 
 /**
  * POST /api/mail/enviar-em-massa
@@ -19,6 +25,8 @@ import {
  * }
  */
 export async function enviarEmMassa(req, res) {
+  const requestId = obterRequestId(req);
+
   try {
     const { assunto, corpo, filtro = "todos", personalizar = true } = req.body;
 
@@ -56,6 +64,7 @@ export async function enviarEmMassa(req, res) {
       assunto,
       corpo,
       personalizar,
+      requestId,
     });
 
     if (resultados.enviados === 0) {
@@ -72,7 +81,11 @@ export async function enviarEmMassa(req, res) {
       ...resultados,
     });
   } catch (err) {
-    console.error("[MAIL] Erro ao enviar em massa:", err);
+    console.error("[MAIL] Erro ao enviar em massa:", {
+      requestId,
+      code: err?.code,
+      message: mensagemErroEmail(err),
+    });
     return res.status(500).json({ message: "Erro interno ao enviar emails." });
   }
 }
@@ -90,6 +103,8 @@ export async function enviarEmMassa(req, res) {
  * }
  */
 export async function enviarIndividual(req, res) {
+  const requestId = obterRequestId(req);
+
   try {
     const { membroId, para, nome, assunto, corpo } = req.body;
 
@@ -130,16 +145,32 @@ export async function enviarIndividual(req, res) {
       assunto,
       corpo,
       nomeDestinatario: nomeDestino,
+      requestId,
     });
 
     return res.json({
       message: `Email enviado com sucesso para ${nomeDestino || emailDestino}.`,
     });
   } catch (err) {
-    console.error("[MAIL] Erro ao enviar individual:", err);
+    console.error("[MAIL] Erro ao enviar individual:", {
+      requestId,
+      code: err?.code,
+      providerStatus: err?.responseCode,
+      message: mensagemErroEmail(err),
+    });
     const status = err?.code === "MAIL_CONFIGURATION_ERROR" ? 503 : 502;
-    return res.status(status).json({ message: mensagemErroEmail(err) });
+    return res.status(status).json({
+      message: mensagemErroEmail(err),
+      requestId,
+    });
   }
+}
+
+export function statusEmail(req, res) {
+  return res.json({
+    ...obterDiagnosticoEmail(),
+    requestId: obterRequestId(req),
+  });
 }
 
 /**
