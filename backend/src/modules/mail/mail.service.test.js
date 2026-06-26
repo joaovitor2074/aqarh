@@ -6,6 +6,9 @@ import { obterConfiguracaoEmail } from "./mail.service.js";
 const MAIL_KEYS = [
   "MAIL_ENV",
   "MAIL_FROM",
+  "BREVO_API_KEY",
+  "BREVO_FROM",
+  "BREVO_FROM_NAME",
   "RESEND_API_KEY",
   "RESEND_FROM",
   "SENDGRID_API_KEY",
@@ -53,6 +56,42 @@ test("configura Gmail e usa a conta autenticada como remetente", () => {
       assert.equal(config.provider, "gmail");
       assert.equal(config.transport.auth.pass, "abcdefghijklmnop");
       assert.match(config.from, /conta@example\.com/);
+    }
+  );
+});
+
+test("configura Brevo para envio HTTPS no Railway", () => {
+  comAmbiente(
+    {
+      MAIL_ENV: " BREVO ",
+      BREVO_API_KEY: "xkeysib-123",
+      BREVO_FROM: "conta@example.com",
+      BREVO_FROM_NAME: "GIEPI IFMA",
+    },
+    () => {
+      const config = obterConfiguracaoEmail();
+
+      assert.equal(config.provider, "brevo");
+      assert.equal(config.apiKey, "xkeysib-123");
+      assert.deepEqual(config.sender, {
+        email: "conta@example.com",
+        name: "GIEPI IFMA",
+      });
+      assert.equal(config.transport, undefined);
+    }
+  );
+});
+
+test("prioriza Brevo quando MAIL_ENV não foi definida", () => {
+  comAmbiente(
+    {
+      BREVO_API_KEY: "xkeysib-123",
+      BREVO_FROM: "conta@example.com",
+      GMAIL_USER: "conta@example.com",
+      GMAIL_APP_PASSWORD: "abcdefghijklmnop",
+    },
+    () => {
+      assert.equal(obterConfiguracaoEmail().provider, "brevo");
     }
   );
 });

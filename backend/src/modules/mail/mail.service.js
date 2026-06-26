@@ -25,6 +25,9 @@ function erroConfiguracao(message) {
  * de tentar abrir uma conexão SMTP.
  */
 export function obterConfiguracaoEmail() {
+  const brevoApiKey = valorEnv("BREVO_API_KEY");
+  const brevoFrom = valorEnv("BREVO_FROM") || valorEnv("MAIL_FROM");
+  const brevoFromName = valorEnv("BREVO_FROM_NAME") || "GIEPI IFMA";
   const resendApiKey = valorEnv("RESEND_API_KEY");
   const resendFrom = valorEnv("RESEND_FROM") || valorEnv("MAIL_FROM");
   const sendgridApiKey = valorEnv("SENDGRID_API_KEY");
@@ -37,20 +40,39 @@ export function obterConfiguracaoEmail() {
 
   const provider =
     providerInformado ||
-    (resendApiKey
-      ? "resend"
-      : sendgridApiKey
-        ? "sendgrid"
-        : gmailUser && gmailPassword
-          ? "gmail"
-          : mailtrapUser && mailtrapPassword
-            ? "mailtrap"
-            : "");
+    (brevoApiKey
+      ? "brevo"
+      : resendApiKey
+        ? "resend"
+        : sendgridApiKey
+          ? "sendgrid"
+          : gmailUser && gmailPassword
+            ? "gmail"
+            : mailtrapUser && mailtrapPassword
+              ? "mailtrap"
+              : "");
 
   if (!provider) {
     throw erroConfiguracao(
       "O serviço de email não está configurado. Defina MAIL_ENV e as credenciais do provedor."
     );
+  }
+
+  if (provider === "brevo") {
+    if (!brevoApiKey || !brevoFrom) {
+      throw erroConfiguracao(
+        "A configuração da Brevo está incompleta. Verifique BREVO_API_KEY e BREVO_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: brevoApiKey,
+      sender: {
+        email: brevoFrom,
+        name: brevoFromName,
+      },
+    };
   }
 
   if (provider === "resend") {
@@ -128,7 +150,7 @@ export function obterConfiguracaoEmail() {
   }
 
   throw erroConfiguracao(
-    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=sendgrid, resend, gmail ou mailtrap.`
+    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=brevo, sendgrid, resend, gmail ou mailtrap.`
   );
 }
 
@@ -223,6 +245,47 @@ async function enviarComResend({ config, para, assunto, corpoFinal, html }) {
 
   return {
     messageId: data.id,
+    response: data,
+  };
+}
+
+async function enviarComBrevo({ config, para, assunto, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": config.apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: config.sender,
+        to: [{ email: para }],
+        subject: assunto,
+        htmlContent: html,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message || `A Brevo recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: data.messageId,
     response: data,
   };
 }
@@ -360,7 +423,14 @@ export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
   const html = montarHTML({ assunto, corpo: corpoFinal });
 
   const info =
-    config.provider === "resend"
+    config.provider === "brevo"
+      ? await enviarComBrevo({
+          config,
+          para,
+          assunto,
+          html,
+        })
+      : config.provider === "resend"
       ? await enviarComResend({
           config,
           para,
