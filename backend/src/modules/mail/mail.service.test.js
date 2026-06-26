@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import process from "node:process";
 import {
   enviarEmail,
+  mensagemErroEmail,
   obterConfiguracaoEmail,
   obterDiagnosticoEmail,
 } from "./mail.service.js";
@@ -213,6 +214,20 @@ test("envia pela API HTTPS da Brevo com o payload esperado", async () => {
   );
   assert.match(requisicao.body.htmlContent, /Grupo Interdisciplinar/);
   assert.doesNotMatch(requisicao.body.htmlContent, /Campus Cod/);
+});
+
+test("traduz bloqueio de IP da Brevo para mensagem acionavel", () => {
+  const error = new Error(
+    "We have detected you are using an unrecognised IP address 54.151.71.81. If you performed this action make sure to add the new IP address in this link: https://app.brevo.com/security/authorised_ips"
+  );
+  error.code = "MAIL_PROVIDER_ERROR";
+  error.responseCode = 401;
+
+  const message = mensagemErroEmail(error);
+
+  assert.match(message, /Brevo bloqueou/);
+  assert.match(message, /Railway/);
+  assert.match(message, /authorised_ips/);
 });
 
 test("configura Resend para envio HTTPS no Railway", () => {

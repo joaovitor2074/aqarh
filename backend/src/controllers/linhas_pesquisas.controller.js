@@ -137,7 +137,7 @@ export async function listarLinhasPesquisaPublicas(req, res) {
         LEFT JOIN pesquisadores p
           ON p.id = plp.pesquisador_id
         WHERE lp.ativo = 1
-        GROUP BY lp.id
+        GROUP BY lp.id, lp.nome, lp.grupo, lp.ativo
         ORDER BY lp.nome ASC
       `);
 

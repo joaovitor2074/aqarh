@@ -238,12 +238,18 @@ export function mensagemErroEmail(error) {
     return error.message;
   }
 
+  const providerMessage = error?.message || "";
+
   if (error?.code === "EAUTH" || error?.responseCode === 535) {
     return "O provedor recusou a autenticação. Verifique o usuário e a senha de aplicativo.";
   }
 
   if (error?.code === "MAIL_PROVIDER_ERROR") {
-    return error.message;
+    if (/unrecognised IP|unrecognized IP|authorised_ips|authorized_ips/i.test(providerMessage)) {
+      return "A Brevo bloqueou o envio porque o IP atual da Railway nao esta autorizado. Adicione o IP informado pela Brevo em https://app.brevo.com/security/authorised_ips ou desative a restricao de IP na conta.";
+    }
+
+    return providerMessage;
   }
 
   if (

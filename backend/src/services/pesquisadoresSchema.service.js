@@ -79,6 +79,60 @@ async function hasUniqueIndex(tableName, columnNames) {
   );
 }
 
+async function getColumnInfo(tableName, columnName) {
+  const [[column]] = await db.query(
+    `
+    SELECT COLUMN_NAME, COLUMN_KEY, EXTRA
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+      AND COLUMN_NAME = ?
+    `,
+    [tableName, columnName]
+  );
+
+  return column || null;
+}
+
+async function getPrimaryKeyColumns(tableName) {
+  const [columns] = await db.query(
+    `
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+      AND INDEX_NAME = 'PRIMARY'
+    ORDER BY SEQ_IN_INDEX
+    `,
+    [tableName]
+  );
+
+  return columns.map((column) => column.COLUMN_NAME);
+}
+
+async function removeLegacyRelationIdColumn(tableName) {
+  const idColumn = await getColumnInfo(tableName, "id");
+
+  if (!idColumn || /auto_increment/i.test(idColumn.EXTRA || "")) {
+    return;
+  }
+
+  try {
+    const primaryKeyColumns = await getPrimaryKeyColumns(tableName);
+
+    if (primaryKeyColumns.includes("id")) {
+      await db.query(`ALTER TABLE ${tableName} DROP PRIMARY KEY`);
+    }
+
+    await db.query(`ALTER TABLE ${tableName} DROP COLUMN id`);
+  } catch (error) {
+    console.warn(
+      "Nao foi possivel remover coluna id legada em pesquisador_linha_pesquisa:",
+      error.message
+    );
+  }
+}
+
 async function normalizePesquisadorLinhaRelacionamentos() {
   const conn = await db.getConnection();
 
@@ -111,6 +165,8 @@ async function normalizePesquisadorLinhaRelacionamentos() {
 async function ensurePesquisadorLinhaUniqueIndex() {
   const tableName = "pesquisador_linha_pesquisa";
   const keyColumns = ["pesquisador_id", "linha_pesquisa_id"];
+
+  await removeLegacyRelationIdColumn(tableName);
 
   if (await hasUniqueIndex(tableName, keyColumns)) return;
 
