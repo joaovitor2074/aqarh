@@ -50,6 +50,8 @@ import { obterDiagnosticoEmail } from "./modules/mail/mail.service.js";
  * =====================================================
  */
 const app = express();
+app.set("trust proxy", 1);
+
 const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, "");
 const allowedOrigins = (
   process.env.CORS_ORIGIN || "http://localhost:5173,https://aqarh.vercel.app"

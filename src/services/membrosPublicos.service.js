@@ -1,4 +1,4 @@
-import { api } from "../utils/api";
+import { API_URL, api } from "../utils/api";
 
 const MEMBER_IMAGES = [
   "/img/equiperetrato.jpeg",
@@ -13,6 +13,22 @@ const MEMBER_IMAGES = [
 
 function getMemberImage(index = 0) {
   return MEMBER_IMAGES[index % MEMBER_IMAGES.length];
+}
+
+function resolveMemberImage(membro, index = 0) {
+  const imagePath = membro.imagem || membro.imagem_url;
+
+  if (!imagePath) return getMemberImage(index);
+
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  if (imagePath.startsWith("/uploads/") || imagePath.startsWith("/img/defaults/")) {
+    return `${API_URL}${imagePath}`;
+  }
+
+  return imagePath;
 }
 
 function parseDadosLattes(value) {
@@ -46,7 +62,7 @@ export function normalizarMembroPublico(membro = {}, index = 0) {
     linhasPesquisa,
     gruposPesquisa,
     areaPrincipal: linhasPesquisa[0] || gruposPesquisa[0] || "Sem linha vinculada",
-    imagem: membro.imagem_url || membro.imagem || getMemberImage(index),
+    imagem: resolveMemberImage(membro, index),
     lattesUrl: membro.lattes_url || dadosLattes?.lattes_url || "",
     espelhoUrl: membro.espelho_url || "",
     idLattes: membro.id_lattes || dadosLattes?.id_lattes || "",
