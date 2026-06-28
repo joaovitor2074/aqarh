@@ -337,6 +337,22 @@ export async function extractMirrorData(page) {
       .map(clean)
       .filter(Boolean);
 
+    function cleanActionNoise(value) {
+      return clean(
+        String(value || "")
+          .replace(/\bui-button\b/gi, " ")
+          .replace(/Visualizar\s+(espelho|historico|histórico)[^.;]*/gi, " ")
+          .replace(/Fechar|Imprimir|Processando|Sua solicitação está sendo executada\.?\s*Aguarde\.?/gi, " ")
+      );
+    }
+
+    function splitList(value) {
+      return clean(value)
+        .split(/\s*;\s*|\n+/)
+        .map(clean)
+        .filter(Boolean);
+    }
+
     const knownLabels = [
       "endereco para acessar este espelho",
       "nome",
@@ -374,23 +390,49 @@ export async function extractMirrorData(page) {
       return nextLine && !isKnownLabel(nextLine) ? nextLine : "";
     };
 
+    const fieldValue = (...patterns) => {
+      const labels = [...document.querySelectorAll("label, .control-label")];
+      const label = labels.find((element) => {
+        const labelKey = key(element.innerText || element.textContent).replace(/:$/, "");
+        return patterns.some((pattern) => labelKey === pattern || labelKey.includes(pattern));
+      });
+
+      if (!label) return "";
+
+      const group = label.closest(".control-group") || label.parentElement;
+      const valueElement =
+        group?.querySelector(".controls") ||
+        label.nextElementSibling ||
+        group?.querySelector("div:not(.control-label)");
+
+      return cleanActionNoise(valueElement?.innerText || valueElement?.textContent || "");
+    };
+
     const espelhoMatch = rawText.match(/(?:https?:\/\/)?dgp\.cnpq\.br\/dgp\/espelhorh\/(\d+)/i);
     const espelhoUrl = espelhoMatch ? `http://dgp.cnpq.br/dgp/espelhorh/${espelhoMatch[1]}` : location.href;
     const lattesUrl = espelhoMatch ? `http://lattes.cnpq.br/${espelhoMatch[1]}` : "";
     const emailMatch = rawText.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
 
-    const tableData = [...document.querySelectorAll("table")].map((table) => {
+    const tableData = [...document.querySelectorAll("table")].map((table, index) => {
       const headers = [...table.querySelectorAll("thead th")].map((th) => clean(th.innerText || th.textContent));
       const headerKeys = headers.map(key);
       const rows = [...table.querySelectorAll("tbody tr")]
         .map((row) => {
-          const cells = [...row.querySelectorAll("td")].map((td) => clean(td.innerText || td.textContent));
-          return { cells, text: clean(row.innerText || row.textContent) };
+          const cells = [...row.querySelectorAll("td")].map((td) =>
+            cleanActionNoise(td.innerText || td.textContent)
+          );
+          return { cells, text: cleanActionNoise(row.innerText || row.textContent) };
         })
         .filter((row) => row.text && !key(row.text).includes("nenhum registro"));
 
-      return { headers, headerKeys, rows };
+      return { index, headers, headerKeys, rows };
     });
+
+    const columnIndex = (table, ...patterns) =>
+      table?.headerKeys.findIndex((header) => patterns.some((pattern) => header.includes(pattern))) ?? -1;
+
+    const hasColumns = (table, ...patterns) =>
+      patterns.every((pattern) => columnIndex(table, pattern) >= 0);
 
     const linhasTable = tableData
       .map((table) => {
@@ -413,7 +455,72 @@ export async function extractMirrorData(page) {
             .filter((row) => row.linha_pesquisa && row.grupo && !key(row.linha_pesquisa).includes("ui-button"))
         : [];
 
-    const homepage = valueAfterKey("homepage");
+    const gruposTable = tableData.find((table) =>
+      hasColumns(table, "nome do grupo", "instituicao", "perfil")
+    );
+    const gruposPesquisa = gruposTable
+      ? gruposTable.rows
+          .map((row) => ({
+            nome: row.cells[columnIndex(gruposTable, "nome do grupo")] || "",
+            instituicao: row.cells[columnIndex(gruposTable, "instituicao")] || "",
+            perfil: row.cells[columnIndex(gruposTable, "perfil")] || "",
+          }))
+          .filter((row) => row.nome)
+      : [];
+
+    const estudantesTable = tableData.find((table) =>
+      hasColumns(table, "estudante", "nivel de treinamento", "grupo de pesquisa")
+    );
+    const estudantesOrientados = estudantesTable
+      ? estudantesTable.rows
+          .map((row) => ({
+            nome: row.cells[columnIndex(estudantesTable, "estudante")] || "",
+            nivel_treinamento: row.cells[columnIndex(estudantesTable, "nivel de treinamento")] || "",
+            grupo_pesquisa: row.cells[columnIndex(estudantesTable, "grupo de pesquisa")] || "",
+          }))
+          .filter((row) => row.nome)
+      : [];
+
+    const gruposEgressoTable = tableData.find(
+      (table) =>
+        table.index !== gruposTable?.index &&
+        hasColumns(table, "nome do grupo", "instituicao") &&
+        columnIndex(table, "perfil") < 0 &&
+        columnIndex(table, "estudante") < 0
+    );
+    const gruposEgresso = gruposEgressoTable
+      ? gruposEgressoTable.rows
+          .map((row) => ({
+            nome: row.cells[columnIndex(gruposEgressoTable, "nome do grupo")] || "",
+            instituicao: row.cells[columnIndex(gruposEgressoTable, "instituicao")] || "",
+          }))
+          .filter((row) => row.nome)
+      : [];
+
+    const nomeCitacoes = fieldValue("nome em citacoes bibliograficas") ||
+      valueAfterKey("nome em citacoes bibliograficas");
+    const areasAtuacao = splitList(fieldValue("areas de atuacao") || valueAfterKey("areas de atuacao"));
+    const bolsistaCnpq = fieldValue("bolsista cnpq") || valueAfterKey("bolsista cnpq");
+    const homepageRaw = fieldValue("homepage") || valueAfterKey("homepage");
+    const homepage =
+      homepageRaw &&
+      !homepageRaw.includes("@") &&
+      !key(homepageRaw).includes("grupos de pesquisa")
+        ? homepageRaw
+        : "";
+
+    const dadosEspelho = {
+      nome_citacoes: nomeCitacoes,
+      nomes_citacao: splitList(nomeCitacoes),
+      areas_atuacao: areasAtuacao,
+      bolsista_cnpq: bolsistaCnpq,
+      homepage,
+      grupos_pesquisa: gruposPesquisa,
+      linhas_pesquisa: linhasPesquisa,
+      estudantes_orientados: estudantesOrientados,
+      grupos_egresso: gruposEgresso,
+      indicadores_producao_disponiveis: key(rawText).includes("indicadores de producao"),
+    };
 
     return {
       espelho_url: espelhoUrl,
@@ -426,6 +533,15 @@ export async function extractMirrorData(page) {
       homepage: homepage.includes("@") ? "" : homepage,
       email: emailMatch?.[0] || (homepage.includes("@") ? homepage : ""),
       linhas_pesquisa: linhasPesquisa,
+      nome_citacoes: nomeCitacoes,
+      nomes_citacao: dadosEspelho.nomes_citacao,
+      areas_atuacao_dgp: areasAtuacao,
+      bolsista_cnpq: bolsistaCnpq,
+      grupos_pesquisa_dgp: gruposPesquisa,
+      estudantes_orientados: estudantesOrientados,
+      grupos_egresso_dgp: gruposEgresso,
+      indicadores_producao_disponiveis: dadosEspelho.indicadores_producao_disponiveis,
+      dados_espelho: dadosEspelho,
     };
   });
 }
@@ -463,22 +579,35 @@ export async function extractLattesData(page) {
 
     const sectionLabels = [
       "dados pessoais",
+      "dados gerais",
       "formacao academica",
+      "formacao academica/titulacao",
       "formacao complementar",
       "atuacao profissional",
       "areas de atuacao",
       "linhas de pesquisa",
       "projetos de pesquisa",
       "projetos de extensao",
+      "projetos de desenvolvimento",
       "producao bibliografica",
       "producoes bibliograficas",
+      "artigos completos publicados em periodicos",
+      "livros e capitulos",
+      "capitulos de livros publicados",
+      "trabalhos publicados em anais de eventos",
       "producao tecnica",
       "producoes tecnicas",
       "bancas",
+      "participacao em bancas",
       "orientacoes",
+      "orientacoes e supervisoes",
+      "orientacoes concluidas",
+      "orientacoes em andamento",
       "eventos",
+      "participacao em eventos",
       "educacao e popularizacao",
       "resumo",
+      "resumo informado pelo autor",
     ];
 
     const valueAfterKey = (...patterns) => {
@@ -503,6 +632,23 @@ export async function extractLattesData(page) {
       return sectionLabels.some((label) => key(nextLine) === label) ? "" : nextLine;
     };
 
+    const sanitizeSectionItem = (value) => {
+      const cleaned = clean(
+        String(value || "")
+          .replace(/^[-*]\s*/, "")
+          .replace(/\bexpandir\b/gi, "")
+          .replace(/\bcontrair\b/gi, "")
+          .replace(/\bmostrar tudo\b/gi, "")
+      );
+      const cleanedKey = key(cleaned);
+
+      if (!cleaned) return "";
+      if (cleanedKey.includes("pagina gerada pelo sistema curriculo lattes")) return "";
+      if (cleanedKey.includes("curriculo lattes")) return "";
+      if (cleanedKey.includes("conselho nacional de desenvolvimento cientifico")) return "";
+      return cleaned;
+    };
+
     const collectSection = (startPatterns, limit = 10) => {
       const startIndex = lines.findIndex((line) => {
         const lineKey = key(line).replace(/:$/, "");
@@ -522,7 +668,8 @@ export async function extractLattesData(page) {
         if (isNextSection) break;
         if (!line || startPatterns.some((pattern) => lineKey.includes(pattern))) continue;
 
-        values.push(line);
+        const item = sanitizeSectionItem(line);
+        if (item) values.push(item);
         if (values.length >= limit) break;
       }
 
@@ -531,12 +678,42 @@ export async function extractLattesData(page) {
 
     const idMatch =
       location.href.match(/lattes\.cnpq\.br\/(\d+)/i) ||
-      location.href.match(/[?&]id=(\d+)/i) ||
+      location.href.match(/[?&]id=([A-Z0-9]+)/i) ||
       rawText.match(/lattes\.cnpq\.br\/(\d+)/i);
     const idLattes = idMatch?.[1] || "";
-    const lattesUrl = idLattes ? `http://lattes.cnpq.br/${idLattes}` : location.href;
+    const lattesUrl = location.href;
+    const hasCaptcha =
+      Boolean(document.querySelector("#divCaptcha, .g-recaptcha, [class*='captcha']")) ||
+      (key(rawText).includes("captcha") && key(rawText).includes("visualizar curriculo"));
+
+    if (hasCaptcha) {
+      return {
+        lattes_url: lattesUrl,
+        lattesUrl,
+        id_lattes: idLattes,
+        ultima_atualizacao_lattes: "",
+        resumo_lattes: "",
+        nome_citacoes: "",
+        linhas_pesquisa_lattes: [],
+        dados_lattes: {
+          lattes_url: lattesUrl,
+          id_lattes: idLattes,
+          coleta_lattes_status: "captcha",
+          coleta_lattes_mensagem: "Curriculo Lattes protegido por verificacao automatica.",
+          pagina_lattes_coletada_em: new Date().toISOString(),
+        },
+      };
+    }
     const resumo = collectSection(["resumo informado pelo autor", "resumo"], 6).join(" ");
     const linhasPesquisaLattes = collectSection(["linhas de pesquisa"], 20);
+    const artigosPublicados = collectSection(["artigos completos publicados em periodicos"], 12);
+    const capitulosLivros = collectSection(
+      ["livros e capitulos", "capitulos de livros publicados", "livros publicados"],
+      12
+    );
+    const trabalhosEventos = collectSection(["trabalhos publicados em anais de eventos"], 12);
+    const orientacoesConcluidas = collectSection(["orientacoes concluidas"], 12);
+    const orientacoesAndamento = collectSection(["orientacoes em andamento"], 12);
 
     const dadosLattes = {
       lattes_url: lattesUrl,
@@ -548,15 +725,28 @@ export async function extractLattesData(page) {
       ),
       resumo_lattes: resumo,
       formacao_academica: collectSection(["formacao academica", "formacao academica/titulacao"], 12),
+      formacao_complementar: collectSection(["formacao complementar"], 12),
       atuacao_profissional: collectSection(["atuacao profissional"], 12),
       areas_atuacao: collectSection(["areas de atuacao"], 12),
       linhas_pesquisa_lattes: linhasPesquisaLattes,
       projetos_pesquisa: collectSection(["projetos de pesquisa"], 12),
+      projetos_extensao: collectSection(["projetos de extensao"], 12),
+      projetos_desenvolvimento: collectSection(["projetos de desenvolvimento"], 12),
       producoes_bibliograficas: collectSection(
         ["producao bibliografica", "producoes bibliograficas"],
         16
       ),
+      artigos_publicados: artigosPublicados,
+      capitulos_livros: capitulosLivros,
+      trabalhos_eventos: trabalhosEventos,
       producoes_tecnicas: collectSection(["producao tecnica", "producoes tecnicas"], 12),
+      orientacoes: unique([...orientacoesConcluidas, ...orientacoesAndamento]),
+      orientacoes_concluidas: orientacoesConcluidas,
+      orientacoes_em_andamento: orientacoesAndamento,
+      bancas: collectSection(["bancas", "participacao em bancas"], 12),
+      eventos: collectSection(["eventos", "participacao em eventos"], 12),
+      educacao_popularizacao: collectSection(["educacao e popularizacao"], 12),
+      coleta_lattes_status: "ok",
       pagina_lattes_coletada_em: new Date().toISOString(),
     };
 
@@ -649,6 +839,22 @@ export async function collectPersonDetails(mainPage, rowHandle, kind, options = 
   const espelhoUrl = mirrorData.espelho_url || mirrorData.espelhoUrl || "";
   const lattesUrl =
     lattesData.lattes_url || lattesData.lattesUrl || mirrorData.lattes_url || mirrorData.lattesUrl || "";
+  const dadosLattes = {
+    ...(lattesData.dados_lattes || {}),
+    espelho_url: espelhoUrl || null,
+    dados_espelho: mirrorData.dados_espelho || {
+      nome_citacoes: mirrorData.nome_citacoes || "",
+      nomes_citacao: mirrorData.nomes_citacao || [],
+      areas_atuacao: mirrorData.areas_atuacao_dgp || [],
+      bolsista_cnpq: mirrorData.bolsista_cnpq || "",
+      homepage: mirrorData.homepage || "",
+      grupos_pesquisa: mirrorData.grupos_pesquisa_dgp || [],
+      linhas_pesquisa: mirrorData.linhas_pesquisa || [],
+      estudantes_orientados: mirrorData.estudantes_orientados || [],
+      grupos_egresso: mirrorData.grupos_egresso_dgp || [],
+      indicadores_producao_disponiveis: Boolean(mirrorData.indicadores_producao_disponiveis),
+    },
+  };
 
   return {
     ...basePerson,
@@ -662,7 +868,7 @@ export async function collectPersonDetails(mainPage, rowHandle, kind, options = 
     ultima_atualizacao_lattes:
       lattesData.ultima_atualizacao_lattes || mirrorData.ultima_atualizacao_lattes || null,
     linhas_pesquisa: mirrorData.linhas_pesquisa || [],
-    dados_lattes: lattesData.dados_lattes || null,
+    dados_lattes: dadosLattes,
     scraping_erros: errors,
   };
 }
