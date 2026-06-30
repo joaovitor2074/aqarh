@@ -171,13 +171,7 @@ export default function Home() {
 
       <section id="sobre" className="section sobre-section">
         <div className="container">
-<<<<<<< HEAD
-          <span className="section-tag sobre">Sobre Nós</span>
-            <span className="section-tag sobre">Sobre Nós</span>
-            {/* <img src="public\img\equipepaisagem.jpeg" alt="" /> */}
-=======
           <span className="section-tag sobre">Sobre o grupo</span>
->>>>>>> 15172badf624830ab538073644935f23c894520b
           <div className="section-header">
             <h2 className="section-title">Pesquisa com compromisso institucional</h2>
             <p className="section-subtitle">
