@@ -103,12 +103,12 @@ export default function Notificacoes() {
 
   return (
     <AdminLayout>
-      <div className="p-6 space-y-6 max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl space-y-5 p-0 sm:space-y-6">
         {/* Cabeçalho */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold flex items-center gap-2">
-              <FaBell className="text-[#006A4E]" />
+            <h1 className="flex items-start gap-2 text-xl font-semibold leading-tight text-gray-900 sm:text-2xl">
+              <FaBell className="mt-1 shrink-0 text-[#006A4E]" />
               Notificações de Scraping
             </h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -120,7 +120,7 @@ export default function Notificacoes() {
             <button
               onClick={handleAprovarTodos}
               disabled={aprovandoTodos}
-              className="flex items-center gap-2 px-4 py-2 bg-[#006A4E] text-white rounded-md hover:bg-green-800 disabled:opacity-60 transition-colors text-sm font-medium"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-[#006A4E] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-800 disabled:opacity-60 sm:w-auto"
             >
               {aprovandoTodos ? (
                 <FaSpinner className="animate-spin" />
@@ -141,12 +141,12 @@ export default function Notificacoes() {
         )}
 
         {erro && !loading && (
-          <div className="flex items-center gap-3 text-red-600 bg-red-50 border border-red-200 rounded-lg p-4">
-            <FaExclamationTriangle />
+          <div className="flex flex-col gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-600 sm:flex-row sm:items-center">
+            <FaExclamationTriangle className="shrink-0" />
             <span>{erro}</span>
             <button
               onClick={carregarNotificacoes}
-              className="ml-auto text-sm underline hover:no-underline"
+              className="text-left text-sm underline hover:no-underline sm:ml-auto"
             >
               Tentar novamente
             </button>
@@ -166,10 +166,10 @@ export default function Notificacoes() {
           {notificacoes.map((n) => (
             <div
               key={n.id}
-              className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm hover:shadow-md transition-shadow"
+              className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5"
             >
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
                   <span className="inline-block text-xs font-semibold uppercase tracking-wide text-[#006A4E] bg-green-50 border border-green-200 px-2 py-0.5 rounded mb-2">
                     {tipoLabel(n.tipo)}
                   </span>
@@ -184,7 +184,7 @@ export default function Notificacoes() {
                 <button
                   onClick={() => handleAprovar(n.id)}
                   disabled={aprovandoId === n.id || aprovandoTodos}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 disabled:opacity-60 transition-colors whitespace-nowrap"
+                  className="flex w-full items-center justify-center gap-2 rounded-md bg-green-500 px-3 py-2 text-sm text-white transition-colors hover:bg-green-600 disabled:opacity-60 sm:w-auto"
                 >
                   {aprovandoId === n.id ? (
                     <FaSpinner className="animate-spin" />

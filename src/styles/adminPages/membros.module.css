@@ -1,6 +1,7 @@
 /* Container */
 .container {
-  padding: 2rem;
+  width: 100%;
+  padding: 0;
   max-width: 1600px;
   margin: 0 auto;
 }
@@ -113,6 +114,7 @@
 /* Table */
 .tableContainer {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -205,6 +207,7 @@
   color: #3b82f6;
   text-decoration: none;
   font-size: 0.875rem;
+  overflow-wrap: anywhere;
 }
 
 .email:hover {
@@ -231,6 +234,12 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   display: inline-block;
+  overflow-wrap: anywhere;
+}
+
+.semEmail {
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
 /* Titulação e Data */
@@ -305,18 +314,26 @@
 
 /* Modal Form */
 .modalForm {
-  padding: 1rem 0;
+  display: grid;
+  gap: 1rem;
+  padding: 0;
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .formGroup {
   margin-bottom: 0;
+}
+
+.modalForm input,
+.modalForm select,
+.modalForm textarea {
+  min-height: 42px;
 }
 
 .helpText {
@@ -364,9 +381,10 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
+  background: #ffffff;
 }
 
 /* Responsive */
@@ -382,12 +400,25 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    padding: 0;
   }
 
   .header {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .title {
+    font-size: 1.85rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .btnNovo {
+    width: 100%;
+    justify-content: center;
   }
 
   .table {
@@ -402,5 +433,195 @@
 
   .colAcoes button {
     margin-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .filtrosGrid {
+    gap: 1rem;
+  }
+
+  .filtroBotoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .table {
+    min-width: 0;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: 0.85rem;
+    padding: 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .table td {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .table td:nth-child(1)::before {
+    content: "Membro";
+  }
+
+  .table td:nth-child(2)::before {
+    content: "Contato";
+  }
+
+  .table td:nth-child(3)::before {
+    content: "Titulacao";
+  }
+
+  .table td:nth-child(4)::before {
+    content: "Vinculo";
+  }
+
+  .table td:nth-child(5)::before {
+    content: "Status";
+  }
+
+  .table td:nth-child(6)::before {
+    content: "Acoes";
+  }
+
+  .table .colMembro {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+
+  .colMembro::before {
+    grid-column: 1 / -1;
+  }
+
+  .avatar {
+    float: none;
+    margin-right: 0;
+  }
+
+  .instituicao,
+  .titulacao,
+  .dataInclusao,
+  .email,
+  .lattes {
+    align-items: flex-start;
+  }
+
+  .table .colAcoes {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(2.5rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .colAcoes::before {
+    grid-column: 1 / -1;
+  }
+
+  .colAcoes button {
+    width: 100%;
+    margin: 0;
+  }
+
+  .modalForm {
+    max-height: min(68dvh, 620px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.2rem;
+    scroll-padding-bottom: 5.5rem;
+    scrollbar-width: thin;
+  }
+
+  .modalForm .formGroup {
+    margin-bottom: 0;
+  }
+
+  .modalForm :global(.space-y-1) {
+    gap: 0.35rem;
+  }
+
+  .modalForm :global(.selectContainer) {
+    margin-bottom: 0;
+  }
+
+  .formRow {
+    gap: 0.75rem;
+  }
+
+  .modalForm label,
+  .modalForm :global(.label) {
+    font-size: 0.84rem;
+    line-height: 1.25;
+  }
+
+  .modalForm input,
+  .modalForm select,
+  .modalForm textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .helpText {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .imagePreview {
+    align-items: flex-start;
+    padding: 0.65rem;
+  }
+
+  .imagePreview img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .modalActions {
+    position: sticky;
+    bottom: -1px;
+    z-index: 2;
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0.85rem 0 0;
+    box-shadow: 0 -12px 22px rgba(255, 255, 255, 0.95);
+  }
+
+  .modalActions button {
+    width: 100%;
   }
 }

@@ -1,6 +1,7 @@
 /* src/styles/adminPages/emailMassa.module.css */
 
 .container {
+  width: 100%;
   max-width: 1200px;
 }
 
@@ -9,6 +10,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
@@ -43,6 +45,10 @@
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  .previewCol {
+    min-width: 0;
   }
 }
 
@@ -157,6 +163,7 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .btnEnviar {
@@ -168,6 +175,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .badge {
@@ -227,6 +235,7 @@
   gap: 2px;
   max-height: 520px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .destinatariosList::-webkit-scrollbar {
@@ -287,6 +296,61 @@
   border-radius: 999px;
   text-transform: capitalize;
   flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    align-items: flex-start;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .formCard,
+  .previewCard {
+    gap: 14px;
+  }
+
+  .checkboxLabel,
+  .resultado,
+  .aviso {
+    align-items: flex-start;
+  }
+
+  .acoes {
+    flex-direction: column-reverse;
+  }
+
+  .acoes button,
+  .btnEnviar {
+    width: 100%;
+  }
+
+  .previewHeader {
+    align-items: flex-start;
+  }
+
+  .destinatariosList {
+    max-height: 380px;
+  }
+
+  .destinatarioItem {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: flex-start;
+  }
+
+  .tag {
+    grid-column: 2;
+    width: fit-content;
+  }
 }
 
 .pesquisador {

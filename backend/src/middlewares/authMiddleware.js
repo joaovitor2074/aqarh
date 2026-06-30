@@ -1,53 +1,49 @@
-// middlewares/authMiddleware.js
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import { getJwtSecret } from "../config/auth.js";
 
 export function authMiddleware(req, res, next) {
-    try {
-        console.log('🔍 Verificando autenticação...');
-        console.log('📄 Headers:', req.headers);
-        
-        const authHeader = req.headers.authorization;
-        
-        if (!authHeader) {
-            console.log('❌ Sem header Authorization');
-            return res.status(401).json({ message: 'Token não fornecido' });
-        }
+  try {
+    const authHeader = req.headers.authorization;
 
-        const parts = authHeader.split(' ');
-        
-        if (parts.length !== 2) {
-            console.log('❌ Formato do token inválido');
-            return res.status(401).json({ message: 'Formato do token inválido' });
-        }
-
-        const [scheme, token] = parts;
-
-        if (!/^Bearer$/i.test(scheme)) {
-            console.log('❌ Scheme do token inválido');
-            return res.status(401).json({ message: 'Token mal formatado' });
-        }
-
-        if (!token) {
-            console.log('❌ Token não fornecido');
-            return res.status(401).json({ message: 'Token não fornecido' });
-        }
-
-        console.log('🔑 Token recebido:', token.substring(0, 20) + '...');
-        
-        // Verificar o token
-        jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta', (err, decoded) => {
-            if (err) {
-                console.log('❌ Token inválido:', err.message);
-                return res.status(401).json({ message: 'Token inválido' });
-            }
-            
-            console.log('✅ Token válido para usuário:', decoded.email);
-            req.userId = decoded.id;
-            req.userEmail = decoded.email;
-            next();
-        });
-    } catch (error) {
-        console.error('❌ Erro no middleware de autenticação:', error);
-        return res.status(500).json({ message: 'Erro interno no servidor' });
+    if (!authHeader) {
+      return res.status(401).json({
+        code: "TOKEN_MISSING",
+        message: "Token nao fornecido",
+      });
     }
+
+    const [scheme, token, ...extraParts] = authHeader.trim().split(/\s+/);
+
+    if (!/^Bearer$/i.test(scheme) || !token || extraParts.length > 0) {
+      return res.status(401).json({
+        code: "TOKEN_MALFORMED",
+        message: "Token mal formatado",
+      });
+    }
+
+    const decoded = jwt.verify(token, getJwtSecret());
+
+    req.userId = decoded.id;
+    req.userRole = decoded.role;
+    req.user = decoded;
+
+    return next();
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        code: "TOKEN_EXPIRED",
+        message: "Sessao expirada",
+      });
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        code: "TOKEN_INVALID",
+        message: "Token invalido",
+      });
+    }
+
+    console.error("Erro no middleware de autenticacao:", error.message);
+    return res.status(500).json({ message: "Erro interno no servidor" });
+  }
 }

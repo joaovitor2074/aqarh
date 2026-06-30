@@ -2,13 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoaderCircle, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { api } from "../../utils/api";
+import { saveSession } from "../../utils/auth";
 import styles from "../../styles/login.module.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState("");
+  const [erro, setErro] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("session") === "expired"
+      ? "Sua sessao expirou. Entre novamente."
+      : "";
+  });
   const navigate = useNavigate();
 
   async function handleLogin(e) {
@@ -19,8 +25,7 @@ export default function Login() {
     try {
       const response = await api.post("/login", { email, senha });
 
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
+      saveSession(response?.token, response?.user);
 
       navigate("/admin/dashboard", { replace: true });
     } catch (err) {

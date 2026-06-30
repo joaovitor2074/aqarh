@@ -6,6 +6,8 @@
  * - Usa variável de ambiente (Vite)
  * - Fallback para localhost em desenvolvimento
  */
+import { clearSession, getStoredToken } from "./auth";
+
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   import.meta.env.NEXT_PUBLIC_API_URL ||
@@ -13,6 +15,7 @@ const API_BASE_URL =
   "http://localhost:3001";
 
 export const API_URL = String(API_BASE_URL).replace(/\/+$/, "");
+let redirectingToLogin = false;
 
 function isAbsoluteUrl(endpoint = "") {
   return /^https?:\/\//i.test(endpoint);
@@ -39,6 +42,48 @@ function normalizeApiEndpoint(endpoint = "") {
   return `/api${path}`;
 }
 
+async function readResponseBody(response) {
+  if (response.status === 204) return null;
+
+  const responseText = await response.text();
+  if (!responseText) return null;
+
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    return responseText;
+  }
+}
+
+function getErrorMessage(body, status) {
+  if (typeof body === "string" && body.trim()) return body;
+
+  return body?.message || body?.error || `Erro ${status}`;
+}
+
+function isLoginRequest(requestUrl) {
+  try {
+    return new URL(requestUrl).pathname === "/api/login";
+  } catch {
+    return false;
+  }
+}
+
+function redirectToLogin() {
+  clearSession();
+
+  if (
+    typeof window === "undefined" ||
+    window.location.pathname === "/login" ||
+    redirectingToLogin
+  ) {
+    return;
+  }
+
+  redirectingToLogin = true;
+  window.location.replace("/login?session=expired");
+}
+
 /**
  * =====================================================
  * FUNÇÃO PRINCIPAL DE REQUISIÇÃO
@@ -51,7 +96,7 @@ function normalizeApiEndpoint(endpoint = "") {
  */
 export async function apiRequest(endpoint, options = {}) {
   // Token armazenado localmente após login
-  const token = localStorage.getItem("token");
+  const token = getStoredToken();
 
   // Detecta se o body é FormData (uploads)
   const isFormData = options.body instanceof FormData;
@@ -83,23 +128,22 @@ export async function apiRequest(endpoint, options = {}) {
       ...options,
       headers,
     });
+    const responseBody = await readResponseBody(response);
 
     /**
      * =====================================================
      * TRATAMENTO DE TOKEN EXPIRADO
      * =====================================================
      */
-    const IS_DEV = import.meta.env.DEV;
-
     if (response.status === 401) {
+      const message = getErrorMessage(responseBody, response.status);
 
-      if (!IS_DEV) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
+      if (!isLoginRequest(requestUrl)) {
+        redirectToLogin();
+        throw new Error("Sua sessao expirou. Entre novamente.");
       }
 
-      throw new Error("Erro 401");
+      throw new Error(message);
     }
 
     /**
@@ -108,18 +152,7 @@ export async function apiRequest(endpoint, options = {}) {
      * =====================================================
      */
     if (!response.ok) {
-      const errorText = await response.text();
-
-      try {
-        const error = JSON.parse(errorText);
-        throw new Error(
-          error.message || error.error || `Erro ${response.status}`
-        );
-      } catch {
-        throw new Error(
-          `Erro ${response.status}: ${errorText || response.statusText}`
-        );
-      }
+      throw new Error(getErrorMessage(responseBody, response.status));
     }
 
     /**
@@ -136,14 +169,7 @@ export async function apiRequest(endpoint, options = {}) {
      * RESPOSTA JSON PADRÃO
      * =====================================================
      */
-    const responseText = await response.text();
-    if (!responseText) return null;
-
-    try {
-      return JSON.parse(responseText);
-    } catch {
-      return responseText;
-    }
+    return responseBody;
   } catch (error) {
     console.error("❌ Erro na requisição:", error);
     throw error;

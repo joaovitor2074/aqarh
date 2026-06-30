@@ -13,9 +13,10 @@ export default function Button({
   ...props
 }) {
   const baseClasses = `
-    inline-flex items-center justify-center gap-2
+    inline-flex max-w-full items-center justify-center gap-2
     rounded-lg
     font-medium
+    leading-tight
     transition
     focus:outline-none focus:ring-2 focus:ring-offset-2
     disabled:opacity-60 disabled:cursor-not-allowed

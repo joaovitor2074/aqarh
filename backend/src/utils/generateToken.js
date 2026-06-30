@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
+import { getJwtSecret } from "../config/auth.js";
 
 export function generateToken(id, role) {
   return jwt.sign(
     { id, role },
-    process.env.JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "1d" }
   );
 }

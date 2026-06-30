@@ -9,7 +9,7 @@ export default function Card({ children, className = "" }) {
         shadow-[0_10px_30px_rgba(15,23,42,0.06)]
         border
         border-gray-200
-        p-6
+        p-4 sm:p-6
         ${className}
       `}
     >

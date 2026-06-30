@@ -22,6 +22,7 @@ export default function Input({
       disabled={disabled}
       className={`
         w-full
+        min-w-0
         px-3 py-2
         rounded-lg
         border

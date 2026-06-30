@@ -3,7 +3,7 @@
  * IMPORTAÇÕES PRINCIPAIS
  * =====================================================
  */
-import React, { useEffect } from "react";
+import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 /**
@@ -33,7 +33,6 @@ import Equipe from "./pages/Equipe";
  */
 import Login from "./pages/admin/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { setupInterceptor } from "./utils/authInterceptor";
 
 /**
  * =====================================================
@@ -72,25 +71,6 @@ import EmailMassa from "./pages/admin/EmailMassa";
  */
 function AppContent() {
   const location = useLocation();
-
-  /**
-   * =====================================================
-   * CONFIGURAÇÃO GLOBAL DE AUTENTICAÇÃO
-   * =====================================================
-   * - Registra interceptors do Axios
-   * - Verifica se existe token salvo
-   */
-  useEffect(() => {
-    setupInterceptor();
-
-    // const IS_DEV = true;
-
-    // const token = localStorage.getItem("token");
-
-    // if (!token && location.pathname !== "/login" && !IS_DEV) {
-    //   window.location.href = "/login";
-    // }
-  }, [location.pathname]);
 
   /**
    * =====================================================

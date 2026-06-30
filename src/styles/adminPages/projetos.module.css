@@ -1,5 +1,6 @@
 .container {
-  padding: 2rem;
+  width: 100%;
+  padding: 0;
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -173,6 +174,7 @@
 
 .tableContainer {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -358,11 +360,16 @@
 
 @media (max-width: 760px) {
   .container {
-    padding: 1rem;
+    padding: 0;
   }
 
   .header {
     flex-direction: column;
+  }
+
+  .headerActions,
+  .headerActions button {
+    width: 100%;
   }
 
   .statsGrid,
@@ -378,5 +385,142 @@
   .actions {
     min-width: 0;
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    gap: 0.75rem;
+  }
+
+  .statBox {
+    padding: 0.85rem;
+  }
+
+  .filtersGrid {
+    gap: 0.85rem;
+  }
+
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: 0.85rem;
+    padding: 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .table td {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .table td:nth-child(1)::before {
+    content: "Projeto";
+  }
+
+  .table td:nth-child(2)::before {
+    content: "Status";
+  }
+
+  .table td:nth-child(3)::before {
+    content: "Ano";
+  }
+
+  .table td:nth-child(4)::before {
+    content: "Linha/Area";
+  }
+
+  .table td:nth-child(5)::before {
+    content: "Coordenador";
+  }
+
+  .table td:nth-child(6)::before {
+    content: "Participantes";
+  }
+
+  .table td:nth-child(7)::before {
+    content: "Site";
+  }
+
+  .table td:nth-child(8)::before {
+    content: "Acoes";
+  }
+
+  .projectCell {
+    min-width: 0;
+    align-items: flex-start;
+  }
+
+  .thumb,
+  .thumbFallback {
+    width: 64px;
+    height: 46px;
+  }
+
+  .projectDescription {
+    max-width: none;
+  }
+
+  .metaLine {
+    align-items: flex-start;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(2.5rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+
+  .modalForm {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .imagePreview {
+    align-items: flex-start;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .modalActions button {
+    width: 100%;
   }
 }

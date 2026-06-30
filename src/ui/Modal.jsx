@@ -27,38 +27,43 @@ export default function Modal({
   const sizes = {
     sm: "max-w-md",
     md: "max-w-lg",
-    lg: "max-w-2xl"
+    lg: "max-w-3xl",
+    xl: "max-w-5xl"
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[1000] flex items-end justify-center overflow-y-auto p-2 sm:items-center sm:p-6">
       
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+        onClick={() => onClose()}
       />
 
       {/* Modal */}
       <div
-        className={`relative bg-white rounded-xl shadow-lg w-full mx-4 ${sizes[size]}`}
+        className={`relative flex max-h-[calc(100dvh-1rem)] w-full flex-col overflow-hidden rounded-lg bg-white shadow-2xl sm:max-h-[calc(100dvh-3rem)] ${sizes[size] || sizes.md}`}
+        role="dialog"
+        aria-modal="true"
       >
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4">
+          <h3 className="min-w-0 text-base font-semibold leading-tight text-gray-800 sm:text-lg">
             {title}
           </h3>
           <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            type="button"
+            onClick={() => onClose()}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-gray-200 bg-white p-0 text-gray-500 transition hover:bg-gray-50 hover:text-gray-800"
+            aria-label="Fechar modal"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Conteúdo */}
-        <div className="p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5">
           {children}
         </div>
 

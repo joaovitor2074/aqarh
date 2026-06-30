@@ -34,6 +34,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .destinatarioInfo strong {
@@ -44,6 +45,7 @@
 .destinatarioInfo span {
   font-size: 13px;
   color: #006A4E;
+  overflow-wrap: anywhere;
 }
 
 /* ── Textarea ── */
@@ -77,6 +79,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding-top: 4px;
+  flex-wrap: wrap;
 }
 
 /* ── Estado sem email ── */
@@ -113,4 +116,27 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .modalTitle {
+    align-items: flex-start;
+  }
+
+  .destinatario {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .destinatarioLabel {
+    white-space: normal;
+  }
+
+  .acoes {
+    flex-direction: column-reverse;
+  }
+
+  .acoes button {
+    width: 100%;
+  }
 }

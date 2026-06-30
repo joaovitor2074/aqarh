@@ -1,6 +1,7 @@
 /* Container */
 .container {
-  padding: 2rem;
+  width: 100%;
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -113,6 +114,7 @@
 /* Table */
 .tableContainer {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -227,12 +229,25 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    padding: 0;
   }
 
   .header {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .title {
+    font-size: 1.85rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .btnNovo {
+    width: 100%;
+    justify-content: center;
   }
 
   .filtrosGrid {
@@ -251,5 +266,115 @@
 
   .colAcoes button {
     margin-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .filtrosGrid {
+    gap: 1rem;
+  }
+
+  .filtroBotoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: 0.85rem;
+    padding: 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .table td {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .table td:nth-child(1)::before {
+    content: "Nome";
+  }
+
+  .table td:nth-child(2)::before {
+    content: "Pesquisadores";
+  }
+
+  .table td:nth-child(3)::before {
+    content: "Grupo";
+  }
+
+  .table td:nth-child(4)::before {
+    content: "Status";
+  }
+
+  .table td:nth-child(5)::before {
+    content: "Acoes";
+  }
+
+  .colNome,
+  .pesquisadores,
+  .grupo {
+    min-width: 0;
+    align-items: flex-start;
+  }
+
+  .table .colAcoes {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(2.5rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .colAcoes::before {
+    grid-column: 1 / -1;
+  }
+
+  .colAcoes button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .modalForm {
+    padding: 0;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .modalActions button {
+    width: 100%;
   }
 }

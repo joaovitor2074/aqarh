@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.25rem;
   margin-bottom: 2rem;
   padding: 1rem 0;
 }
@@ -64,6 +65,7 @@
 /* Tabela */
 .tableContainer {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -182,6 +184,7 @@
   border-radius: 4px;
   font-family: inherit;
   resize: vertical;
+  min-height: 120px;
 }
 
 .helpText {
@@ -214,6 +217,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .emptySubtitle {
@@ -255,4 +259,141 @@
   border-radius: 4px;
   font-size: 0.875rem;
   color: #0369a1;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1.25rem;
+  }
+
+  .tituloCom {
+    font-size: 1.85rem;
+  }
+
+  .subtitulo {
+    font-size: 0.95rem;
+  }
+
+  .headerActions,
+  .headerActions button,
+  .btnNovo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filtrosGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .filtroBotoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    margin-bottom: 0.85rem;
+    padding: 0.9rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .table td {
+    max-width: none;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #7f8c8d;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .table td:nth-child(1)::before {
+    content: "Titulo";
+  }
+
+  .table td:nth-child(2)::before {
+    content: "Descricao";
+  }
+
+  .table td:nth-child(3)::before {
+    content: "Tipo";
+  }
+
+  .table td:nth-child(4)::before {
+    content: "Imagem";
+  }
+
+  .table td:nth-child(5)::before {
+    content: "Status";
+  }
+
+  .table td:nth-child(6)::before {
+    content: "Criado em";
+  }
+
+  .table td:nth-child(7)::before {
+    content: "Acoes";
+  }
+
+  .table .colAcoes {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(2.5rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .colAcoes::before {
+    grid-column: 1 / -1;
+  }
+
+  .colAcoes button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .modalForm {
+    padding: 0;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+  }
+
+  .modalActions button {
+    width: 100%;
+  }
 }

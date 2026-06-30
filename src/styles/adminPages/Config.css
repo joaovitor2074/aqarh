@@ -1,7 +1,8 @@
 /* Config.css */
 
 .config-page {
-    padding: 2rem;
+    width: 100%;
+    padding: 0;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -43,6 +44,7 @@
     font-weight: 500;
     color: #666;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .config-tab:hover {
@@ -86,7 +88,7 @@
 /* Forms */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 1.5rem;
 }
 
@@ -104,6 +106,8 @@
 .form-group input,
 .form-group select,
 .form-group textarea {
+    width: 100%;
+    min-width: 0;
     padding: 0.75rem;
     border: 1px solid #ced4da;
     border-radius: 6px;
@@ -330,6 +334,7 @@ input:checked + .slider:before {
 .status-actions {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .stats-grid {
@@ -375,13 +380,16 @@ input:checked + .slider:before {
 }
 
 .section-header {
-    /* display: flex; */
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .admin-table {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .admin-table table {
@@ -434,6 +442,7 @@ input:checked + .slider:before {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .logs-entries {
@@ -539,20 +548,78 @@ input:checked + .slider:before {
 /* Responsividade */
 @media (max-width: 768px) {
     .config-page {
-        padding: 1rem;
+        padding: 0;
+    }
+
+    .config-header h1 {
+        font-size: 1.85rem;
+    }
+
+    .config-subtitle {
+        font-size: 0.95rem;
     }
     
     .config-tabs {
         overflow-x: auto;
         flex-wrap: nowrap;
+        padding-bottom: 0.75rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .config-tab {
+        flex: 0 0 auto;
+        padding: 0.7rem 1rem;
+    }
+
+    .config-card-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .config-card-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .config-card-content {
+        padding: 1rem;
     }
     
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .switch-container {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.85rem;
     }
     
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .status-display,
+    .logs-filters,
+    .logs-pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .status-actions,
+    .section-header,
+    .btn-add,
+    .btn-salvar {
+        width: 100%;
+    }
+
+    .status-actions button,
+    .btn-add,
+    .btn-salvar {
+        justify-content: center;
+        width: 100%;
     }
     
     .log-entry {
@@ -562,6 +629,97 @@ input:checked + .slider:before {
     
     .admin-table {
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-table {
+        overflow: visible;
+    }
+
+    .admin-table thead {
+        display: none;
+    }
+
+    .admin-table table,
+    .admin-table tbody,
+    .admin-table tr,
+    .admin-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .admin-table tr {
+        margin-bottom: 0.85rem;
+        padding: 0.9rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: #ffffff;
+    }
+
+    .admin-table td {
+        padding: 0.65rem 0;
+        border-bottom: 1px solid #eef2f7;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-table td::before {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: #6c757d;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .admin-table td:nth-child(1)::before {
+        content: "Nome";
+    }
+
+    .admin-table td:nth-child(2)::before {
+        content: "Email";
+    }
+
+    .admin-table td:nth-child(3)::before {
+        content: "Nivel";
+    }
+
+    .admin-table td:nth-child(4)::before {
+        content: "Status";
+    }
+
+    .admin-table td:nth-child(5)::before {
+        content: "Ultimo acesso";
+    }
+
+    .admin-table td:nth-child(6)::before {
+        content: "Acoes";
+    }
+
+    .admin-table td:last-child {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .admin-table td:last-child::before {
+        grid-column: 1 / -1;
+    }
+
+    .admin-table td:last-child button {
+        width: 100%;
+    }
+
+    .permissions-info {
+        padding: 1rem;
     }
 }
 
