@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { comunicadosService } from '../services/comunicdos.service'
 import styles from '../styles/components/ComunicadosModal.module.css'
-import { FaTimes, FaBell, FaUserGraduate, FaUserTie, FaFlask, FaImage } from 'react-icons/fa'
+import {
+  FaBell,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaChevronLeft,
+  FaChevronRight,
+  FaFlask,
+  FaImage,
+  FaTimes,
+  FaUserGraduate,
+  FaUserTie
+} from 'react-icons/fa'
 
 export default function ComunicadosModal() {
   const [comunicados, setComunicados] = useState([])
@@ -215,46 +226,38 @@ export default function ComunicadosModal() {
 
   const comunicado = comunicados[currentComunicado]
   const imageSrc = getImageSource(comunicado)
+  const tipoClass = styles[`tipo_${comunicado.tipo}`] || styles.tipo_default
 
   return (
     <>
-      {/* Botão de debug - apenas para desenvolvimento */}
-      {process.env.NODE_ENV === 'development' && (
-        <button
-          onClick={limparDescartados}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            background: '#333',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 9998,
-            fontSize: '12px'
-          }}
-        >
-          🔄 Redefinir comunicados
-        </button>
-      )}
-      
       <div className={styles.modalOverlay}>
-        <div className={styles.modal}>
+        <section
+          className={`${styles.modal} ${tipoClass}`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="comunicado-title"
+        >
           <div className={styles.modalHeader}>
             <div className={styles.tipoContainer}>
-              {getTipoIcon(comunicado.tipo)}
-              <span className={styles.tipoLabel}>
-                {getTipoLabel(comunicado.tipo)}
-              </span>
+              <span className={styles.tipoIcon}>{getTipoIcon(comunicado.tipo)}</span>
+              <div className={styles.tipoText}>
+                <span className={styles.headerEyebrow}>Comunicado GIEPI</span>
+                <span className={styles.tipoLabel}>
+                  {getTipoLabel(comunicado.tipo)}
+                </span>
+              </div>
             </div>
             
             <div className={styles.headerActions}>
               <span className={styles.badgeInfo}>
                 {currentComunicado + 1} de {comunicados.length}
               </span>
-              <button className={styles.closeButton} onClick={fecharModal}>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={fecharModal}
+                aria-label="Fechar comunicados"
+              >
                 <FaTimes />
               </button>
             </div>
@@ -269,6 +272,9 @@ export default function ComunicadosModal() {
                 onError={() => handleImageError(comunicado.id)}
                 onLoad={() => console.log(`✅ Imagem carregada: ${imageSrc}`)}
               />
+              <div className={styles.imageOverlay}>
+                <span className={styles.imageTag}>{getTipoLabel(comunicado.tipo)}</span>
+              </div>
               {imageErrors[comunicado.id] && (
                 <div className={styles.imageFallback}>
                   <FaImage />
@@ -277,19 +283,25 @@ export default function ComunicadosModal() {
               )}
             </div>
             
-            <h2 className={styles.titulo}>{comunicado.titulo}</h2>
-            
-            {comunicado.descricao && (
-              <p className={styles.descricao}>{comunicado.descricao}</p>
-            )}
-            
-            <div className={styles.metaInfo}>
-              <span className={styles.data}>
-                📅 Publicado em: {formatarData(comunicado.criado_em)}
-              </span>
-              <span className={styles.statusBadge}>
-                ● Ativo
-              </span>
+            <div className={styles.messagePanel}>
+              <span className={styles.contentEyebrow}>Atualização do grupo</span>
+              <h2 id="comunicado-title" className={styles.titulo}>{comunicado.titulo}</h2>
+              
+              {comunicado.descricao && (
+                <p className={styles.descricao}>{comunicado.descricao}</p>
+              )}
+              
+              <div className={styles.metaInfo}>
+                <span className={styles.data}>
+                  <FaCalendarAlt />
+                  <span>Publicado em</span>
+                  <strong>{formatarData(comunicado.criado_em)}</strong>
+                </span>
+                <span className={styles.statusBadge}>
+                  <span className={styles.statusDot}></span>
+                  Ativo
+                </span>
+              </div>
             </div>
           </div>
           
@@ -297,25 +309,35 @@ export default function ComunicadosModal() {
             {comunicados.length > 1 && (
               <>
                 <button 
+                  type="button"
                   onClick={irParaAnterior}
                   disabled={currentComunicado === 0}
                   className={`${styles.navButton} ${styles.prevButton}`}
                 >
+                  <FaChevronLeft />
                   Anterior
                 </button>
                 
-                <div className={styles.dots}>
-                  {comunicados.map((_, index) => (
-                    <span 
-                      key={index}
-                      className={`${styles.dot} ${index === currentComunicado ? styles.activeDot : ''}`}
-                      onClick={() => setCurrentComunicado(index)}
-                    />
-                  ))}
+                <div className={styles.navigationCenter}>
+                  <div className={styles.dots} aria-label="Selecionar comunicado">
+                    {comunicados.map((_, index) => (
+                      <button
+                        type="button"
+                        key={index}
+                        className={`${styles.dot} ${index === currentComunicado ? styles.activeDot : ''}`}
+                        onClick={() => setCurrentComunicado(index)}
+                        aria-label={`Ir para comunicado ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                  <span className={styles.footerCount}>
+                    {currentComunicado + 1}/{comunicados.length}
+                  </span>
                 </div>
                 
                 <div className={styles.footerActions}>
                   <button 
+                    type="button"
                     onClick={fecharApenasEste}
                     className={styles.dismissButton}
                   >
@@ -323,10 +345,12 @@ export default function ComunicadosModal() {
                   </button>
                   
                   <button 
+                    type="button"
                     onClick={irParaProximo}
                     className={`${styles.navButton} ${styles.nextButton}`}
                   >
                     {currentComunicado === comunicados.length - 1 ? 'Fechar Todos' : 'Próximo'}
+                    {currentComunicado === comunicados.length - 1 ? <FaCheckCircle /> : <FaChevronRight />}
                   </button>
                 </div>
               </>
@@ -335,21 +359,24 @@ export default function ComunicadosModal() {
             {comunicados.length === 1 && (
               <div className={styles.singleActions}>
                 <button 
+                  type="button"
                   onClick={fecharApenasEste}
                   className={styles.dismissButton}
                 >
                   Já vi este comunicado
                 </button>
                 <button 
+                  type="button"
                   onClick={fecharModal}
                   className={styles.closeButtonLarge}
                 >
+                  <FaCheckCircle />
                   Fechar
                 </button>
               </div>
             )}
           </div>
-        </div>
+        </section>
       </div>
     </>
   )

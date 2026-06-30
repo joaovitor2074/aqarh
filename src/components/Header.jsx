@@ -1,120 +1,121 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "../styles/Header.module.css";
+
+const menuItems = [
+  { path: "/", label: "Início", key: "inicio" },
+  { path: "/sobre", label: "Sobre", key: "sobre" },
+  { path: "/pesquisas", label: "Pesquisas", key: "pesquisas" },
+  { path: "/projetos", label: "Projetos", key: "projetos" },
+  { path: "/publicacoes", label: "Publicações", key: "publicacoes" },
+  { path: "/equipe", label: "Equipe", key: "equipe" },
+];
+
+function LogoMark({ className = "" }) {
+  const [logoError, setLogoError] = useState(false);
+
+  return (
+    <div className={`${styles.logoFrame} ${className}`}>
+      {!logoError ? (
+        <img
+          src="/img/logohead.png"
+          alt="GIEPI"
+          className={styles.logo}
+          onError={() => setLogoError(true)}
+        />
+      ) : (
+        <span className={styles.logoFallback} aria-label="GIEPI">
+          G
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
+  const activeMenu = location.pathname.split("/")[1] || "inicio";
 
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 10);
     }
+
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
-    
-    // Identificar a página ativa
-    const path = location.pathname.split('/')[1] || 'inicio';
-    setActiveMenu(path);
-    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [location]);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   return (
     <>
-      {/* HEADER */}
-      <header
-        className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}
-      >
+      <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
         <div className={styles.headerContainer}>
-          {/* Logo com efeito moderno */}
-          <div className={styles.logoContainer}>
-            <div className={styles.logoWrapper}>
-              <img
-                src="/img/header.png"
-                alt="Logo GIEPI"
-                className={styles.logo}
-              />
-              <div className={styles.logoGlow}></div>
-            </div>
+          <Link to="/" className={styles.logoContainer} onClick={() => setOpen(false)}>
+            <LogoMark />
             <div className={styles.logoText}>
               <span className={styles.logoMain}>GIEPI</span>
-              <span className={styles.logoSubtitle}>Grupo de Pesquisa</span>
+              <span className={styles.logoSubtitle}>IFMA Campus Codó</span>
             </div>
-          </div>
+          </Link>
 
-          {/* Menu Desktop com indicador ativo */}
-          <nav className={styles.navDesktop}>
+          <nav className={styles.navDesktop} aria-label="Navegação principal">
             <ul className={styles.navList}>
-              {[
-                { path: "/", label: "Início", key: "inicio" },
-                { path: "/pesquisas", label: "Pesquisas", key: "pesquisas" },
-                { path: "/projetos", label: "Projetos", key: "projetos" },
-                { path: "/publicacoes", label: "Publicações", key: "publicacoes" },
-                { path: "/equipe", label: "Equipe", key: "equipe" },
-              ].map((item) => (
+              {menuItems.map((item) => (
                 <li key={item.key} className={styles.navItem}>
-                  <Link 
+                  <Link
                     to={item.path}
                     className={`${styles.navLink} ${activeMenu === item.key ? styles.active : ""}`}
                   >
                     {item.label}
-                    {activeMenu === item.key && <span className={styles.activeIndicator}></span>}
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* CTA Desktop com gradiente */}
           <div className={styles.ctaContainer}>
-            <Link
-              to="/publicacoes"
-              className={styles.ctaButton}
-            >
-              <span className={styles.ctaText}>Publicações</span>
+            <Link to="/publicacoes" className={styles.ctaButton}>
+              Produção científica
             </Link>
           </div>
 
-          {/* Hamburguer Menu Moderno */}
           <button
             className={styles.hamburger}
             onClick={() => setOpen(true)}
             aria-label="Abrir menu"
+            aria-expanded={open}
           >
             <span className={styles.hamburgerLine}></span>
             <span className={styles.hamburgerLine}></span>
             <span className={styles.hamburgerLine}></span>
           </button>
         </div>
-
-        {/* Linha decorativa */}
-        <div className={styles.headerLine}></div>
       </header>
 
-      {/* OVERLAY */}
-      {open && (
-        <div
-          className={styles.overlay}
-          onClick={() => setOpen(false)}
-        ></div>
-      )}
+      {open && <div className={styles.overlay} onClick={() => setOpen(false)}></div>}
 
-      {/* MENU MOBILE Modernizado */}
       <aside
         className={`${styles.mobileMenu} ${open ? styles.menuOpen : styles.menuClosed}`}
+        aria-hidden={!open}
       >
         <div className={styles.mobileHeader}>
           <div className={styles.mobileLogo}>
-            <img
-              src="/img/header.png"
-              alt="Logo GIEPI"
-              className={styles.mobileLogoImg}
-            />
-            <span className={styles.mobileLogoText}>GIEPI</span>
+            <LogoMark className={styles.mobileLogoImg} />
+            <div>
+              <span className={styles.mobileLogoText}>GIEPI</span>
+              <span className={styles.mobileLogoSub}>IFMA Campus Codó</span>
+            </div>
           </div>
-          <button 
+          <button
             className={styles.closeButton}
             onClick={() => setOpen(false)}
             aria-label="Fechar menu"
@@ -125,43 +126,28 @@ export default function Header() {
         </div>
 
         <div className={styles.mobileContent}>
-          <nav className={styles.mobileNav}>
+          <nav className={styles.mobileNav} aria-label="Navegação mobile">
             <ul className={styles.mobileList}>
-              {[
-                { path: "/", label: "Início", icon: "🏠" },
-                { path: "/pesquisas", label: "Pesquisas", icon: "🔬" },
-                { path: "/projetos", label: "Projetos", icon: "📋" },
-                { path: "/publicacoes", label: "Publicações",  },
-                { path: "/equipe", label: "Equipe", icon: "👥" },
-              ].map((item, index) => (
-                <li key={index} className={styles.mobileItem}>
-                  <Link 
+              {menuItems.map((item) => (
+                <li key={item.key} className={styles.mobileItem}>
+                  <Link
                     to={item.path}
-                    className={`${styles.mobileLink} ${activeMenu === item.path.split('/')[1] ? styles.mobileActive : ""}`}
+                    className={`${styles.mobileLink} ${
+                      activeMenu === item.key ? styles.mobileActive : ""
+                    }`}
                     onClick={() => setOpen(false)}
                   >
-                    <span className={styles.mobileIcon}>{item.icon}</span>
                     <span className={styles.mobileLabel}>{item.label}</span>
-                    <span className={styles.mobileArrow}>→</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          <div className={styles.mobileFooter}>
-            <Link
-              to="/publicacoes"
-              className={styles.mobileCta}
-              onClick={() => setOpen(false)}
-            >
-              <div className={styles.mobileCtaIcon}>📖</div>
-              <div className={styles.mobileCtaContent}>
-                <div className={styles.mobileCtaTitle}>Acessar Publicações</div>
-                <div className={styles.mobileCtaSubtitle}>Conheça nossas produções científicas</div>
-              </div>
-            </Link>
-          </div>
+          <Link to="/publicacoes" className={styles.mobileCta} onClick={() => setOpen(false)}>
+            <div className={styles.mobileCtaTitle}>Produção científica</div>
+            <div className={styles.mobileCtaSubtitle}>Artigos, relatórios e documentos do grupo</div>
+          </Link>
         </div>
       </aside>
     </>

@@ -356,12 +356,12 @@
         "grupo": "Agricultura Irrigada em áreas de Cerrado"
       },
       {
-        "linha_pesquisa": "Engenharia Sanitária e Ambiental",
-        "grupo": "Agricultura Irrigada em áreas de Cerrado"
-      },
-      {
         "linha_pesquisa": "Agricultura irrigada com água alterada",
         "grupo": "Tecnologias sustentáveis na gestão de cultivos irrigados no Cerrado"
+      },
+      {
+        "linha_pesquisa": "Engenharia Sanitária e Ambiental",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
       },
       {
         "linha_pesquisa": "Modelagem de água no solo",
@@ -428,6 +428,10 @@
       {
         "linha_pesquisa": "Química e Meio Ambiente",
         "grupo": "Química, Meio Ambiente e Ensino de Ciências"
+      },
+      {
+        "linha_pesquisa": "Fitotecnia/Olericultura",
+        "grupo": "Agricultura Irrigada em áreas de Cerrado"
       },
       {
         "linha_pesquisa": "Química e Desenvolvimento de Produtos Alimentícios",
@@ -525,7 +529,12 @@
   {
     "nome": "Vilma da Silva Mesquita Oliveira",
     "espelhoUrl": "http://dgp.cnpq.br/dgp/espelhorh/0039584305",
-    "linhas_pesquisa": []
+    "linhas_pesquisa": [
+      {
+        "linha_pesquisa": "Educação, História e Memória",
+        "grupo": "Núcleo de Educação, História e Memória - NEHME"
+      }
+    ]
   },
   {
     "nome": "Wady Lima Castro Junior",
@@ -536,12 +545,12 @@
         "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
       },
       {
-        "linha_pesquisa": "Manejo da Agricultura Irrigada",
-        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
-      },
-      {
         "linha_pesquisa": "AGRICULTURA FAMILIAR, PRODUÇÃO E PROCESSAMENTO DE ALIMENTOS",
         "grupo": "GRUPO DE PESQUISA EM DESENVOLVIMENTO RURAL, AMBIENTAL E SOCIAL - GDAS"
+      },
+      {
+        "linha_pesquisa": "Manejo da Agricultura Irrigada",
+        "grupo": "Grupo de Ações em Recursos Sustentáveis Agro-Ambientais, GARSA"
       },
       {
         "linha_pesquisa": "Hidrologia, Recursos Hídricos e Meio Ambiente",

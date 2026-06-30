@@ -3,6 +3,7 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
+import styles from "../styles/adminLayout.module.css";
 
 /*
  * AdminLayout.jsx
@@ -20,17 +21,17 @@ import Topbar from "./Topbar";
 
 export default function AdminLayout({ children, userName = "Administrador" }) {
   return (
-    <div className="min-h-screen w-full flex bg-gray-100">
+    <div className={styles.adminShell}>
       {/* SIDEBAR */}
       <Sidebar />
 
       {/* ÁREA PRINCIPAL */}
-      <div className="flex flex-col flex-1">
+      <div className={styles.mainPanel}>
         {/* TOPBAR */}
         <Topbar userName={userName} />
             
         {/* CONTEÚDO */}
-        <main className="p-6 w-full">
+        <main className={styles.contentArea}>
           {children}
         </main>
       </div>

@@ -7,13 +7,14 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   build: {
     outDir: "dist",
   },
   server: {
     proxy: {
       "/adminjv": {
-        target: "http://localhost:3000",
+        target: "http://localhost:3001",
         changeOrigin: true
       }
     }

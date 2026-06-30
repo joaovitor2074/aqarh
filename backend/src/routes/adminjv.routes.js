@@ -16,7 +16,7 @@ import { Router } from "express";
  * CONTROLLERS
  * =====================================================
  */
-import { runScrape } from "../controllers/scrape.controller.js";
+import { getScrapeSnapshot, runScrape } from "../controllers/scrape.controller.js";
 import { scrapeStatus } from "../controllers/scrapeStatus.controller.js";
 import {
   listarNotificacoes,
@@ -56,6 +56,9 @@ router.post("/scrape/run", (req, res) => runScrape(req, res));
  * Retorna se o scraping está rodando, parado ou com erro
  */
 router.get("/scrape/status", scrapeStatus);
+router.get("/scrape/snapshot", (req, res) => {
+  res.json(getScrapeSnapshot());
+});
 
 /**
  * =====================================================

@@ -6,7 +6,38 @@
  * - Usa variável de ambiente (Vite)
  * - Fallback para localhost em desenvolvimento
  */
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.NEXT_PUBLIC_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost:3001";
+
+export const API_URL = String(API_BASE_URL).replace(/\/+$/, "");
+
+function isAbsoluteUrl(endpoint = "") {
+  return /^https?:\/\//i.test(endpoint);
+}
+
+function withLeadingSlash(endpoint = "") {
+  return endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+}
+
+function normalizeApiEndpoint(endpoint = "") {
+  if (isAbsoluteUrl(endpoint)) return endpoint;
+
+  const path = withLeadingSlash(endpoint);
+
+  if (
+    path === "/api" ||
+    path.startsWith("/api/") ||
+    path === "/adminjv" ||
+    path.startsWith("/adminjv/")
+  ) {
+    return path;
+  }
+
+  return `/api${path}`;
+}
 
 /**
  * =====================================================
@@ -44,7 +75,11 @@ export async function apiRequest(endpoint, options = {}) {
      * EXECUÇÃO DA REQUISIÇÃO
      * =====================================================
      */
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const requestUrl = isAbsoluteUrl(endpoint)
+      ? endpoint
+      : `${API_URL}${withLeadingSlash(endpoint)}`;
+
+    const response = await fetch(requestUrl, {
       ...options,
       headers,
     });
@@ -54,7 +89,7 @@ export async function apiRequest(endpoint, options = {}) {
      * TRATAMENTO DE TOKEN EXPIRADO
      * =====================================================
      */
-    const IS_DEV = true;
+    const IS_DEV = import.meta.env.DEV;
 
     if (response.status === 401) {
 
@@ -74,17 +109,25 @@ export async function apiRequest(endpoint, options = {}) {
      */
     if (!response.ok) {
       const errorText = await response.text();
+      let errorData = null;
 
       try {
-        const error = JSON.parse(errorText);
-        throw new Error(
-          error.message || error.error || `Erro ${response.status}`
-        );
+        errorData = JSON.parse(errorText);
       } catch {
-        throw new Error(
-          `Erro ${response.status}: ${errorText || response.statusText}`
-        );
+        // A resposta pode não ser JSON (por exemplo, erro de proxy).
       }
+
+      const message =
+        errorData?.message ||
+        errorData?.error ||
+        errorText ||
+        response.statusText ||
+        `Erro ${response.status}`;
+
+      const requestError = new Error(message);
+      requestError.status = response.status;
+      requestError.data = errorData;
+      throw requestError;
     }
 
     /**
@@ -101,7 +144,14 @@ export async function apiRequest(endpoint, options = {}) {
      * RESPOSTA JSON PADRÃO
      * =====================================================
      */
-    return response.json();
+    const responseText = await response.text();
+    if (!responseText) return null;
+
+    try {
+      return JSON.parse(responseText);
+    } catch {
+      return responseText;
+    }
   } catch (error) {
     console.error("❌ Erro na requisição:", error);
     throw error;
@@ -117,9 +167,7 @@ export async function apiRequest(endpoint, options = {}) {
  */
 export const api = {
   get: (endpoint, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "GET",
@@ -128,9 +176,7 @@ export const api = {
   },
 
   post: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "POST",
@@ -140,9 +186,7 @@ export const api = {
   },
 
   put: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "PUT",
@@ -152,9 +196,7 @@ export const api = {
   },
 
   patch: (endpoint, data, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "PATCH",
@@ -164,9 +206,7 @@ export const api = {
   },
 
   delete: (endpoint, options = {}) => {
-    const normalizedEndpoint = endpoint.startsWith("http")
-      ? endpoint
-      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+    const normalizedEndpoint = normalizeApiEndpoint(endpoint);
 
     return apiRequest(normalizedEndpoint, {
       method: "DELETE",

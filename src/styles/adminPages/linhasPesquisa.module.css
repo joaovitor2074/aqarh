@@ -148,8 +148,20 @@
 
 .pesquisadores {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  max-width: 360px;
+}
+
+.pesquisadores svg {
+  margin-top: 0.2rem;
+  flex: 0 0 auto;
+}
+
+.pesquisadores span {
+  min-width: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .grupo {

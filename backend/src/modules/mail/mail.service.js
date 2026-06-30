@@ -1,0 +1,657 @@
+// src/modules/mail/mail.service.js
+// Substituir o mail.service.ts por esta versão JS com Nodemailer real
+
+import nodemailer from "nodemailer";
+import process from "node:process";
+
+const TEMPOS_SMTP = {
+  connectionTimeout: 15_000,
+  greetingTimeout: 15_000,
+  socketTimeout: 30_000,
+};
+
+const EMAIL_BRAND_NAME =
+  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - GIEPI";
+const EMAIL_BACKGROUND_IMAGE_PATH = "/img/email/imagem-fundo-email.png";
+const DEFAULT_SITE_URL = "https://aqarh.vercel.app";
+
+function valorEnv(nome) {
+  return (process.env[nome] || "").trim();
+}
+
+function obterBaseUrlPublica() {
+  return (
+    valorEnv("EMAIL_ASSET_BASE_URL") ||
+    valorEnv("APP_URL") ||
+    valorEnv("SITE_URL") ||
+    valorEnv("FRONTEND_URL") ||
+    DEFAULT_SITE_URL
+  ).replace(/\/+$/, "");
+}
+
+function obterUrlImagemFundoEmail() {
+  try {
+    return new URL(EMAIL_BACKGROUND_IMAGE_PATH, `${obterBaseUrlPublica()}/`)
+      .toString();
+  } catch {
+    return `${DEFAULT_SITE_URL}${EMAIL_BACKGROUND_IMAGE_PATH}`;
+  }
+}
+
+function escaparHtml(valor = "") {
+  return String(valor)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function erroConfiguracao(message) {
+  const error = new Error(message);
+  error.code = "MAIL_CONFIGURATION_ERROR";
+  return error;
+}
+
+function mascararEmail(email = "") {
+  const [usuario, dominio] = email.split("@");
+
+  if (!usuario || !dominio) {
+    return email ? "***" : "";
+  }
+
+  const inicio = usuario.slice(0, Math.min(2, usuario.length));
+  return `${inicio}***@${dominio}`;
+}
+
+function registrarEventoEmail(evento, dados = {}, nivel = "log") {
+  const payload = Object.fromEntries(
+    Object.entries({
+      timestamp: new Date().toISOString(),
+      evento,
+      ...dados,
+    }).filter(([, valor]) => valor !== undefined)
+  );
+
+  console[nivel](`[MAIL] ${JSON.stringify(payload)}`);
+}
+
+/**
+ * Retorna a configuração efetiva do provedor e valida as credenciais antes
+ * de tentar abrir uma conexão SMTP.
+ */
+export function obterConfiguracaoEmail() {
+  const brevoApiKey = valorEnv("BREVO_API_KEY");
+  const brevoFrom = valorEnv("BREVO_FROM") || valorEnv("MAIL_FROM");
+  const brevoFromName = valorEnv("BREVO_FROM_NAME") || EMAIL_BRAND_NAME;
+  const resendApiKey = valorEnv("RESEND_API_KEY");
+  const resendFrom = valorEnv("RESEND_FROM") || valorEnv("MAIL_FROM");
+  const sendgridApiKey = valorEnv("SENDGRID_API_KEY");
+  const sendgridFrom = valorEnv("SENDGRID_FROM") || valorEnv("MAIL_FROM");
+  const gmailUser = valorEnv("GMAIL_USER");
+  const gmailPassword = valorEnv("GMAIL_APP_PASSWORD").replace(/\s/g, "");
+  const mailtrapUser = valorEnv("MAILTRAP_USER");
+  const mailtrapPassword = valorEnv("MAILTRAP_PASS");
+  const providerInformado = valorEnv("MAIL_ENV").toLowerCase();
+
+  const provider =
+    providerInformado ||
+    (brevoApiKey
+      ? "brevo"
+      : resendApiKey
+        ? "resend"
+        : sendgridApiKey
+          ? "sendgrid"
+          : gmailUser && gmailPassword
+            ? "gmail"
+            : mailtrapUser && mailtrapPassword
+              ? "mailtrap"
+              : "");
+
+  if (!provider) {
+    throw erroConfiguracao(
+      "O serviço de email não está configurado. Defina MAIL_ENV e as credenciais do provedor."
+    );
+  }
+
+  if (provider === "brevo") {
+    if (!brevoApiKey || !brevoFrom) {
+      throw erroConfiguracao(
+        "A configuração da Brevo está incompleta. Verifique BREVO_API_KEY e BREVO_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: brevoApiKey,
+      sender: {
+        email: brevoFrom,
+        name: brevoFromName,
+      },
+    };
+  }
+
+  if (provider === "resend") {
+    if (!resendApiKey || !resendFrom) {
+      throw erroConfiguracao(
+        "A configuração do Resend está incompleta. Verifique RESEND_API_KEY e RESEND_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: resendApiKey,
+      from: resendFrom,
+    };
+  }
+
+  if (provider === "sendgrid") {
+    if (!sendgridApiKey || !sendgridFrom) {
+      throw erroConfiguracao(
+        "A configuração do SendGrid está incompleta. Verifique SENDGRID_API_KEY e SENDGRID_FROM."
+      );
+    }
+
+    return {
+      provider,
+      apiKey: sendgridApiKey,
+      from: sendgridFrom,
+    };
+  }
+
+  if (provider === "gmail") {
+    if (!gmailUser || !gmailPassword) {
+      throw erroConfiguracao(
+        "A configuração do Gmail está incompleta. Verifique GMAIL_USER e GMAIL_APP_PASSWORD."
+      );
+    }
+
+    return {
+      provider,
+      from: valorEnv("MAIL_FROM") || `"${EMAIL_BRAND_NAME}" <${gmailUser}>`,
+      transport: {
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: gmailUser,
+          pass: gmailPassword,
+        },
+        ...TEMPOS_SMTP,
+      },
+    };
+  }
+
+  if (provider === "mailtrap") {
+    if (!mailtrapUser || !mailtrapPassword) {
+      throw erroConfiguracao(
+        "A configuração do Mailtrap está incompleta. Verifique MAILTRAP_USER e MAILTRAP_PASS."
+      );
+    }
+
+    return {
+      provider,
+      from:
+        valorEnv("MAIL_FROM") ||
+        `"${EMAIL_BRAND_NAME}" <no-reply@giepi.local>`,
+      transport: {
+        host: "sandbox.smtp.mailtrap.io",
+        port: 2525,
+        secure: false,
+        auth: {
+          user: mailtrapUser,
+          pass: mailtrapPassword,
+        },
+        ...TEMPOS_SMTP,
+      },
+    };
+  }
+
+  throw erroConfiguracao(
+    `Provedor de email "${providerInformado}" inválido. Use MAIL_ENV=brevo, sendgrid, resend, gmail ou mailtrap.`
+  );
+}
+
+export function obterDiagnosticoEmail() {
+  try {
+    const config = obterConfiguracaoEmail();
+    const remetente =
+      config.sender?.email || separarEndereco(config.from || "").email || "";
+
+    return {
+      configurado: true,
+      provider: config.provider,
+      remetente: mascararEmail(remetente),
+      credencialConfigurada: Boolean(config.apiKey || config.transport?.auth),
+    };
+  } catch (error) {
+    return {
+      configurado: false,
+      provider: valorEnv("MAIL_ENV").toLowerCase() || null,
+      erro: error.message,
+    };
+  }
+}
+
+export function mensagemErroEmail(error) {
+  if (error?.code === "MAIL_CONFIGURATION_ERROR") {
+    return error.message;
+  }
+
+  const providerMessage = error?.message || "";
+
+  if (error?.code === "EAUTH" || error?.responseCode === 535) {
+    return "O provedor recusou a autenticação. Verifique o usuário e a senha de aplicativo.";
+  }
+
+  if (error?.code === "MAIL_PROVIDER_ERROR") {
+    if (/unrecognised IP|unrecognized IP|authorised_ips|authorized_ips/i.test(providerMessage)) {
+      return "A Brevo bloqueou o envio porque o IP atual da Railway nao esta autorizado. Adicione o IP informado pela Brevo em https://app.brevo.com/security/authorised_ips ou desative a restricao de IP na conta.";
+    }
+
+    return providerMessage;
+  }
+
+  if (
+    ["ECONNECTION", "ECONNREFUSED", "ETIMEDOUT", "ESOCKET"].includes(
+      error?.code
+    )
+  ) {
+    return "Não foi possível conectar ao servidor de email. Tente novamente em alguns instantes.";
+  }
+
+  return "O provedor de email não conseguiu entregar a mensagem.";
+}
+
+/**
+ * Cria o transporter baseado no ambiente.
+ * Em desenvolvimento usa Mailtrap, em produção usa Gmail.
+ *
+ * VARIÁVEIS DE AMBIENTE NECESSÁRIAS:
+ *
+ * Para Mailtrap (desenvolvimento/testes):
+ *   MAIL_ENV=mailtrap
+ *   MAILTRAP_USER=seu_usuario_mailtrap
+ *   MAILTRAP_PASS=sua_senha_mailtrap
+ *
+ * Para Gmail (produção):
+ *   MAIL_ENV=gmail
+ *   GMAIL_USER=seuemail@gmail.com
+ *   GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx   ← App Password de 16 dígitos
+ *
+ * Como gerar Gmail App Password:
+ *   1. Acesse myaccount.google.com
+ *   2. Segurança → Verificação em duas etapas (ativar se necessário)
+ *   3. Segurança → Senhas de app → Selecionar app "Outro" → Gerar
+ *   4. Copie os 16 dígitos e cole em GMAIL_APP_PASSWORD
+ */
+function criarTransporter() {
+  const config = obterConfiguracaoEmail();
+  return {
+    config,
+    transporter: nodemailer.createTransport(config.transport),
+  };
+}
+
+async function enviarComResend({ config, para, assunto, corpoFinal, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: config.from,
+        to: [para],
+        subject: assunto,
+        text: corpoFinal,
+        html,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message || `O Resend recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: data.id,
+    response: data,
+  };
+}
+
+async function enviarComBrevo({ config, para, assunto, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": config.apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: config.sender,
+        to: [{ email: para }],
+        subject: assunto,
+        htmlContent: html,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      data.message || `A Brevo recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: data.messageId,
+    providerStatus: response.status,
+    response: data,
+  };
+}
+
+function separarEndereco(remetente) {
+  const match = remetente.match(/^\s*(.*?)\s*<([^<>]+)>\s*$/);
+
+  if (!match) {
+    return { email: remetente };
+  }
+
+  return {
+    email: match[2].trim(),
+    ...(match[1].trim() && { name: match[1].trim().replace(/^"|"$/g, "") }),
+  };
+}
+
+async function enviarComSendGrid({ config, para, assunto, corpoFinal, html }) {
+  let response;
+
+  try {
+    response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: para }] }],
+        from: separarEndereco(config.from),
+        subject: assunto,
+        content: [
+          { type: "text/plain", value: corpoFinal },
+          { type: "text/html", value: html },
+        ],
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (error) {
+    error.code ||= "ECONNECTION";
+    throw error;
+  }
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const error = new Error(
+      data.errors?.[0]?.message ||
+        `O SendGrid recusou o envio (HTTP ${response.status}).`
+    );
+    error.code = "MAIL_PROVIDER_ERROR";
+    error.responseCode = response.status;
+    throw error;
+  }
+
+  return {
+    messageId: response.headers.get("x-message-id"),
+  };
+}
+
+/**
+ * Monta o HTML do email.
+ * Template com fundo institucional e conteudo central legivel.
+ */
+function montarHTML({ assunto, corpo, remetente = EMAIL_BRAND_NAME }) {
+  const assuntoSeguro = escaparHtml(assunto);
+  const remetenteSeguro = escaparHtml(remetente);
+  const corpoSeguro = escaparHtml(corpo);
+  const imagemFundoSeguro = escaparHtml(obterUrlImagemFundoEmail());
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${assuntoSeguro}</title>
+</head>
+<body style="margin:0;padding:0;background:#063d2e;font-family:Arial,Helvetica,sans-serif;color:#24312b;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;line-height:0;">
+    ${remetenteSeguro} - ${assuntoSeguro}
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" background="${imagemFundoSeguro}" style="width:100%;background-color:#063d2e;background-image:url('${imagemFundoSeguro}');background-repeat:no-repeat;background-position:center top;background-size:cover;padding:42px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.28);box-shadow:0 18px 42px rgba(0,0,0,0.28);">
+
+          <tr>
+            <td style="background:#00543f;padding:30px 34px 28px;border-bottom:4px solid #36c66a;">
+              <p style="margin:0;color:#bff4d1;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;">
+                Comunicado institucional
+              </p>
+              <h1 style="margin:12px 0 0;color:#ffffff;font-size:24px;font-weight:700;line-height:1.32;">
+                ${assuntoSeguro}
+              </h1>
+              <p style="margin:14px 0 0;color:#d8f8e5;font-size:13px;line-height:1.55;">
+                ${remetenteSeguro}
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:34px 36px 32px;background:#ffffff;">
+              <div style="margin:0 0 22px;padding:0 0 0 16px;border-left:4px solid #1b8f5a;">
+                <p style="margin:0;color:#0f5132;font-size:13px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">
+                  Mensagem
+                </p>
+              </div>
+              <div style="color:#2f3b46;font-size:15px;line-height:1.78;white-space:pre-line;">
+                ${corpoSeguro}
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:24px 36px;background:#eef7f1;border-top:1px solid #d8eadf;">
+              <p style="margin:0 0 6px;color:#426855;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">
+                Enviado por
+              </p>
+              <p style="margin:0;color:#0b3d2e;font-size:14px;font-weight:700;line-height:1.5;">
+                ${remetenteSeguro}
+              </p>
+              <p style="margin:12px 0 0;color:#63746a;font-size:12px;line-height:1.55;">
+                Este email foi enviado automaticamente pelo sistema GIEPI.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <p style="margin:18px 0 0;color:#c9f3d8;font-size:11px;line-height:1.5;">
+          ${remetenteSeguro}
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+/**
+ * Envia um email para um único destinatário.
+ *
+ * @param {object} opcoes
+ * @param {string} opcoes.para - Email do destinatário
+ * @param {string} opcoes.assunto - Assunto do email
+ * @param {string} opcoes.corpo - Corpo em texto/html simples
+ * @param {string} [opcoes.nomeDestinatario] - Nome para personalizar saudação
+ */
+export async function enviarEmail({
+  para,
+  assunto,
+  corpo,
+  nomeDestinatario,
+  requestId,
+}) {
+  const config = obterConfiguracaoEmail();
+  const inicio = Date.now();
+
+  const corpoFinal = nomeDestinatario
+    ? `Olá, ${nomeDestinatario}!\n\n${corpo}`
+    : corpo;
+  const html = montarHTML({ assunto, corpo: corpoFinal });
+
+  registrarEventoEmail("envio_iniciado", {
+    requestId,
+    provider: config.provider,
+    destinatario: mascararEmail(para),
+    remetente: mascararEmail(
+      config.sender?.email || separarEndereco(config.from || "").email
+    ),
+  });
+
+  try {
+    const info =
+      config.provider === "brevo"
+        ? await enviarComBrevo({
+            config,
+            para,
+            assunto,
+            html,
+          })
+        : config.provider === "resend"
+          ? await enviarComResend({
+              config,
+              para,
+              assunto,
+              corpoFinal,
+              html,
+            })
+          : config.provider === "sendgrid"
+            ? await enviarComSendGrid({
+                config,
+                para,
+                assunto,
+                corpoFinal,
+                html,
+              })
+            : await criarTransporter().transporter.sendMail({
+                from: config.from,
+                to: para,
+                subject: assunto,
+                text: corpoFinal,
+                html,
+              });
+
+    registrarEventoEmail("envio_aceito", {
+      requestId,
+      provider: config.provider,
+      destinatario: mascararEmail(para),
+      providerStatus: info.providerStatus,
+      messageId: info.messageId || null,
+      duracaoMs: Date.now() - inicio,
+    });
+
+    return info;
+  } catch (error) {
+    registrarEventoEmail(
+      "envio_falhou",
+      {
+        requestId,
+        provider: config.provider,
+        destinatario: mascararEmail(para),
+        code: error.code,
+        providerStatus: error.responseCode,
+        mensagem: mensagemErroEmail(error),
+        duracaoMs: Date.now() - inicio,
+      },
+      "error"
+    );
+    throw error;
+  }
+}
+
+/**
+ * Envia email em massa para uma lista de destinatários.
+ * Envia individualmente para personalizar a saudação.
+ *
+ * @param {object} opcoes
+ * @param {Array<{email: string, nome: string}>} opcoes.destinatarios
+ * @param {string} opcoes.assunto
+ * @param {string} opcoes.corpo
+ * @param {boolean} [opcoes.personalizar] - Se true, adiciona "Olá, [nome]!" no início
+ */
+export async function enviarEmailEmMassa({
+  destinatarios,
+  assunto,
+  corpo,
+  personalizar = true,
+  requestId,
+}) {
+  const resultados = {
+    total: destinatarios.length,
+    enviados: 0,
+    falhas: [],
+  };
+
+  for (const dest of destinatarios) {
+    try {
+      await enviarEmail({
+        para: dest.email,
+        assunto,
+        corpo,
+        nomeDestinatario: personalizar ? dest.nome : null,
+        requestId,
+      });
+      resultados.enviados++;
+    } catch (err) {
+      resultados.falhas.push({
+        email: dest.email,
+        erro: mensagemErroEmail(err),
+      });
+    }
+  }
+
+  registrarEventoEmail("campanha_concluida", {
+    requestId,
+    total: resultados.total,
+    enviados: resultados.enviados,
+    falhas: resultados.falhas.length,
+  });
+
+  return resultados;
+}

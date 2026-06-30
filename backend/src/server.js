@@ -16,6 +16,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
+import process from "node:process";
 import { fileURLToPath } from "url";
 
 /**
@@ -36,29 +37,49 @@ import authRoutes from "./routes/auth.routes.js";
 import membrosRoutes from "./routes/membros.routes.js";
 import linhasPesquisaRoutes from "./routes/linhas_pesquisas.routes.js";
 import comunicadosRoutes from "./routes/comunicados.routes.js";
+import projetosRoutes from "./routes/projetos.routes.js";
 import adminjvRoutes from "./routes/adminjv.routes.js";
 
 // Rotas de e-mail compiladas pelo TypeScript (dist)
-import mailRoutes from "../dist/routes/mail.routes.js";
 
+import mailRoutes from "./routes/mail.routes.js";
+import { obterDiagnosticoEmail } from "./modules/mail/mail.service.js";
 /**
  * =====================================================
  * INICIALIZAÇÃO DO EXPRESS
  * =====================================================
  */
 const app = express();
+app.set("trust proxy", 1);
+
+const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, "");
+const allowedOrigins = (
+  process.env.CORS_ORIGIN || "http://localhost:5173,https://aqarh.vercel.app"
+)
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Origem nao permitida pelo CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
 /**
  * =====================================================
  * MIDDLEWARES GLOBAIS
  * =====================================================
  */
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Frontend (Vite)
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -106,6 +127,7 @@ app.use("/api", authRoutes);
 app.use("/api/membros", membrosRoutes);
 app.use("/api/linhas-pesquisa", linhasPesquisaRoutes);
 app.use("/api/comunicados", comunicadosRoutes);
+app.use("/api/projetos", projetosRoutes);
 app.use("/api/mail", mailRoutes);
 app.use("/adminjv", adminjvRoutes);
 
@@ -127,10 +149,10 @@ app.get("/debug-public", (req, res) => {
       files,
       accessibleUrls: {
         defaults: files.defaults.map(
-          (f) => `http://localhost:${process.env.PORT}/img/defaults/${f}`
+          (f) => `http://localhost:${PORT}/img/defaults/${f}`
         ),
         uploads: files.uploads.map(
-          (f) => `http://localhost:${process.env.PORT}/uploads/${f}`
+          (f) => `http://localhost:${PORT}/uploads/${f}`
         ),
       },
     });
@@ -144,11 +166,14 @@ app.get("/debug-public", (req, res) => {
  * INICIALIZAÇÃO DO SERVIDOR
  * =====================================================
  */
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${process.env.PORT}`);
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log("📁 Pasta public:", publicPath);
+  console.log("[MAIL] Configuração carregada:", obterDiagnosticoEmail());
   console.log(
-    `🌐 Debug: http://localhost:${process.env.PORT}/debug-public`
+    `🌐 Debug: http://localhost:${PORT}/debug-public`
   );
 });
 

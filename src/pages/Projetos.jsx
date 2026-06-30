@@ -1,155 +1,181 @@
-import { useState } from 'react';
-import { FaSearch, FaFilter, FaCalendarAlt, FaUserFriends, FaGraduationCap, FaBookOpen, FaArrowRight } from 'react-icons/fa';
-import styles from '../styles/Projetos.module.css';
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaArrowRight,
+  FaBookOpen,
+  FaCalendarAlt,
+  FaExternalLinkAlt,
+  FaGraduationCap,
+  FaSearch,
+  FaUserFriends,
+} from "react-icons/fa";
+import { projetosService } from "../services/projetos.service";
+import { DEFAULT_LINHA_IMAGE, getLinhaImage } from "../utils/linhaImages";
+import styles from "../styles/Projetos.module.css";
+
+function uniqueValues(values) {
+  return Array.from(new Set(values.filter(Boolean))).sort((a, b) =>
+    String(a).localeCompare(String(b), "pt-BR")
+  );
+}
+
+function getProjectImage(project, index) {
+  return (
+    project.imagem_url ||
+    getLinhaImage(
+      [project.titulo, project.area, project.linha_nome, project.linha_grupo, project.descricao],
+      index
+    )
+  );
+}
+
+function getProjectTags(project) {
+  const partnerTags = (project.parceiros || []).map((parceiro) => parceiro.nome);
+  return uniqueValues([
+    project.area,
+    project.linha_nome,
+    project.linha_grupo,
+    project.status,
+    ...partnerTags,
+  ]).slice(0, 6);
+}
+
+function getParticipantCount(project) {
+  return (project.coordenador_id ? 1 : 0) + (project.estudantes?.length || 0);
+}
+
+function getParticipantLabel(project) {
+  const total = getParticipantCount(project);
+  if (!total) return "Equipe a definir";
+  return total === 1 ? "1 participante" : `${total} participantes`;
+}
+
+function getStatusClass(status) {
+  if (status === "Finalizado") return styles.statusCompleted;
+  if (status === "Planejado") return styles.statusPlanned;
+  return styles.statusActive;
+}
 
 export default function Projetos() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeArea, setActiveArea] = useState("Todos");
+  const [activeStatus, setActiveStatus] = useState("Todos");
+  const [activeYear, setActiveYear] = useState("Todos");
   const [expandedProject, setExpandedProject] = useState(null);
 
-  const projects = [
-    {
-      id: 1,
-      title: "Análise da Qualidade da Água em Comunidades Rurais",
-      category: "Científicos",
-      image: "/images/projetos/agua-comunidades.jpg",
-      excerpt: "Estudo sobre parâmetros físico-químicos e microbiológicos da água consumida em povoados da região de Codó.",
-      description: "Projeto de pesquisa aplicada que visa mapear e analisar a qualidade da água em comunidades rurais do Maranhão, identificando fontes de contaminação e propondo soluções de tratamento acessíveis.",
-      status: "Em andamento",
-      startDate: "2023-08-01",
-      endDate: "2025-07-31",
-      team: "8 pesquisadores",
-      publications: 3,
-      budget: "R$ 120.000,00",
-      partner: "FAPEMA",
-      tags: ["Recursos Hídricos", "Saúde Pública", "Água", "Comunidades Rurais"]
-    },
-    {
-      id: 2,
-      title: "Avaliação Nutricional de Alimentos Regionais",
-      category: "Científicos",
-      image: "/images/projetos/alimentos-regionais.jpg",
-      excerpt: "Pesquisa com foco na composição nutricional e aplicações tecnológicas de alimentos maranhenses.",
-      description: "Estudo abrangente da composição nutricional de frutas, tubérculos e outros produtos agrícolas da região, visando valorizar a biodiversidade local e desenvolver produtos inovadores.",
-      status: "Concluído",
-      startDate: "2022-03-15",
-      endDate: "2023-09-14",
-      team: "6 pesquisadores",
-      publications: 5,
-      budget: "R$ 85.000,00",
-      partner: "IFMA",
-      tags: ["Alimentos", "Nutrição", "Biodiversidade", "Desenvolvimento Regional"]
-    },
-    {
-      id: 3,
-      title: "Relatório Técnico – Feira de Ciências do IFMA",
-      category: "Acadêmicos",
-      image: "/images/projetos/feira-ciencias.jpg",
-      excerpt: "Projeto apresentado na Feira de Ciências com foco em sustentabilidade e inovação.",
-      description: "Projeto acadêmico desenvolvido por alunos do IFMA para a Feira de Ciências, abordando temas de sustentabilidade ambiental e inovação tecnológica.",
-      status: "Concluído",
-      startDate: "2023-05-10",
-      endDate: "2023-08-10",
-      team: "4 estudantes",
-      publications: 1,
-      budget: "R$ 5.000,00",
-      partner: "IFMA Campus Codó",
-      tags: ["Extensão", "Ensino", "Feira de Ciências", "Sustentabilidade"]
-    },
-    {
-      id: 4,
-      title: "Monitoramento de Recursos Hídricos",
-      category: "Científicos",
-      image: "/images/projetos/monitoramento-hidrico.jpg",
-      excerpt: "Projeto contínuo de análise de rios locais e impactos ambientais.",
-      description: "Projeto de monitoramento ambiental contínuo de recursos hídricos na região, utilizando tecnologias de sensoriamento e análise laboratorial avançada.",
-      status: "Em andamento",
-      startDate: "2023-01-10",
-      endDate: "2025-12-31",
-      team: "10 pesquisadores",
-      publications: 2,
-      budget: "R$ 200.000,00",
-      partner: "CNPq",
-      tags: ["Monitoramento", "Recursos Hídricos", "Ambiente", "Sensoriamento"]
-    },
-    {
-      id: 5,
-      title: "Práticas de Laboratório – Química Geral",
-      category: "Acadêmicos",
-      image: "/images/projetos/quimica-laboratorio.jpg",
-      excerpt: "Registro dos experimentos realizados na disciplina de Química do IFMA.",
-      description: "Projeto acadêmico de registro e documentação de práticas laboratoriais realizadas na disciplina de Química Geral, com foco em metodologia científica.",
-      status: "Concluído",
-      startDate: "2023-02-01",
-      endDate: "2023-07-31",
-      team: "2 professores + 30 estudantes",
-      publications: 0,
-      budget: "R$ 8.000,00",
-      partner: "IFMA",
-      tags: ["Ensino", "Química", "Laboratório", "Metodologia"]
-    },
-    {
-      id: 6,
-      title: "Sistemas Agroflorestais para Agricultura Familiar",
-      category: "Científicos",
-      image: "/images/projetos/agroflorestas.jpg",
-      excerpt: "Desenvolvimento de sistemas integrados de produção para pequenos produtores.",
-      description: "Projeto de pesquisa e extensão que desenvolve e implementa sistemas agroflorestais adaptados às condições do Maranhão, visando sustentabilidade e aumento da renda familiar.",
-      status: "Em andamento",
-      startDate: "2022-06-01",
-      endDate: "2024-05-31",
-      team: "12 pesquisadores",
-      publications: 4,
-      budget: "R$ 150.000,00",
-      partner: "MDA",
-      tags: ["Agroflorestas", "Agricultura Familiar", "Sustentabilidade", "Extensão"]
+  useEffect(() => {
+    let mounted = true;
+
+    async function carregarProjetos() {
+      try {
+        setLoading(true);
+        const data = await projetosService.buscarPublicos();
+
+        if (mounted) {
+          setProjects(data?.projetos || []);
+          setError("");
+        }
+      } catch (requestError) {
+        console.error("Erro ao carregar projetos:", requestError);
+        if (mounted) {
+          setError("Nao foi possivel carregar os projetos agora.");
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
     }
-  ];
 
-  const categories = ["Todos", "Científicos", "Acadêmicos"];
+    carregarProjetos();
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesCategory = activeCategory === "Todos" || project.category === activeCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  const stats = {
-    total: projects.length,
-    emAndamento: projects.filter(p => p.status === "Em andamento").length,
-    concluidos: projects.filter(p => p.status === "Concluído").length,
-    publicacoes: projects.reduce((acc, p) => acc + p.publications, 0),
-    investimento: projects.reduce((acc, p) => acc + parseFloat(p.budget.replace('R$ ', '').replace('.', '').replace(',', '.')), 0)
-  };
+  const areas = useMemo(
+    () => ["Todos", ...uniqueValues(projects.map((project) => project.area || project.linha_nome))],
+    [projects]
+  );
+
+  const statuses = useMemo(
+    () => ["Todos", ...uniqueValues(projects.map((project) => project.status))],
+    [projects]
+  );
+
+  const years = useMemo(
+    () =>
+      [
+        "Todos",
+        ...uniqueValues(projects.map((project) => project.ano).filter(Boolean)).sort(
+          (a, b) => Number(b) - Number(a)
+        ),
+      ],
+    [projects]
+  );
+
+  const filteredProjects = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
+
+    return projects.filter((project) => {
+      const searchable = [
+        project.titulo,
+        project.descricao,
+        project.area,
+        project.linha_nome,
+        project.linha_grupo,
+        project.coordenador_nome,
+        ...(project.estudantes || []).map((estudante) => estudante.nome),
+        ...(project.parceiros || []).map((parceiro) => parceiro.nome),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch = !search || searchable.includes(search);
+      const matchesArea =
+        activeArea === "Todos" || project.area === activeArea || project.linha_nome === activeArea;
+      const matchesStatus = activeStatus === "Todos" || project.status === activeStatus;
+      const matchesYear = activeYear === "Todos" || String(project.ano) === String(activeYear);
+
+      return matchesSearch && matchesArea && matchesStatus && matchesYear;
+    });
+  }, [activeArea, activeStatus, activeYear, projects, searchTerm]);
+
+  const stats = useMemo(
+    () => ({
+      total: projects.length,
+      emAndamento: projects.filter((project) => project.status === "Em andamento").length,
+      finalizados: projects.filter((project) => project.status === "Finalizado").length,
+      participantes: projects.reduce((acc, project) => acc + getParticipantCount(project), 0),
+    }),
+    [projects]
+  );
 
   return (
     <div className={styles.projetosContainer}>
-      {/* Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
             <div className={styles.heroBadge}>
-              <span>Inovação e Pesquisa</span>
+              <span>Inovacao e Pesquisa</span>
             </div>
             <h1 className={styles.heroTitle}>
-              Projetos <span className={styles.highlight}>Científicos</span>
+              Projetos <span className={styles.highlight}>Cientificos</span>
             </h1>
             <p className={styles.heroDescription}>
-              Pesquisa, desenvolvimento e inovação no IFMA – Campus Codó. Conheça nossos projetos 
-              em andamento e concluídos.
+              Projetos cadastrados no sistema do GIEPI, com dados vindos diretamente do
+              backend administrativo.
             </p>
-            
+
             <div className={styles.heroStats}>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
                   <FaBookOpen />
                 </div>
                 <div className={styles.statContent}>
-                  <div className={styles.statNumber}>{stats.total}</div>
+                  <div className={styles.statNumber}>{loading ? "..." : stats.total}</div>
                   <div className={styles.statLabel}>Projetos</div>
                 </div>
               </div>
@@ -158,8 +184,8 @@ export default function Projetos() {
                   <FaCalendarAlt />
                 </div>
                 <div className={styles.statContent}>
-                  <div className={styles.statNumber}>{stats.emAndamento}</div>
-                  <div className={styles.statLabel}>Em Andamento</div>
+                  <div className={styles.statNumber}>{loading ? "..." : stats.emAndamento}</div>
+                  <div className={styles.statLabel}>Em andamento</div>
                 </div>
               </div>
               <div className={styles.statCard}>
@@ -167,8 +193,8 @@ export default function Projetos() {
                   <FaGraduationCap />
                 </div>
                 <div className={styles.statContent}>
-                  <div className={styles.statNumber}>{stats.publicacoes}</div>
-                  <div className={styles.statLabel}>Publicações</div>
+                  <div className={styles.statNumber}>{loading ? "..." : stats.participantes}</div>
+                  <div className={styles.statLabel}>Participantes</div>
                 </div>
               </div>
             </div>
@@ -176,7 +202,6 @@ export default function Projetos() {
         </div>
       </section>
 
-      {/* Filters */}
       <section className={styles.filtersSection}>
         <div className={styles.container}>
           <div className={styles.filtersContent}>
@@ -184,146 +209,255 @@ export default function Projetos() {
               <FaSearch className={styles.searchIcon} />
               <input
                 type="text"
-                placeholder="Buscar projetos..."
+                placeholder="Buscar projetos, pesquisadores, estudantes ou parceiros..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 className={styles.searchInput}
               />
             </div>
-            
-            <div className={styles.filterButtons}>
-              {categories.map(category => (
-                <button
-                  key={category}
-                  className={`${styles.filterButton} ${activeCategory === category ? styles.active : ''}`}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
+
+            <div className={styles.filterSelects}>
+              <select
+                value={activeArea}
+                onChange={(event) => setActiveArea(event.target.value)}
+                className={styles.filterSelect}
+              >
+                {areas.map((area) => (
+                  <option key={area} value={area}>
+                    {area === "Todos" ? "Todas as areas" : area}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={activeStatus}
+                onChange={(event) => setActiveStatus(event.target.value)}
+                className={styles.filterSelect}
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status === "Todos" ? "Todos os status" : status}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={activeYear}
+                onChange={(event) => setActiveYear(event.target.value)}
+                className={styles.filterSelect}
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year === "Todos" ? "Todos os anos" : year}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Projects Grid */}
       <section className={styles.projectsSection}>
         <div className={styles.container}>
-          <div className={styles.projectsGrid}>
-            {filteredProjects.map(project => (
-              <div 
-                key={project.id} 
-                className={`${styles.projectCard} ${expandedProject === project.id ? styles.expanded : ''}`}
-                onClick={() => setExpandedProject(expandedProject === project.id ? null : project.id)}
-              >
-                <div className={styles.projectImage}>
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `/images/placeholder-project.jpg`;
-                    }}
-                  />
-                  <div className={`${styles.statusBadge} ${project.status === 'Em andamento' ? styles.statusActive : styles.statusCompleted}`}>
-                    {project.status}
-                  </div>
-                  <div className={styles.categoryBadge}>
-                    {project.category}
-                  </div>
-                </div>
-                
-                <div className={styles.projectContent}>
-                  <h3 className={styles.projectTitle}>{project.title}</h3>
-                  <p className={styles.projectExcerpt}>{project.excerpt}</p>
-                  
-                  <div className={styles.projectMeta}>
-                    <div className={styles.metaItem}>
-                      <FaCalendarAlt />
-                      <span>{new Date(project.startDate).getFullYear()}</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                      <FaUserFriends />
-                      <span>{project.team}</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                      <FaGraduationCap />
-                      <span>{project.publications} publicações</span>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.tagsContainer}>
-                    {project.tags.slice(0, 3).map((tag, index) => (
-                      <span key={index} className={styles.tag}>{tag}</span>
-                    ))}
-                  </div>
-                  
-                  {expandedProject === project.id && (
-                    <div className={styles.expandedDetails}>
-                      <div className={styles.detailsSection}>
-                        <h4>Descrição Detalhada</h4>
-                        <p>{project.description}</p>
-                      </div>
-                      
-                      <div className={styles.detailsGrid}>
-                        <div className={styles.detailItem}>
-                          <strong>Parceiro:</strong>
-                          <span>{project.partner}</span>
-                        </div>
-                        <div className={styles.detailItem}>
-                          <strong>Orçamento:</strong>
-                          <span>{project.budget}</span>
-                        </div>
-                        <div className={styles.detailItem}>
-                          <strong>Período:</strong>
-                          <span>{new Date(project.startDate).toLocaleDateString('pt-BR')} - {new Date(project.endDate).toLocaleDateString('pt-BR')}</span>
-                        </div>
-                      </div>
-                      
-                      <div className={styles.fullTagsContainer}>
-                        {project.tags.map((tag, index) => (
-                          <span key={index} className={styles.tag}>{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className={styles.projectActions}>
-                    <button className={styles.detailsButton}>
-                      {expandedProject === project.id ? 'Mostrar menos' : 'Ver detalhes'}
-                      <FaArrowRight className={styles.arrowIcon} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {filteredProjects.length === 0 && (
+          {loading && (
             <div className={styles.noResults}>
               <FaSearch className={styles.noResultsIcon} />
-              <h3>Nenhum projeto encontrado</h3>
-              <p>Tente alterar os termos da busca ou selecione outra categoria</p>
+              <h3>Carregando projetos</h3>
+              <p>Buscando os dados cadastrados no painel administrativo.</p>
             </div>
+          )}
+
+          {!loading && error && (
+            <div className={styles.noResults}>
+              <FaSearch className={styles.noResultsIcon} />
+              <h3>Erro ao carregar</h3>
+              <p>{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
+              <div className={styles.projectsGrid}>
+                {filteredProjects.map((project, index) => {
+                  const tags = getProjectTags(project);
+                  const image = getProjectImage(project, index);
+
+                  return (
+                    <article
+                      key={project.id}
+                      className={`${styles.projectCard} ${
+                        expandedProject === project.id ? styles.expanded : ""
+                      }`}
+                      onClick={() =>
+                        setExpandedProject(expandedProject === project.id ? null : project.id)
+                      }
+                    >
+                      <div className={styles.projectImage}>
+                        <img
+                          src={image}
+                          alt={project.titulo}
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = DEFAULT_LINHA_IMAGE;
+                          }}
+                        />
+                        <div className={`${styles.statusBadge} ${getStatusClass(project.status)}`}>
+                          {project.status}
+                        </div>
+                        <div className={styles.categoryBadge}>
+                          {project.area || project.linha_nome || "Projeto"}
+                        </div>
+                      </div>
+
+                      <div className={styles.projectContent}>
+                        <h3 className={styles.projectTitle}>{project.titulo}</h3>
+                        <p className={styles.projectExcerpt}>
+                          {project.descricao || "Sem descricao cadastrada."}
+                        </p>
+
+                        <div className={styles.projectMeta}>
+                          <div className={styles.metaItem}>
+                            <FaCalendarAlt />
+                            <span>{project.ano || "Ano nao informado"}</span>
+                          </div>
+                          <div className={styles.metaItem}>
+                            <FaUserFriends />
+                            <span>{getParticipantLabel(project)}</span>
+                          </div>
+                          {project.parceiros?.length > 0 && (
+                            <div className={styles.metaItem}>
+                              <FaBookOpen />
+                              <span>{project.parceiros.length} parceiro(s)</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {tags.length > 0 && (
+                          <div className={styles.tagsContainer}>
+                            {tags.slice(0, 3).map((tag) => (
+                              <span key={tag} className={styles.tag}>
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {expandedProject === project.id && (
+                          <div className={styles.expandedDetails}>
+                            <div className={styles.detailsSection}>
+                              <h4>Descricao detalhada</h4>
+                              <p>{project.descricao || "Sem descricao detalhada cadastrada."}</p>
+                            </div>
+
+                            {project.resultados && (
+                              <div className={styles.detailsSection}>
+                                <h4>Resultados</h4>
+                                <p>{project.resultados}</p>
+                              </div>
+                            )}
+
+                            <div className={styles.detailsGrid}>
+                              <div className={styles.detailItem}>
+                                <strong>Coordenador</strong>
+                                <span>{project.coordenador_nome || "Nao informado"}</span>
+                              </div>
+                              <div className={styles.detailItem}>
+                                <strong>Linha/Area</strong>
+                                <span>
+                                  {project.linha_nome || project.area || "Nao informada"}
+                                </span>
+                              </div>
+                              <div className={styles.detailItem}>
+                                <strong>Estudantes</strong>
+                                <span>
+                                  {project.estudantes?.length
+                                    ? project.estudantes.map((estudante) => estudante.nome).join(", ")
+                                    : "Nao informado"}
+                                </span>
+                              </div>
+                              <div className={styles.detailItem}>
+                                <strong>Parceiros</strong>
+                                <span>
+                                  {project.parceiros?.length
+                                    ? project.parceiros.map((parceiro) => parceiro.nome).join(", ")
+                                    : "Nao informado"}
+                                </span>
+                              </div>
+                              {project.mostrar_orcamento_publico && project.orcamento && (
+                                <div className={styles.detailItem}>
+                                  <strong>Orcamento</strong>
+                                  <span>{project.orcamento}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {tags.length > 0 && (
+                              <div className={styles.fullTagsContainer}>
+                                {tags.map((tag) => (
+                                  <span key={tag} className={styles.tag}>
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {project.link_externo && (
+                              <a
+                                href={project.link_externo}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={styles.externalLink}
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                <FaExternalLinkAlt />
+                                Abrir link externo
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        <div className={styles.projectActions}>
+                          <button className={styles.detailsButton} type="button">
+                            {expandedProject === project.id ? "Mostrar menos" : "Ver detalhes"}
+                            <FaArrowRight className={styles.arrowIcon} />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              {filteredProjects.length === 0 && (
+                <div className={styles.noResults}>
+                  <FaSearch className={styles.noResultsIcon} />
+                  <h3>Nenhum projeto encontrado</h3>
+                  <p>
+                    {projects.length === 0
+                      ? "Nenhum projeto publicado foi cadastrado no painel administrativo."
+                      : "Tente alterar os filtros ou buscar por outro termo."}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaContent}>
             <h2>Quer desenvolver um projeto conosco?</h2>
             <p>
-              Estamos abertos a parcerias e colaborações. Se você tem uma ideia de projeto 
-              ou deseja colaborar com nossas pesquisas, entre em contato.
+              Estamos abertos a parcerias e colaboracoes. Se voce tem uma ideia de
+              projeto ou deseja colaborar com nossas pesquisas, entre em contato.
             </p>
             <div className={styles.ctaButtons}>
-              <a href="/parcerias" className={styles.ctaButtonPrimary}>
-                Propor Parceria
+              <a href="/equipe" className={styles.ctaButtonPrimary}>
+                Conhecer a equipe
               </a>
-              <a href="/contato" className={styles.ctaButtonSecondary}>
-                Fale Conosco
+              <a href="/publicacoes" className={styles.ctaButtonSecondary}>
+                Ver publicacoes
               </a>
             </div>
           </div>

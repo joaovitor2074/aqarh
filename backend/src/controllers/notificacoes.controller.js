@@ -2,9 +2,17 @@
 import { db } from '../config/db.js';
 import { normalizarNome } from '../services/normalizacao.service.js';
 import { obterLinhasDePessoa } from '../services/arquivoBruto.service.js';
-import { aprovarPessoa } from '../services/aprovacao.service.js';
 import { criarOuBuscarLinha } from '../services/resolvers.service.js';
 import { logger } from '../services/log.service.js';
+import {
+  ensurePesquisaRelacionamentosSchema,
+  ensurePesquisadoresSchema,
+} from '../services/pesquisadoresSchema.service.js';
+
+function serializeJsonValue(value) {
+  if (!value) return null;
+  return typeof value === 'string' ? value : JSON.stringify(value);
+}
 
 export async function listarNotificacoes(req, res) {
   try {
@@ -86,6 +94,9 @@ export async function listarNotificacoes(req, res) {
 }
 
 export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
+  await ensurePesquisadoresSchema();
+  await ensurePesquisaRelacionamentosSchema();
+
   const conn = await db.getConnection();
   
   try {
@@ -98,7 +109,18 @@ export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
     }
     
     const dadosParseados = typeof dados === 'string' ? JSON.parse(dados) : dados;
-    const { nome, titulacao_max, data_inclusao, email, espelho_url } = dadosParseados;
+    const {
+      nome,
+      titulacao_max,
+      data_inclusao,
+      email,
+      espelho_url,
+      lattes_url,
+      id_lattes,
+      ultima_atualizacao_lattes,
+      dados_lattes,
+    } = dadosParseados;
+    const dadosLattesJson = serializeJsonValue(dados_lattes);
     
     if (!nome) {
       throw new Error('Nome da pessoa é obrigatório');
@@ -128,11 +150,26 @@ export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
              data_inclusao = ?,
              email = ?,
              espelho_url = ?,
+             lattes_url = ?,
+             id_lattes = ?,
+             ultima_atualizacao_lattes = ?,
+             dados_lattes = ?,
              tipo_vinculo = ?,
              ativo = 1,
              updated_at = NOW()
          WHERE id = ?`,
-        [titulacao_max, data_inclusao, email, espelho_url, tipoVinculo, pessoaId]
+        [
+          titulacao_max,
+          data_inclusao,
+          email,
+          espelho_url,
+          lattes_url,
+          id_lattes,
+          ultima_atualizacao_lattes,
+          dadosLattesJson,
+          tipoVinculo,
+          pessoaId,
+        ]
       );
       
       logger.success('Dados da pessoa atualizados', { pessoaId });
@@ -140,9 +177,32 @@ export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
       // Cria nova pessoa
       const [result] = await conn.query(
         `INSERT INTO pesquisadores 
-         (nome, titulacao_maxima, data_inclusao, email, espelho_url, tipo_vinculo, ativo) 
-         VALUES (?, ?, ?, ?, ?, ?, 1)`,
-        [nomeNormalizado, titulacao_max, data_inclusao, email, espelho_url, tipoVinculo]
+         (
+           nome,
+           titulacao_maxima,
+           data_inclusao,
+           email,
+           espelho_url,
+           lattes_url,
+           id_lattes,
+           ultima_atualizacao_lattes,
+           dados_lattes,
+           tipo_vinculo,
+           ativo
+         ) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        [
+          nomeNormalizado,
+          titulacao_max,
+          data_inclusao,
+          email,
+          espelho_url,
+          lattes_url,
+          id_lattes,
+          ultima_atualizacao_lattes,
+          dadosLattesJson,
+          tipoVinculo,
+        ]
       );
       
       pessoaId = result.insertId;
@@ -222,6 +282,8 @@ export async function AprovarNotificacao(dados, tipoVinculo = 'pesquisador') {
 // Mantenha as outras funções (listarNotificacoes, AprovarNotificacaoLinha) conforme você já tem
 // ... restante do código ...
 export async function AprovarNotificacaoLinha(idNotificacao) {
+  await ensurePesquisaRelacionamentosSchema();
+
   const conn = await db.getConnection();
   
   try {

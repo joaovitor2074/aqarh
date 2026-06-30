@@ -4,7 +4,7 @@
  * =====================================================
  */
 import React, { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 /**
  * =====================================================
@@ -20,6 +20,7 @@ import Footer from "./components/Footer";
  * =====================================================
  */
 import Home from "./pages/Home";
+import Sobre from "./pages/Sobre";
 import Projetos from "./pages/Projetos";
 import Pesquisas from "./pages/Pesquisas";
 import Publicacoes from "./pages/Publicacoes";
@@ -60,6 +61,9 @@ import Config from "./pages/admin/Config";
  * =====================================================
  */
 import { Toaster } from "react-hot-toast";
+
+import EmailMassa from "./pages/admin/EmailMassa";
+
 
 /**
  * =====================================================
@@ -120,6 +124,11 @@ function AppContent() {
 
             {/* ================= ROTAS ADMIN (PROTEGIDAS) ================= */}
             <Route
+              path="/admin"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+
+            <Route
               path="/admin/dashboard"
               element={
                 <ProtectedRoute>
@@ -133,6 +142,14 @@ function AppContent() {
               element={
                 <ProtectedRoute>
                   <Membros />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/email-massa"
+              element={
+                <ProtectedRoute>
+                  <EmailMassa />
                 </ProtectedRoute>
               }
             />
@@ -183,7 +200,13 @@ function AppContent() {
             />
 
             {/* ================= ROTAS PÚBLICAS ================= */}
+            <Route
+              path="/admin/*"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+
             <Route path="/" element={<Home />} />
+            <Route path="/sobre" element={<Sobre />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/pesquisas" element={<Pesquisas />} />
             <Route path="/publicacoes" element={<Publicacoes />} />
