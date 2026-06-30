@@ -66,6 +66,129 @@ function clearCache() {
   cache.lastUpdated = null;
 }
 
+function nomeKey(nome) {
+  return String(nome || "").trim().toUpperCase();
+}
+
+function parseJsonValue(value) {
+  if (!value) return null;
+  if (typeof value === "object") return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function hasUsefulValue(value) {
+  if (value === null || value === undefined || value === "") return false;
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === "object") return Object.values(value).some(hasUsefulValue);
+  return true;
+}
+
+function mergeUseful(currentValue, nextValue) {
+  if (!hasUsefulValue(nextValue)) return currentValue;
+
+  if (
+    currentValue &&
+    nextValue &&
+    !Array.isArray(currentValue) &&
+    !Array.isArray(nextValue) &&
+    typeof currentValue === "object" &&
+    typeof nextValue === "object"
+  ) {
+    const merged = { ...currentValue };
+
+    for (const [key, value] of Object.entries(nextValue)) {
+      merged[key] = mergeUseful(currentValue[key], value);
+    }
+
+    return merged;
+  }
+
+  return nextValue;
+}
+
+function normalizeDateForMysql(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+
+  const text = String(value).trim();
+  const brDate = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (brDate) {
+    return `${brDate[3]}-${brDate[2]}-${brDate[1]}`;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  return null;
+}
+
+async function atualizarMembrosExistentes(normalizados, tipoVinculo) {
+  if (!normalizados.length) return 0;
+
+  const [existentes] = await db.query(
+    `
+    SELECT
+      id,
+      nome,
+      titulacao_maxima,
+      data_inclusao,
+      email,
+      espelho_url,
+      lattes_url,
+      id_lattes,
+      ultima_atualizacao_lattes,
+      dados_lattes
+    FROM pesquisadores
+    WHERE tipo_vinculo = ?
+    `,
+    [tipoVinculo]
+  );
+  const existentesPorNome = new Map(existentes.map((row) => [nomeKey(row.nome), row]));
+  let atualizados = 0;
+
+  for (const item of normalizados) {
+    const atual = existentesPorNome.get(nomeKey(item.nome));
+    if (!atual) continue;
+
+    const dadosAtuais = parseJsonValue(atual.dados_lattes) || {};
+    const dadosNovos = item.dados_lattes || null;
+    const dadosLattes = mergeUseful(dadosAtuais, dadosNovos);
+
+    await db.query(
+      `
+      UPDATE pesquisadores
+      SET titulacao_maxima = ?,
+          data_inclusao = ?,
+          email = ?,
+          espelho_url = ?,
+          lattes_url = ?,
+          id_lattes = ?,
+          ultima_atualizacao_lattes = ?,
+          dados_lattes = ?
+      WHERE id = ?
+      `,
+      [
+        item.titulacao_max || atual.titulacao_maxima || null,
+        normalizeDateForMysql(item.data_inclusao) || atual.data_inclusao || null,
+        item.email || atual.email || null,
+        item.espelho_url || atual.espelho_url || null,
+        item.lattes_url || atual.lattes_url || null,
+        item.id_lattes || atual.id_lattes || null,
+        item.ultima_atualizacao_lattes || atual.ultima_atualizacao_lattes || null,
+        hasUsefulValue(dadosLattes) ? JSON.stringify(dadosLattes) : atual.dados_lattes,
+        atual.id,
+      ]
+    );
+
+    atualizados += 1;
+  }
+
+  return atualizados;
+}
+
 /* =====================================================
    PESQUISADORES (OTIMIZADO)
 ===================================================== */
@@ -89,6 +212,7 @@ export async function processarScrapePesquisador(browser = null) {
     const dbPesquisadores = await getCachedPesquisadores('pesquisador');
 
     const novos = detectarNovosPesquisadores(normalizados, dbPesquisadores);
+    const existentesAtualizados = await atualizarMembrosExistentes(normalizados, 'pesquisador');
 
 
     console.log("DB CACHE:", dbPesquisadores.length);
@@ -112,7 +236,7 @@ export async function processarScrapePesquisador(browser = null) {
     scrapeEmitter.emit("status", {
       etapa: "pesquisadores",
       status: "sucesso",
-      mensagem: `Pesquisadores processados: ${notificacoesCriadas} novas notificacoes`
+      mensagem: `Pesquisadores processados: ${notificacoesCriadas} novas notificacoes, ${existentesAtualizados} atualizados`
     });
 
     return {
@@ -120,6 +244,7 @@ export async function processarScrapePesquisador(browser = null) {
       total_banco: dbPesquisadores.length,
       novos_encontrados: novos.length,
       novos_inseridos: notificacoesCriadas,
+      existentes_atualizados: existentesAtualizados,
       duplicados_ignorados: novos.length - notificacoesCriadas
     };
 
@@ -156,6 +281,7 @@ export async function processarEstudantes(browser = null) {
     const normalizados = normalizarPesquisadores(brutos);
     const dbEstudantes = await getCachedPesquisadores('estudante');
     const novos = detectarNovosPesquisadores(normalizados, dbEstudantes);
+    const existentesAtualizados = await atualizarMembrosExistentes(normalizados, 'estudante');
 
 
     scrapeEmitter.emit("status", {
@@ -174,7 +300,7 @@ export async function processarEstudantes(browser = null) {
     scrapeEmitter.emit("status", {
       etapa: "estudantes",
       status: "sucesso",
-      mensagem: `Estudantes processados: ${notificacoesCriadas} novos pendentes`
+      mensagem: `Estudantes processados: ${notificacoesCriadas} novos pendentes, ${existentesAtualizados} atualizados`
     });
 
     return {
@@ -182,6 +308,7 @@ export async function processarEstudantes(browser = null) {
       total_banco: dbEstudantes.length, // não mudou
       novos_encontrados: novos.length,
       novos_pendentes: notificacoesCriadas,
+      existentes_atualizados: existentesAtualizados,
       duplicados_ignorados: normalizados.length - novos.length
     };
 

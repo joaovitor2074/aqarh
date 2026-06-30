@@ -16,6 +16,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
+import process from "node:process";
 import { fileURLToPath } from "url";
 
 /**
@@ -42,12 +43,15 @@ import adminjvRoutes from "./routes/adminjv.routes.js";
 // Rotas de e-mail compiladas pelo TypeScript (dist)
 
 import mailRoutes from "./routes/mail.routes.js";
+import { obterDiagnosticoEmail } from "./modules/mail/mail.service.js";
 /**
  * =====================================================
  * INICIALIZAÇÃO DO EXPRESS
  * =====================================================
  */
 const app = express();
+app.set("trust proxy", 1);
+
 const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, "");
 const allowedOrigins = (
   process.env.CORS_ORIGIN || "http://localhost:5173,https://aqarh.vercel.app"
@@ -167,6 +171,7 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log("📁 Pasta public:", publicPath);
+  console.log("[MAIL] Configuração carregada:", obterDiagnosticoEmail());
   console.log(
     `🌐 Debug: http://localhost:${PORT}/debug-public`
   );

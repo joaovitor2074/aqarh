@@ -3,14 +3,20 @@ import {
   FaChalkboardTeacher,
   FaChevronDown,
   FaChevronUp,
+  FaBookOpen,
+  FaBriefcase,
   FaEnvelope,
   FaExclamationTriangle,
+  FaExternalLinkAlt,
   FaFilter,
   FaFlask,
   FaGraduationCap,
   FaIdCard,
+  FaProjectDiagram,
   FaSearch,
+  FaTimes,
   FaUniversity,
+  FaUserFriends,
   FaUserGraduate,
   FaUserTie,
   FaUsers,
@@ -73,6 +79,309 @@ function formatMemberBio(member) {
   }.`;
 }
 
+const MAX_DETAIL_ITEMS = 8;
+
+function hasItems(items) {
+  return Array.isArray(items) && items.length > 0;
+}
+
+function hasDetailContent(details = {}) {
+  return [
+    details.nomeCitacoes,
+    details.formacaoAcademica,
+    details.formacaoComplementar,
+    details.atuacaoProfissional,
+    details.areasAtuacao,
+    details.linhasPesquisaLattes,
+    details.projetosPesquisa,
+    details.producoesBibliograficas,
+    details.producoesTecnicas,
+    details.orientacoes,
+    details.bancas,
+    details.eventos,
+    details.educacaoPopularizacao,
+    details.gruposDgp,
+    details.estudantesOrientados,
+    details.gruposEgresso,
+  ].some(hasItems);
+}
+
+function countDetailItems(details = {}) {
+  return [
+    details.nomeCitacoes,
+    details.formacaoAcademica,
+    details.formacaoComplementar,
+    details.atuacaoProfissional,
+    details.areasAtuacao,
+    details.linhasPesquisaLattes,
+    details.projetosPesquisa,
+    details.producoesBibliograficas,
+    details.producoesTecnicas,
+    details.orientacoes,
+    details.bancas,
+    details.eventos,
+    details.educacaoPopularizacao,
+    details.gruposDgp,
+    details.estudantesOrientados,
+    details.gruposEgresso,
+  ].reduce((total, items) => total + (Array.isArray(items) ? items.length : 0), 0);
+}
+
+function pluralize(count, singular, plural) {
+  return count === 1 ? singular : plural;
+}
+
+function DetailList({ title, items, icon }) {
+  if (!hasItems(items)) return null;
+
+  const visibleItems = items.slice(0, MAX_DETAIL_ITEMS);
+  const hiddenCount = items.length - visibleItems.length;
+
+  return (
+    <section className={styles.modalSection}>
+      <h4>
+        {icon}
+        {title}
+      </h4>
+      <ul className={styles.modalList}>
+        {visibleItems.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+        {hiddenCount > 0 && <li>+ {hiddenCount} registro(s)</li>}
+      </ul>
+    </section>
+  );
+}
+
+function DetailObjectList({ title, items, icon, renderMeta }) {
+  if (!hasItems(items)) return null;
+
+  const visibleItems = items.slice(0, MAX_DETAIL_ITEMS);
+  const hiddenCount = items.length - visibleItems.length;
+
+  return (
+    <section className={styles.modalSection}>
+      <h4>
+        {icon}
+        {title}
+      </h4>
+      <ul className={styles.modalList}>
+        {visibleItems.map((item) => (
+          <li key={`${item.nome}-${renderMeta(item)}`}>
+            <strong>{item.nome}</strong>
+            {renderMeta(item) && <span>{renderMeta(item)}</span>}
+          </li>
+        ))}
+        {hiddenCount > 0 && <li>+ {hiddenCount} registro(s)</li>}
+      </ul>
+    </section>
+  );
+}
+
+function MemberDetailModal({ member, onClose }) {
+  useEffect(() => {
+    if (!member) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [member, onClose]);
+
+  if (!member) return null;
+
+  const details = member.detalhesLattes || {};
+  const categoryConfig = getCategoryConfig(member.tipoVinculo);
+  const hasCurriculumDetails = hasDetailContent(details);
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <article
+        className={styles.memberModal}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          className={styles.modalClose}
+          type="button"
+          onClick={onClose}
+          aria-label="Fechar detalhes"
+        >
+          <FaTimes />
+        </button>
+
+        <header className={styles.modalHeader}>
+          <img
+            src={member.imagem}
+            alt={member.nome}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = "/img/equiperetrato.jpeg";
+            }}
+          />
+          <div>
+            <span className={styles.modalCategory}>{categoryConfig.singular}</span>
+            <h3>{member.nome}</h3>
+            <p>{member.cargo || member.titulacao}</p>
+            {member.instituicao && (
+              <span className={styles.modalInstitution}>
+                <FaUniversity /> {member.instituicao}
+              </span>
+            )}
+          </div>
+        </header>
+
+        <div className={styles.modalActions}>
+          {member.email && (
+            <a href={`mailto:${member.email}`} className={styles.modalLink}>
+              <FaEnvelope /> Email
+            </a>
+          )}
+          {member.lattesUrl && (
+            <a
+              href={member.lattesUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.modalLink}
+            >
+              <FaIdCard /> Lattes <FaExternalLinkAlt />
+            </a>
+          )}
+          {member.espelhoUrl && (
+            <a
+              href={member.espelhoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.modalLink}
+            >
+              <FaBookOpen /> Espelho DGP <FaExternalLinkAlt />
+            </a>
+          )}
+        </div>
+
+        <div className={styles.modalStats}>
+          <div>
+            <strong>{member.linhasPesquisa.length}</strong>
+            <span>Linhas</span>
+          </div>
+          <div>
+            <strong>{member.gruposPesquisa.length || details.gruposDgp?.length || 0}</strong>
+            <span>Grupos</span>
+          </div>
+          <div>
+            <strong>{details.estudantesOrientados?.length || 0}</strong>
+            <span>Orientados</span>
+          </div>
+        </div>
+
+        {member.resumo && (
+          <section className={styles.modalSection}>
+            <h4>
+              <FaBookOpen />
+              Resumo
+            </h4>
+            <p className={styles.modalText}>{member.resumo}</p>
+          </section>
+        )}
+
+        {details.status === "captcha" && (
+          <div className={styles.modalNotice}>
+            Dados diretos do Lattes protegidos por verificacao. Exibindo informacoes do espelho DGP.
+          </div>
+        )}
+
+        <div className={styles.modalSectionsGrid}>
+          <DetailList
+            title="Nome em citações"
+            items={details.nomeCitacoes}
+            icon={<FaIdCard />}
+          />
+          <DetailList
+            title="Formação acadêmica"
+            items={details.formacaoAcademica}
+            icon={<FaGraduationCap />}
+          />
+          <DetailList
+            title="Formação complementar"
+            items={details.formacaoComplementar}
+            icon={<FaGraduationCap />}
+          />
+          <DetailList
+            title="Atuação profissional"
+            items={details.atuacaoProfissional}
+            icon={<FaBriefcase />}
+          />
+          <DetailList
+            title="Áreas de atuação"
+            items={details.areasAtuacao}
+            icon={<FaFlask />}
+          />
+          <DetailList
+            title="Linhas no Lattes"
+            items={details.linhasPesquisaLattes}
+            icon={<FaProjectDiagram />}
+          />
+          <DetailList
+            title="Projetos"
+            items={details.projetosPesquisa}
+            icon={<FaProjectDiagram />}
+          />
+          <DetailList
+            title="Produção bibliográfica"
+            items={details.producoesBibliograficas}
+            icon={<FaBookOpen />}
+          />
+          <DetailList
+            title="Produção técnica"
+            items={details.producoesTecnicas}
+            icon={<FaFlask />}
+          />
+          <DetailList
+            title="Orientações"
+            items={details.orientacoes}
+            icon={<FaUserFriends />}
+          />
+          <DetailList title="Bancas" items={details.bancas} icon={<FaUsers />} />
+          <DetailList title="Eventos" items={details.eventos} icon={<FaUsers />} />
+          <DetailObjectList
+            title="Grupos no DGP"
+            items={details.gruposDgp}
+            icon={<FaUsers />}
+            renderMeta={(item) => [item.instituicao, item.perfil].filter(Boolean).join(" - ")}
+          />
+          <DetailObjectList
+            title="Estudantes orientados"
+            items={details.estudantesOrientados}
+            icon={<FaUserGraduate />}
+            renderMeta={(item) =>
+              [item.nivel_treinamento, item.grupo_pesquisa].filter(Boolean).join(" - ")
+            }
+          />
+          <DetailObjectList
+            title="Grupos de egresso"
+            items={details.gruposEgresso}
+            icon={<FaUsers />}
+            renderMeta={(item) => item.instituicao}
+          />
+        </div>
+
+        {!hasCurriculumDetails && !member.resumo && (
+          <div className={styles.modalNotice}>
+            Dados detalhados ainda nao foram coletados para este membro.
+          </div>
+        )}
+      </article>
+    </div>
+  );
+}
+
 export default function Equipe() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
@@ -82,6 +391,7 @@ export default function Equipe() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -217,6 +527,13 @@ export default function Equipe() {
       ["estudante", "aluno"].includes(member.tipoVinculo)
     ).length,
     colaboradores: teamMembers.filter((member) => member.tipoVinculo === "colaborador").length,
+    curriculos: teamMembers.filter((member) => hasDetailContent(member.detalhesLattes)).length,
+  };
+  const hasActiveFilters = Boolean(searchTerm.trim()) || selectedCategory !== "todos";
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("todos");
   };
 
   return (
@@ -247,6 +564,10 @@ export default function Equipe() {
                 <div className={styles.statNumber}>{stats.colaboradores}</div>
                 <div className={styles.statLabel}>Colaboradores</div>
               </div>
+              <div className={styles.statItem}>
+                <div className={styles.statNumber}>{stats.curriculos}</div>
+                <div className={styles.statLabel}>Currículos</div>
+              </div>
             </div>
           </div>
         </div>
@@ -261,27 +582,53 @@ export default function Equipe() {
             </p>
           </div>
 
-          <div className={styles.areasGrid}>
-            {researchAreas.map((area) => (
-              <div key={area.label} className={styles.areaCard}>
-                <div className={styles.areaIcon}>
-                  <FaFlask />
+          {researchAreas.length > 0 ? (
+            <div className={styles.areasGrid}>
+              {researchAreas.map((area) => (
+                <div key={area.label} className={styles.areaCard}>
+                  <div className={styles.areaIcon}>
+                    <FaFlask />
+                  </div>
+                  <h3 className={styles.areaTitle}>{area.label}</h3>
+                  <p className={styles.areaDescription}>
+                    {area.count === 1
+                      ? "1 membro vinculado"
+                      : `${area.count} membros vinculados`}
+                  </p>
                 </div>
-                <h3 className={styles.areaTitle}>{area.label}</h3>
-                <p className={styles.areaDescription}>
-                  {area.count === 1
-                    ? "1 membro vinculado"
-                    : `${area.count} membros vinculados`}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.areaFallback}>
+              <FaFlask />
+              <span>Nenhum grupo vinculado aos membros ativos.</span>
+            </div>
+          )}
         </div>
       </section>
 
       <section className={styles.filtersSection}>
         <div className={styles.container}>
           <div className={styles.searchContainer}>
+            <div className={styles.filtersHeaderLine}>
+              <div>
+                <span className={styles.filtersEyebrow}>Equipe cadastrada</span>
+                <strong>
+                  {filteredMembers.length}{" "}
+                  {pluralize(filteredMembers.length, "membro encontrado", "membros encontrados")}
+                </strong>
+              </div>
+              {hasActiveFilters && (
+                <button
+                  className={styles.clearFiltersButton}
+                  type="button"
+                  onClick={clearFilters}
+                >
+                  <FaTimes /> Limpar filtros
+                </button>
+              )}
+            </div>
+
             <div className={styles.searchBox}>
               <FaSearch className={styles.searchIcon} />
               <input
@@ -337,6 +684,8 @@ export default function Equipe() {
                 const categoryConfig = getCategoryConfig(member.tipoVinculo);
                 const anchor = createResearcherAnchor(member.nome);
                 const isHighlighted = highlightedAnchor === anchor;
+                const detailCount = countDetailItems(member.detalhesLattes);
+                const hasCurriculum = hasDetailContent(member.detalhesLattes);
 
                 return (
                   <div
@@ -347,6 +696,15 @@ export default function Equipe() {
                     } ${isHighlighted ? styles.highlightedMember : ""}`}
                     onMouseEnter={() => setActiveMember(member.id)}
                     onMouseLeave={() => setActiveMember(null)}
+                    onClick={() => setSelectedMember(member)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedMember(member);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className={styles.memberImage}>
                       <div className={styles.imageWrapper}>
@@ -379,6 +737,23 @@ export default function Equipe() {
                         <div className={styles.memberArea}>
                           <span className={styles.areaBadge}>{member.areaPrincipal}</span>
                         </div>
+                        <div className={styles.memberMetaRow}>
+                          {member.ultimaAtualizacaoLattes && (
+                            <span>
+                              <FaIdCard /> {member.ultimaAtualizacaoLattes}
+                            </span>
+                          )}
+                          {hasCurriculum && (
+                            <span>
+                              <FaBookOpen /> Perfil enriquecido
+                            </span>
+                          )}
+                          {member.detalhesLattes?.estudantesOrientados?.length > 0 && (
+                            <span>
+                              <FaUserFriends /> {member.detalhesLattes.estudantesOrientados.length}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div className={styles.memberStats}>
@@ -394,15 +769,20 @@ export default function Equipe() {
                           </span>
                           <span className={styles.statLabel}>Grupos</span>
                         </div>
+                        <div className={styles.stat}>
+                          <span className={styles.statNumber}>{detailCount}</span>
+                          <span className={styles.statLabel}>Dados</span>
+                        </div>
                       </div>
 
                       <div className={styles.memberBio}>
                         <p className={styles.bioText}>{formatMemberBio(member)}</p>
                         <button
                           className={styles.readMore}
-                          onClick={() =>
-                            setExpandedBio(expandedBio === member.id ? null : member.id)
-                          }
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setExpandedBio(expandedBio === member.id ? null : member.id);
+                          }}
                           type="button"
                         >
                           {expandedBio === member.id ? (
@@ -444,8 +824,22 @@ export default function Equipe() {
                       )}
 
                       <div className={styles.memberContact}>
+                        <button
+                          className={styles.contactLink}
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedMember(member);
+                          }}
+                        >
+                          <FaBookOpen /> Perfil completo
+                        </button>
                         {member.email && (
-                          <a href={`mailto:${member.email}`} className={styles.contactLink}>
+                          <a
+                            href={`mailto:${member.email}`}
+                            className={styles.contactLink}
+                            onClick={(event) => event.stopPropagation()}
+                          >
                             <FaEnvelope /> Email
                           </a>
                         )}
@@ -455,6 +849,7 @@ export default function Equipe() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.contactLink}
+                            onClick={(event) => event.stopPropagation()}
                           >
                             <FaIdCard /> Lattes
                           </a>
@@ -497,6 +892,11 @@ export default function Equipe() {
           </div>
         </div>
       </section>
+
+      <MemberDetailModal
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
     </div>
   );
 }

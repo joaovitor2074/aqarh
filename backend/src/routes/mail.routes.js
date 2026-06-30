@@ -7,12 +7,14 @@ import {
   enviarEmMassa,
   enviarIndividual,
   listarDestinatarios,
+  statusEmail,
 } from "../controllers/mail.controller.js";
 
 const router = Router();
 
 // Preview de destinatários (sem enviar)
 router.get("/destinatarios", authMiddleware, listarDestinatarios);
+router.get("/status", authMiddleware, statusEmail);
 
 // Envio em massa
 router.post("/enviar-em-massa", authMiddleware, enviarEmMassa);

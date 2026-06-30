@@ -32,7 +32,11 @@ function getImageUrl(imagePath, req) {
     return imagePath;
   }
 
-  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const forwardedProto = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const protocol = forwardedProto || req.protocol;
+  const host = forwardedHost || req.get("host");
+  const baseUrl = `${protocol}://${host}`;
   const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   return `${baseUrl}${cleanPath}`;
 }
@@ -390,6 +394,7 @@ export async function atualizarMembro(req, res) {
       tipo_vinculo = "pesquisador",
       ativo = true,
       linha_pesquisa_id,
+      remover_imagem,
     } = req.body;
 
     if (!nome) {
@@ -405,8 +410,11 @@ export async function atualizarMembro(req, res) {
       return res.status(404).json({ message: "Membro nao encontrado" });
     }
 
+    const deveRemoverImagem = parseBoolean(remover_imagem, false);
     const imagemFinal = req.file?.filename
       ? getImagePath(req.file.filename)
+      : deveRemoverImagem
+        ? null
       : membroAtual.imagem || null;
 
     await db.query(
@@ -463,7 +471,11 @@ export async function atualizarMembro(req, res) {
       }
     }
 
-    if (req.file?.filename && membroAtual.imagem && membroAtual.imagem !== imagemFinal) {
+    if (
+      (req.file?.filename || deveRemoverImagem) &&
+      membroAtual.imagem &&
+      membroAtual.imagem !== imagemFinal
+    ) {
       deleteLocalImage(membroAtual.imagem);
     }
 

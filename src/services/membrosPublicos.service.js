@@ -1,4 +1,4 @@
-import { api } from "../utils/api";
+import { API_URL, api } from "../utils/api";
 
 const MEMBER_IMAGES = [
   "/img/equiperetrato.jpeg",
@@ -15,6 +15,22 @@ function getMemberImage(index = 0) {
   return MEMBER_IMAGES[index % MEMBER_IMAGES.length];
 }
 
+function resolveMemberImage(membro, index = 0) {
+  const imagePath = membro.imagem || membro.imagem_url;
+
+  if (!imagePath) return getMemberImage(index);
+
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  if (imagePath.startsWith("/uploads/") || imagePath.startsWith("/img/defaults/")) {
+    return `${API_URL}${imagePath}`;
+  }
+
+  return imagePath;
+}
+
 function parseDadosLattes(value) {
   if (!value) return null;
   if (typeof value === "object") return value;
@@ -26,6 +42,102 @@ function parseDadosLattes(value) {
   }
 }
 
+function uniqueList(values = []) {
+  const seen = new Set();
+
+  return values
+    .flatMap((value) => {
+      if (!value) return [];
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") return value.split(/\s*;\s*|\n+/);
+      return [value];
+    })
+    .map((value) => {
+      if (typeof value === "string") return value.trim();
+      return value;
+    })
+    .filter((value) => {
+      const text = typeof value === "string" ? value : JSON.stringify(value);
+      const key = text.toLowerCase();
+      if (!text || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function normalizeObjectList(values = [], fields = []) {
+  return uniqueList(values)
+    .map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+
+      return fields.reduce((acc, field) => {
+        acc[field] = item[field] || "";
+        return acc;
+      }, {});
+    })
+    .filter((item) => item && Object.values(item).some(Boolean));
+}
+
+function normalizeLattesDetails(dadosLattes = {}) {
+  const dadosEspelho = dadosLattes?.dados_espelho || {};
+
+  return {
+    status: dadosLattes?.coleta_lattes_status || "",
+    statusMensagem: dadosLattes?.coleta_lattes_mensagem || "",
+    coletadoEm: dadosLattes?.pagina_lattes_coletada_em || "",
+    nomeCitacoes: uniqueList([
+      dadosLattes?.nome_citacoes,
+      dadosEspelho?.nome_citacoes,
+      dadosEspelho?.nomes_citacao,
+    ]),
+    formacaoAcademica: uniqueList(dadosLattes?.formacao_academica),
+    formacaoComplementar: uniqueList(dadosLattes?.formacao_complementar),
+    atuacaoProfissional: uniqueList(dadosLattes?.atuacao_profissional),
+    areasAtuacao: uniqueList([dadosLattes?.areas_atuacao, dadosEspelho?.areas_atuacao]),
+    linhasPesquisaLattes: uniqueList([
+      dadosLattes?.linhas_pesquisa_lattes,
+      dadosEspelho?.linhas_pesquisa?.map((linha) => linha.linha_pesquisa || linha.nome),
+    ]),
+    projetosPesquisa: uniqueList([
+      dadosLattes?.projetos_pesquisa,
+      dadosLattes?.projetos_extensao,
+      dadosLattes?.projetos_desenvolvimento,
+    ]),
+    producoesBibliograficas: uniqueList([
+      dadosLattes?.producoes_bibliograficas,
+      dadosLattes?.artigos_publicados,
+      dadosLattes?.capitulos_livros,
+      dadosLattes?.trabalhos_eventos,
+    ]),
+    producoesTecnicas: uniqueList(dadosLattes?.producoes_tecnicas),
+    orientacoes: uniqueList([
+      dadosLattes?.orientacoes,
+      dadosLattes?.orientacoes_concluidas,
+      dadosLattes?.orientacoes_em_andamento,
+    ]),
+    bancas: uniqueList(dadosLattes?.bancas),
+    eventos: uniqueList(dadosLattes?.eventos),
+    educacaoPopularizacao: uniqueList(dadosLattes?.educacao_popularizacao),
+    gruposDgp: normalizeObjectList(dadosEspelho?.grupos_pesquisa, [
+      "nome",
+      "instituicao",
+      "perfil",
+    ]),
+    estudantesOrientados: normalizeObjectList(dadosEspelho?.estudantes_orientados, [
+      "nome",
+      "nivel_treinamento",
+      "grupo_pesquisa",
+    ]),
+    gruposEgresso: normalizeObjectList(dadosEspelho?.grupos_egresso, [
+      "nome",
+      "instituicao",
+    ]),
+    bolsistaCnpq: dadosEspelho?.bolsista_cnpq || "",
+    homepage: dadosEspelho?.homepage || "",
+    indicadoresProducaoDisponiveis: Boolean(dadosEspelho?.indicadores_producao_disponiveis),
+  };
+}
+
 export function normalizarMembroPublico(membro = {}, index = 0) {
   const linhasPesquisa = Array.isArray(membro.linhas_pesquisa)
     ? membro.linhas_pesquisa
@@ -34,6 +146,7 @@ export function normalizarMembroPublico(membro = {}, index = 0) {
     ? membro.grupos_pesquisa
     : [];
   const dadosLattes = parseDadosLattes(membro.dados_lattes);
+  const detalhesLattes = normalizeLattesDetails(dadosLattes);
 
   return {
     id: membro.id || `${membro.nome}-${index}`,
@@ -46,7 +159,7 @@ export function normalizarMembroPublico(membro = {}, index = 0) {
     linhasPesquisa,
     gruposPesquisa,
     areaPrincipal: linhasPesquisa[0] || gruposPesquisa[0] || "Sem linha vinculada",
-    imagem: membro.imagem_url || membro.imagem || getMemberImage(index),
+    imagem: resolveMemberImage(membro, index),
     lattesUrl: membro.lattes_url || dadosLattes?.lattes_url || "",
     espelhoUrl: membro.espelho_url || "",
     idLattes: membro.id_lattes || dadosLattes?.id_lattes || "",
@@ -56,6 +169,7 @@ export function normalizarMembroPublico(membro = {}, index = 0) {
     instituicao: membro.instituicao || "",
     cargo: membro.cargo || "",
     resumo: dadosLattes?.resumo_lattes || "",
+    detalhesLattes,
     dadosLattes,
   };
 }

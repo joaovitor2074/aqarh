@@ -365,6 +365,26 @@
   background: #e5e7eb;
 }
 
+.imagePreviewInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.imagePreviewInfo span {
+  overflow-wrap: anywhere;
+}
+
+.removeImageNotice {
+  display: block;
+  margin-top: 0.5rem;
+  color: #92400e;
+  font-size: 0.82rem;
+}
+
 .checkboxLabel {
   display: flex;
   align-items: center;

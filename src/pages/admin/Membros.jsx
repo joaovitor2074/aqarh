@@ -27,6 +27,10 @@ import {
   FaUniversity,
 } from "react-icons/fa"
 
+function isImageFile(value) {
+  return typeof File !== "undefined" && value instanceof File
+}
+
 export default function Membros() {
   // ── Estados principais ──
   const [membros, setMembros] = useState([])
@@ -62,8 +66,10 @@ export default function Membros() {
     cargo: "",
     imagem: null,
     imagem_url: "",
+    remover_imagem: false,
   })
   const [imagemPreviewUrl, setImagemPreviewUrl] = useState("")
+  const [imageInputKey, setImageInputKey] = useState(0)
 
   // ────────────────────────────────────────
   // Busca de dados
@@ -118,7 +124,12 @@ export default function Membros() {
   }, [buscarMembros])
 
   useEffect(() => {
-    if (typeof File !== "undefined" && form.imagem instanceof File) {
+    if (form.remover_imagem) {
+      setImagemPreviewUrl("")
+      return undefined
+    }
+
+    if (isImageFile(form.imagem)) {
       const previewUrl = URL.createObjectURL(form.imagem)
       setImagemPreviewUrl(previewUrl)
       return () => URL.revokeObjectURL(previewUrl)
@@ -126,7 +137,7 @@ export default function Membros() {
 
     setImagemPreviewUrl(form.imagem_url || "")
     return undefined
-  }, [form.imagem, form.imagem_url])
+  }, [form.imagem, form.imagem_url, form.remover_imagem])
 
   // ────────────────────────────────────────
   // Handlers do formulário
@@ -143,6 +154,7 @@ export default function Membros() {
       setForm((prev) => ({
         ...prev,
         imagem: files?.[0] || null,
+        remover_imagem: false,
       }))
       return
     }
@@ -167,8 +179,9 @@ export default function Membros() {
     payload.append("orcid", form.orcid || "")
     payload.append("instituicao", form.instituicao || "")
     payload.append("cargo", form.cargo || "")
+    payload.append("remover_imagem", form.remover_imagem ? "1" : "0")
 
-    if (typeof File !== "undefined" && form.imagem instanceof File) {
+    if (isImageFile(form.imagem)) {
       payload.append("imagem", form.imagem)
     }
 
@@ -190,7 +203,9 @@ export default function Membros() {
       cargo: "",
       imagem: null,
       imagem_url: "",
+      remover_imagem: false,
     })
+    setImageInputKey((prev) => prev + 1)
   }
 
   const handleSubmit = async (e) => {
@@ -231,8 +246,30 @@ export default function Membros() {
       cargo: membro.cargo || "",
       imagem: null,
       imagem_url: membro.imagem_url || "",
+      remover_imagem: false,
     })
+    setImageInputKey((prev) => prev + 1)
     setModalOpen(true)
+  }
+
+  const handleRemoveImage = () => {
+    setForm((prev) => {
+      if (isImageFile(prev.imagem)) {
+        return {
+          ...prev,
+          imagem: null,
+          remover_imagem: false,
+        }
+      }
+
+      return {
+        ...prev,
+        imagem: null,
+        imagem_url: "",
+        remover_imagem: Boolean(editing && prev.imagem_url),
+      }
+    })
+    setImageInputKey((prev) => prev + 1)
   }
 
   const handleDelete = async (id) => {
@@ -263,6 +300,8 @@ export default function Membros() {
     setMembroEmail(membro)
     setEmailModalOpen(true)
   }
+
+  const hasSelectedImage = isImageFile(form.imagem)
 
   // ────────────────────────────────────────
   // Render
@@ -578,6 +617,7 @@ export default function Membros() {
 
             <FormGroup label="Foto do membro">
               <Input
+                key={imageInputKey}
                 name="imagem"
                 type="file"
                 accept="image/*"
@@ -592,12 +632,26 @@ export default function Membros() {
                     src={imagemPreviewUrl}
                     alt=""
                   />
-                  <span>
-                    {typeof File !== "undefined" && form.imagem instanceof File
-                      ? form.imagem.name
-                      : "Imagem atual cadastrada"}
-                  </span>
+                  <div className={styles.imagePreviewInfo}>
+                    <span>
+                      {hasSelectedImage
+                        ? form.imagem.name
+                        : "Imagem atual cadastrada"}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveImage}
+                    >
+                      <FaTrash /> {hasSelectedImage ? "Limpar selecao" : "Remover foto"}
+                    </Button>
+                  </div>
                 </div>
+              )}
+              {form.remover_imagem && (
+                <small className={styles.removeImageNotice}>
+                  A foto atual sera removida quando salvar este membro.
+                </small>
               )}
             </FormGroup>
 
