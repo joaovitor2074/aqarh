@@ -27,3 +27,6 @@ dist-ssr
 .env*.local
 .env
 backend/.env
+
+# Browser automation artifacts
+tests/perfil-chrome/
