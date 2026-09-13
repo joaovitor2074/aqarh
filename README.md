@@ -447,7 +447,7 @@ Esse modelo garante **segurança, confiabilidade e legitimidade institucional**.
 
 ## 🎓 Contexto Acadêmico
 
-O GIEPI é um projeto acadêmico com foco em:
+O AQARH é um projeto acadêmico com foco em:
 
 * Divulgação científica
 * Transparência institucional
@@ -460,8 +460,8 @@ O sistema foi pensado para ser **escalável**, podendo futuramente atender outro
 
 ## 🚀 Considerações Finais
 
-O GIEPI não é apenas um sistema de scraping, mas uma **plataforma institucional de gestão e divulgação científica**, unindo tecnologia, organização e comunicação acadêmica.
+O AQARH não é apenas um sistema de scraping, mas uma **plataforma institucional de gestão e divulgação científica**, unindo tecnologia, organização e comunicação acadêmica.
 
 ---
 
-📄 *Este README faz parte da documentação oficial do projeto GIEPI.*
+📄 *Este README faz parte da documentação oficial do projeto AQARH.*

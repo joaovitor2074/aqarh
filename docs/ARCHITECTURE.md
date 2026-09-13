@@ -1,10 +1,10 @@
-# Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI
+# Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- AQARH
 
 ## 📌 Visão Geral
 
-O **Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI** é um sistema web desenvolvido com o objetivo de **dar visibilidade, transparência e organização** às atividades de um grupo de pesquisa acadêmico. O projeto surgiu a partir da necessidade de centralizar informações que antes ficavam restritas a plataformas consideradas pouco acessíveis ao público geral, como o Lattes.
+O **Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- AQARH** é um sistema web desenvolvido com o objetivo de **dar visibilidade, transparência e organização** às atividades de um grupo de pesquisa acadêmico. O projeto surgiu a partir da necessidade de centralizar informações que antes ficavam restritas a plataformas consideradas pouco acessíveis ao público geral, como o Lattes.
 
-Atualmente, grande parte das produções, linhas de pesquisa e atualizações dos pesquisadores só eram visíveis individualmente em seus currículos. O GIEPI resolve esse problema ao **centralizar, organizar e publicar essas informações de forma institucional**, com controle administrativo.
+Atualmente, grande parte das produções, linhas de pesquisa e atualizações dos pesquisadores só eram visíveis individualmente em seus currículos. O AQARH resolve esse problema ao **centralizar, organizar e publicar essas informações de forma institucional**, com controle administrativo.
 
 ---
 
@@ -20,7 +20,7 @@ Atualmente, grande parte das produções, linhas de pesquisa e atualizações do
 
 ## 💡 Solução Proposta
 
-O GIEPI automatiza a coleta de dados acadêmicos do grupo de pesquisa, organiza essas informações em um banco de dados próprio e permite que apenas conteúdos **validados por um administrador** sejam publicados para o público.
+O AQARH automatiza a coleta de dados acadêmicos do grupo de pesquisa, organiza essas informações em um banco de dados próprio e permite que apenas conteúdos **validados por um administrador** sejam publicados para o público.
 
 O sistema atua como uma ponte entre os dados acadêmicos e a divulgação científica institucional.
 
@@ -71,7 +71,7 @@ O administrador pode:
 A organização do projeto foi pensada para garantir **clareza, escalabilidade e separação de responsabilidades** entre backend, front-end e recursos públicos.
 
 ```
-/giepi
+/AQARH
  ├─ backend/
  │   ├─ src/
  │   │   ├─ config/        # Configurações (DB, env, e-mail)
@@ -102,7 +102,7 @@ Essa estrutura facilita a manutenção do sistema e permite sua evolução para 
 
 ## 🧠 Documentação do Backend
 
-O backend do GIEPI é responsável por **coletar, processar, validar, armazenar e publicar** as informações do grupo de pesquisa, garantindo controle administrativo e integridade dos dados.
+O backend do AQARH é responsável por **coletar, processar, validar, armazenar e publicar** as informações do grupo de pesquisa, garantindo controle administrativo e integridade dos dados.
 
 Ele foi desenvolvido seguindo boas práticas de separação de responsabilidades, utilizando uma arquitetura baseada em **controllers**, **services** e **rotas**.
 
@@ -166,7 +166,7 @@ Exemplos de responsabilidades:
 
 ### 🧠 Services (Regras de Negócio)
 
-Os **services** concentram toda a lógica central do GIEPI. Eles são responsáveis por transformar dados brutos em informações institucionais confiáveis, sempre respeitando o fluxo de validação administrativa.
+Os **services** concentram toda a lógica central do AQARH. Eles são responsáveis por transformar dados brutos em informações institucionais confiáveis, sempre respeitando o fluxo de validação administrativa.
 
 Essa camada é o núcleo do sistema e garante **consistência, rastreabilidade e governança dos dados**.
 
@@ -241,14 +241,14 @@ A separação entre scraping, comparação, notificação e publicação garante
 * o administrador tenha controle total
 * o sistema mantenha integridade e confiabilidade
 
-Essa abordagem diferencia o GIEPI de soluções automatizadas sem controle humano.
+Essa abordagem diferencia o AQARH de soluções automatizadas sem controle humano.
 
 ---
 ---
 
 ## 🗄️ Documentação do Banco de Dados (MySQL)
 
-O banco de dados do GIEPI foi modelado utilizando o **MySQL**, com foco em **estrutura relacional**, **integridade dos dados** e **rastreabilidade das alterações**.
+O banco de dados do AQARH foi modelado utilizando o **MySQL**, com foco em **estrutura relacional**, **integridade dos dados** e **rastreabilidade das alterações**.
 
 A escolha por um banco relacional se deve à necessidade de:
 
@@ -346,7 +346,7 @@ O banco de dados foi projetado para:
 * preservar histórico de alterações
 * permitir auditoria das decisões administrativas
 
-Essa estrutura garante **segurança, transparência e confiabilidade** ao GIEPI.
+Essa estrutura garante **segurança, transparência e confiabilidade** ao AQARH.
 
 ---
 
@@ -447,7 +447,7 @@ Esse modelo garante **segurança, confiabilidade e legitimidade institucional**.
 
 ## 🎓 Contexto Acadêmico
 
-O GIEPI é um projeto acadêmico com foco em:
+O AQARH é um projeto acadêmico com foco em:
 
 * Divulgação científica
 * Transparência institucional
@@ -460,8 +460,8 @@ O sistema foi pensado para ser **escalável**, podendo futuramente atender outro
 
 ## 🚀 Considerações Finais
 
-O GIEPI não é apenas um sistema de scraping, mas uma **plataforma institucional de gestão e divulgação científica**, unindo tecnologia, organização e comunicação acadêmica.
+O AQARH não é apenas um sistema de scraping, mas uma **plataforma institucional de gestão e divulgação científica**, unindo tecnologia, organização e comunicação acadêmica.
 
 ---
 
-📄 *Este README faz parte da documentação oficial do projeto GIEPI.*
+📄 *Este README faz parte da documentação oficial do projeto AQARH.*
