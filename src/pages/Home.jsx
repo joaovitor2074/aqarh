@@ -121,7 +121,7 @@ export default function Home() {
               <img src="/img/logoGIEPI.png" alt="" className="hero-logo" />
               <span className="hero-kicker">IFMA Campus Codó</span>
             </div>
-            <h1 className="hero-title">Grupo Interdisciplinar em Ensino, Pesquisa e Inovação</h1>
+            <h1 className="hero-title">Avaliação da Qualidade de Alimentos e Recursos Hídricos</h1>
             <p className="hero-subtitle">
               Pesquisa aplicada, formação científica e projetos de inovação voltados ao
               desenvolvimento regional.

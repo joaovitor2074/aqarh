@@ -1,8 +1,8 @@
-# Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- AQARH
+# Avaliação da Qualidade de Alimentos e Recursos Hídricos- AQARH
 
 ## 📌 Visão Geral
 
-O **Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- AQARH** é um sistema web desenvolvido com o objetivo de **dar visibilidade, transparência e organização** às atividades de um grupo de pesquisa acadêmico. O projeto surgiu a partir da necessidade de centralizar informações que antes ficavam restritas a plataformas consideradas pouco acessíveis ao público geral, como o Lattes.
+O **Avaliação da Qualidade de Alimentos e Recursos Hídricos- AQARH** é um sistema web desenvolvido com o objetivo de **dar visibilidade, transparência e organização** às atividades de um grupo de pesquisa acadêmico. O projeto surgiu a partir da necessidade de centralizar informações que antes ficavam restritas a plataformas consideradas pouco acessíveis ao público geral, como o Lattes.
 
 Atualmente, grande parte das produções, linhas de pesquisa e atualizações dos pesquisadores só eram visíveis individualmente em seus currículos. O AQARH resolve esse problema ao **centralizar, organizar e publicar essas informações de forma institucional**, com controle administrativo.
 

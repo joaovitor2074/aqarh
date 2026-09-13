@@ -54,7 +54,7 @@ export default function Sobre() {
           <span className={styles.kicker}>Sobre o AQARH</span>
           <h1>Ensino, pesquisa e inovação com compromisso institucional.</h1>
           <p>
-            O Grupo Interdisciplinar em Ensino, Pesquisa e Inovação articula
+            O Avaliação da Qualidade de Alimentos e Recursos Hídricos articula
             pessoas, projetos e linhas de pesquisa para fortalecer a produção
             acadêmica no IFMA Campus Codó.
           </p>

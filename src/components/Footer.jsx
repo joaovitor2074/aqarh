@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-col footer-brand">
           <h3>AQARH</h3>
-          <p>Grupo Interdisciplinar em Ensino, Pesquisa e Inovação.</p>
+          <p>Avaliação da Qualidade de Alimentos e Recursos Hídricos.</p>
           <p>Instituto Federal do Maranhão - Campus Codó.</p>
         </div>
 
