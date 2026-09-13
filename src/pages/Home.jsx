@@ -118,7 +118,7 @@ export default function Home() {
         <div className="hero-content">
           <div className="hero-text">
             <div className="hero-brand" aria-label="AQARH">
-              <img src="/img/header.png" alt="" className="hero-logo" />
+              <img src="/img/logoGIEPI.png" alt="" className="hero-logo" />
               <span className="hero-kicker">IFMA Campus Codó</span>
             </div>
             <h1 className="hero-title">Grupo Interdisciplinar em Ensino, Pesquisa e Inovação</h1>
