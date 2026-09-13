@@ -45,7 +45,7 @@ export default function Login() {
             </div>
 
             <div>
-              <span>GIEPI</span>
+              <span>AQARH</span>
               <strong>Painel institucional</strong>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function Login() {
         </div>
 
         <aside className={styles.infoPanel} aria-label="Resumo institucional">
-          <span className={styles.infoKicker}>Sistema GIEPI</span>
+          <span className={styles.infoKicker}>Sistema AQARH</span>
           <h2>Gestao academica integrada.</h2>
 
           <div className={styles.infoGrid}>

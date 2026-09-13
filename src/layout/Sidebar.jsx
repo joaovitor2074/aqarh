@@ -42,7 +42,7 @@ export default function Sidebar() {
         </div>
 
         <div className={styles.brandText}>
-          <strong>GIEPI</strong>
+          <strong>AQARH</strong>
           <span>IFMA | Campus Codo</span>
         </div>
       </div>

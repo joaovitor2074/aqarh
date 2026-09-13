@@ -117,7 +117,7 @@ export default function Home() {
 
         <div className="hero-content">
           <div className="hero-text">
-            <div className="hero-brand" aria-label="GIEPI">
+            <div className="hero-brand" aria-label="AQARH">
               <img src="/img/header.png" alt="" className="hero-logo" />
               <span className="hero-kicker">IFMA Campus Codó</span>
             </div>
@@ -128,7 +128,7 @@ export default function Home() {
             </p>
             <div className="hero-buttons">
               <a href="/sobre" className="btn btn-primary">
-                <FaFlask /> Conhecer o GIEPI
+                <FaFlask /> Conhecer o AQARH
               </a>
               <a href="/projetos" className="btn btn-outline">
                 <FaProjectDiagram /> Ver projetos
@@ -175,7 +175,7 @@ export default function Home() {
           <div className="section-header">
             <h2 className="section-title">Pesquisa com compromisso institucional</h2>
             <p className="section-subtitle">
-              O GIEPI articula ensino, pesquisa, inovação e extensão para produzir
+              O AQARH articula ensino, pesquisa, inovação e extensão para produzir
               conhecimento útil ao território.
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function Home() {
                 aproximam ciência, tecnologia e demandas sociais.
               </p>
               <p>
-                A produção do GIEPI busca fortalecer a formação acadêmica, apoiar
+                A produção do AQARH busca fortalecer a formação acadêmica, apoiar
                 iniciativas institucionais e ampliar o impacto da pesquisa no Maranhão.
               </p>
               <div className="sobre-actions">
@@ -247,7 +247,7 @@ export default function Home() {
               <div className="image-frame">
                 <img src="/img/microscopiopaisagem1.jpeg" alt="Laboratório de pesquisa do IFMA" />
                 <div className="image-badge">
-                  <span>GIEPI</span>
+                  <span>AQARH</span>
                   <strong>Ensino, pesquisa e inovação</strong>
                 </div>
               </div>
@@ -330,7 +330,7 @@ export default function Home() {
             <span className="section-tag">Projetos</span>
             <h2 className="section-title">Projetos em destaque</h2>
             <p className="section-subtitle">
-              Uma visão objetiva das frentes de trabalho do GIEPI.
+              Uma visão objetiva das frentes de trabalho do AQARH.
             </p>
           </div>
 
@@ -394,7 +394,7 @@ export default function Home() {
             <h2>Conheça a equipe e a produção do grupo</h2>
             <p>
               Acompanhe projetos, linhas de pesquisa e publicações desenvolvidas no
-              âmbito do GIEPI.
+              âmbito do AQARH.
             </p>
             <div className="cta-buttons">
               <a href="/equipe" className="btn btn-primary btn-large">

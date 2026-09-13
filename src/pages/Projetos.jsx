@@ -165,7 +165,7 @@ export default function Projetos() {
               Projetos <span className={styles.highlight}>Cientificos</span>
             </h1>
             <p className={styles.heroDescription}>
-              Projetos cadastrados no sistema do GIEPI, com dados vindos diretamente do
+              Projetos cadastrados no sistema do AQARH, com dados vindos diretamente do
               backend administrativo.
             </p>
 

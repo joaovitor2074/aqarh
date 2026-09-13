@@ -1,7 +1,7 @@
 {
-  "name": "giepi-backend",
+  "name": "AQARH-backend",
   "version": "1.0.0",
-  "description": "Backend do projeto GIEPI com Node.js, Express e MySQL",
+  "description": "Backend do projeto AQARH com Node.js, Express e MySQL",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

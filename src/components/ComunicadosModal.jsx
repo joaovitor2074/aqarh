@@ -241,7 +241,7 @@ export default function ComunicadosModal() {
             <div className={styles.tipoContainer}>
               <span className={styles.tipoIcon}>{getTipoIcon(comunicado.tipo)}</span>
               <div className={styles.tipoText}>
-                <span className={styles.headerEyebrow}>Comunicado GIEPI</span>
+                <span className={styles.headerEyebrow}>Comunicado AQARH</span>
                 <span className={styles.tipoLabel}>
                   {getTipoLabel(comunicado.tipo)}
                 </span>

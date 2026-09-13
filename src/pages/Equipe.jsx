@@ -545,7 +545,7 @@ export default function Equipe() {
               Nossa <span className={styles.highlight}>Equipe</span>
             </h1>
             <p className={styles.heroDescription}>
-              Conheça os pesquisadores, estudantes e colaboradores cadastrados no GIEPI.
+              Conheça os pesquisadores, estudantes e colaboradores cadastrados no AQARH.
             </p>
             <div className={styles.heroStats}>
               <div className={styles.statItem}>

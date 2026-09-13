@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-col footer-brand">
-          <h3>GIEPI</h3>
+          <h3>AQARH</h3>
           <p>Grupo Interdisciplinar em Ensino, Pesquisa e Inovação.</p>
           <p>Instituto Federal do Maranhão - Campus Codó.</p>
         </div>
@@ -30,7 +30,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2026 GIEPI - IFMA Campus Codó</p>
+        <p>© 2026 AQARH - IFMA Campus Codó</p>
         <p>Portal acadêmico do grupo de pesquisa.</p>
       </div>
     </footer>

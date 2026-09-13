@@ -100,11 +100,11 @@ export default function Pesquisas() {
               <span>Linhas de Pesquisa</span>
             </div>
             <h1 className={styles.heroTitle}>
-              Pesquisas do <span className={styles.highlight}>GIEPI</span>
+              Pesquisas do <span className={styles.highlight}>AQARH</span>
             </h1>
             <p className={styles.heroDescription}>
               Linhas reais cadastradas no banco de dados, com grupos e pesquisadores
-              vinculados ao cadastro do GIEPI.
+              vinculados ao cadastro do AQARH.
             </p>
 
             <div className={styles.heroStats}>
@@ -315,7 +315,7 @@ export default function Pesquisas() {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaContent}>
-            <h2>Quer conhecer quem pesquisa no GIEPI?</h2>
+            <h2>Quer conhecer quem pesquisa no AQARH?</h2>
             <p>
               A equipe pública reúne os pesquisadores, estudantes e colaboradores cadastrados
               no sistema.

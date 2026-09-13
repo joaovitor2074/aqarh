@@ -19,12 +19,12 @@ function LogoMark({ className = "" }) {
       {!logoError ? (
         <img
           src="/img/logohead.png"
-          alt="GIEPI"
+          alt="AQARH"
           className={styles.logo}
           onError={() => setLogoError(true)}
         />
       ) : (
-        <span className={styles.logoFallback} aria-label="GIEPI">
+        <span className={styles.logoFallback} aria-label="AQARH">
           G
         </span>
       )}
@@ -62,7 +62,7 @@ export default function Header() {
           <Link to="/" className={styles.logoContainer} onClick={() => setOpen(false)}>
             <LogoMark />
             <div className={styles.logoText}>
-              <span className={styles.logoMain}>GIEPI</span>
+              <span className={styles.logoMain}>AQARH</span>
               <span className={styles.logoSubtitle}>IFMA Campus Codó</span>
             </div>
           </Link>
@@ -111,7 +111,7 @@ export default function Header() {
           <div className={styles.mobileLogo}>
             <LogoMark className={styles.mobileLogoImg} />
             <div>
-              <span className={styles.mobileLogoText}>GIEPI</span>
+              <span className={styles.mobileLogoText}>AQARH</span>
               <span className={styles.mobileLogoSub}>IFMA Campus Codó</span>
             </div>
           </div>

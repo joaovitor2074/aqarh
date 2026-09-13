@@ -270,7 +270,7 @@ export default function Dashboard() {
             <h1 className={styles.title}>Painel de acompanhamento institucional</h1>
             <p className={styles.subtitle}>
               Indicadores consolidados de membros, pesquisa, comunicados e atualizacoes
-              automatizadas do GIEPI.
+              automatizadas do AQARH.
             </p>
 
             <div className={styles.headerMeta}>

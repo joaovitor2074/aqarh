@@ -51,7 +51,7 @@ export default function Sobre() {
         />
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <span className={styles.kicker}>Sobre o GIEPI</span>
+          <span className={styles.kicker}>Sobre o AQARH</span>
           <h1>Ensino, pesquisa e inovação com compromisso institucional.</h1>
           <p>
             O Grupo Interdisciplinar em Ensino, Pesquisa e Inovação articula
@@ -76,7 +76,7 @@ export default function Sobre() {
               <span className={styles.sectionTag}>Identidade</span>
               <h2>Um grupo feito para conectar conhecimento e prática.</h2>
               <p>
-                O GIEPI reúne docentes, estudantes e colaboradores em um ambiente
+                O AQARH reúne docentes, estudantes e colaboradores em um ambiente
                 de pesquisa interdisciplinar. A proposta é aproximar ensino,
                 ciência, tecnologia e extensão, criando caminhos para que a
                 produção acadêmica dialogue com necessidades concretas.
@@ -151,7 +151,7 @@ export default function Sobre() {
               <span className={styles.sectionTag}>Método</span>
               <h2>Da demanda ao resultado publicado.</h2>
               <p>
-                O GIEPI organiza suas frentes de trabalho para que cada etapa seja
+                O AQARH organiza suas frentes de trabalho para que cada etapa seja
                 acompanhada, registrada e transformada em evidência acadêmica.
               </p>
             </div>
@@ -171,7 +171,7 @@ export default function Sobre() {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaContent}>
-            <h2>Explore as frentes de trabalho do GIEPI.</h2>
+            <h2>Explore as frentes de trabalho do AQARH.</h2>
             <p>
               Veja as linhas de pesquisa, os projetos publicados e a equipe que
               sustenta a produção científica do grupo.

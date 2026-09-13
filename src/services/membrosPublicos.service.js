@@ -150,7 +150,7 @@ export function normalizarMembroPublico(membro = {}, index = 0) {
 
   return {
     id: membro.id || `${membro.nome}-${index}`,
-    nome: membro.nome || "Membro do GIEPI",
+    nome: membro.nome || "Membro do AQARH",
     email: membro.email || "",
     ativo: membro.ativo !== false && membro.ativo !== 0,
     tipoVinculo: membro.tipo_vinculo || "pesquisador",

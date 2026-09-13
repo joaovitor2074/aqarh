@@ -47,7 +47,7 @@ export default function Publicacoes() {
       category: "Relatório Técnico",
       image: getLinhaImage(["feira de ciencias", "educacao", "ensino"], 2),
       excerpt: "Documentação completa dos projetos apresentados na Feira de Ciências do IFMA Campus Codó.",
-      authors: ["GIEPI"],
+      authors: ["AQARH"],
       journal: "IFMA",
       year: 2023,
       volume: null,
@@ -140,7 +140,7 @@ export default function Publicacoes() {
               Publicações <span className={styles.highlight}>Científicas</span>
             </h1>
             <p className={styles.heroDescription}>
-              Artigos, relatórios e documentos produzidos pelo Grupo GIEPI — IFMA Campus Codó.
+              Artigos, relatórios e documentos produzidos pelo Grupo AQARH — IFMA Campus Codó.
               Conheça nossa produção científica e contribuições para o avanço do conhecimento.
             </p>
             

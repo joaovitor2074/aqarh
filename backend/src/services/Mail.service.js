@@ -4,7 +4,7 @@
 import nodemailer from "nodemailer";
 
 const EMAIL_BRAND_NAME =
-  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - GIEPI";
+  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - AQARH";
 const EMAIL_BACKGROUND_IMAGE_PATH = "/img/email/imagem-fundo-email.png";
 const DEFAULT_SITE_URL = "https://aqarh.vercel.app";
 
@@ -149,7 +149,7 @@ function montarHTML({ assunto, corpo, remetente = EMAIL_BRAND_NAME }) {
                 ${remetenteSeguro}
               </p>
               <p style="margin:12px 0 0;color:#63746a;font-size:12px;line-height:1.55;">
-                Este email foi enviado automaticamente pelo sistema GIEPI.
+                Este email foi enviado automaticamente pelo sistema AQARH.
               </p>
             </td>
           </tr>
@@ -185,7 +185,7 @@ export async function enviarEmail({ para, assunto, corpo, nomeDestinatario }) {
   const info = await transporter.sendMail({
     from:
       process.env.MAIL_FROM ||
-      `"${EMAIL_BRAND_NAME}" <no-reply@giepi.ifma.edu.br>`,
+      `"${EMAIL_BRAND_NAME}" <no-reply@AQARH.ifma.edu.br>`,
     to: para,
     subject: assunto,
     text: corpoFinal,

@@ -7,7 +7,7 @@ import styles from "../styles/adminLayout.module.css";
 const pageMeta = {
   "/admin/dashboard": {
     title: "Painel institucional",
-    description: "Indicadores de gestao, pesquisa e comunicacao do GIEPI.",
+    description: "Indicadores de gestao, pesquisa e comunicacao do AQARH.",
   },
   "/admin/membros": {
     title: "Membros",
@@ -74,7 +74,7 @@ export default function Topbar() {
 
         <div className={styles.userPill}>
           <span>
-            {configuracoesGerais?.nomeSistema || "Gestao GIEPI"}
+            {configuracoesGerais?.nomeSistema || "Gestao AQARH"}
           </span>
           <div className={styles.userAvatar} aria-hidden="true">
             <ShieldCheck size={18} />

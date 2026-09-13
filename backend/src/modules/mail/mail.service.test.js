@@ -9,7 +9,7 @@ import {
 } from "./mail.service.js";
 
 const EMAIL_BRAND_NAME =
-  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - GIEPI";
+  "Grupo Interdisciplinar em Ensino, Pesquisa e Inova\u00e7\u00e3o - AQARH";
 
 const MAIL_KEYS = [
   "MAIL_ENV",
@@ -235,14 +235,14 @@ test("configura Resend para envio HTTPS no Railway", () => {
     {
       MAIL_ENV: "resend",
       RESEND_API_KEY: "re_123",
-      RESEND_FROM: "GIEPI <contato@example.com>",
+      RESEND_FROM: "AQARH <contato@example.com>",
     },
     () => {
       const config = obterConfiguracaoEmail();
 
       assert.equal(config.provider, "resend");
       assert.equal(config.apiKey, "re_123");
-      assert.equal(config.from, "GIEPI <contato@example.com>");
+      assert.equal(config.from, "AQARH <contato@example.com>");
       assert.equal(config.transport, undefined);
     }
   );
@@ -252,7 +252,7 @@ test("prioriza Resend quando MAIL_ENV não foi definida", () => {
   comAmbiente(
     {
       RESEND_API_KEY: "re_123",
-      RESEND_FROM: "GIEPI <contato@example.com>",
+      RESEND_FROM: "AQARH <contato@example.com>",
       GMAIL_USER: "conta@example.com",
       GMAIL_APP_PASSWORD: "abcdefghijklmnop",
     },
@@ -267,14 +267,14 @@ test("configura SendGrid para envio HTTPS com remetente verificado", () => {
     {
       MAIL_ENV: "sendgrid",
       SENDGRID_API_KEY: "SG.123",
-      SENDGRID_FROM: "GIEPI <conta@gmail.com>",
+      SENDGRID_FROM: "AQARH <conta@gmail.com>",
     },
     () => {
       const config = obterConfiguracaoEmail();
 
       assert.equal(config.provider, "sendgrid");
       assert.equal(config.apiKey, "SG.123");
-      assert.equal(config.from, "GIEPI <conta@gmail.com>");
+      assert.equal(config.from, "AQARH <conta@gmail.com>");
       assert.equal(config.transport, undefined);
     }
   );

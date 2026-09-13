@@ -101,7 +101,7 @@ export async function obterLinhasDePessoa(nome, tipo = 'pesquisador') {
   
   return linhas.map(linha => ({
     linha_pesquisa: linha.linha_pesquisa?.trim() || linha.nome?.trim() || '',
-    grupo: linha.grupo?.trim() || 'Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- GIEPI'
+    grupo: linha.grupo?.trim() || 'Grupo Interdisciplinar em Ensino, Pesquisa e Inovação- AQARH'
   })).filter(linha => linha.linha_pesquisa);
 }
 
